@@ -64,6 +64,7 @@ class RAM
     CONSTANT
 
     puts value.chomp
+    integer
   end
 
   def push(value)
