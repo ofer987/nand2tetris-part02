@@ -30,7 +30,7 @@ class Stack
     array << value
 
     # binding.pry
-    @index += 1
+    self.index += 1
   end
 
   def pop
@@ -39,7 +39,7 @@ class Stack
     raise "cannot pop index below #{STACK_START_RAM_INDEX}" if index.negative?
 
     # binding.pry
-    @index -= 1
+    self.index -= 1
 
     value
   end
