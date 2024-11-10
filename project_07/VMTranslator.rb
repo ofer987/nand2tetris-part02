@@ -28,8 +28,8 @@ def parse(ram, line)
   end
 end
 
-File.readlines(path).each do |line|
-  parse(ram, line)
-end
+File.readlines(path)
+  .map(&:chomp)
+  .each { |line| parse(ram, line) }
 
 exit 0
