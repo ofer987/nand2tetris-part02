@@ -96,7 +96,22 @@ class RAM
     second_value = decrement_stack
     puts operation.chomp
 
+    is_equal_operation = <<~EQUALITY
+      @IS_EQUAL
+      D;JEQ
+
+      (IS_NOT_EQUAL)
+      D=0
+      0;JMP
+
+      (IS_EQUAL)
+      D=-1
+      0:JMP
+    EQUALITY
+
     is_equal = <<~EQUALITY
+      @EQUALITY
+      0;JMP
       // Value is 0 if not equal
       A=0
 
