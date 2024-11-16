@@ -102,10 +102,15 @@ class RAM
 
       (IS_NOT_EQUAL)
       D=0
+
+      @#{Stack::STACK_ADDRESS_LOCATION}
+      A=M
       0;JMP
 
       (IS_EQUAL)
       D=-1
+      @#{Stack::STACK_ADDRESS_LOCATION}
+      A=M
       0:JMP
     EQUALITY
 
