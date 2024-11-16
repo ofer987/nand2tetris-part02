@@ -63,6 +63,21 @@ class RAM
     push(first_value + second_value)
   end
 
+  def sub
+    reset_to_zero = <<~RESET
+      D=0
+    RESET
+    puts reset_to_zero.chomp
+
+    first_value = decrement_stack
+    puts sub_operation.chomp
+
+    second_value = decrement_stack
+    puts sub_operation.chomp
+
+    push(second_value - first_value)
+  end
+
   private
 
   def add_operation
@@ -71,6 +86,17 @@ class RAM
       A=M
 
       D=D+M
+    VALUE
+
+    result.chomp
+  end
+
+  def sub_operation
+    result = <<~VALUE
+      @#{Stack::STACK_ADDRESS_LOCATION}
+      A=M
+
+      D=D-M
     VALUE
 
     result.chomp
