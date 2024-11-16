@@ -229,11 +229,16 @@ class RAM
   end
 
   def neg
+    pre_operation = <<~NEGATE
+      @0
+      D=A
+    NEGATE
+    puts pre_operation.chomp
+
     value = decrement_stack
 
     operation = <<~NEGATE
-      @0
-      D=A-M
+      D=D-M
     NEGATE
     puts operation.chomp
 
