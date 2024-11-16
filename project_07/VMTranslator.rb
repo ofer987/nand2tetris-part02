@@ -7,6 +7,13 @@ require_relative './ram'
 CONSTANT_REGEX = /constant (\d+)/
 PUSH_REGEX = /^push (.+)$/
 ADD_REGEX = /^add$/
+SUB_REGEX = /^sub$/
+EQ_REGEX = /^eq$/
+LT_REGEX = /^lt$/
+GT_REGEX = /^gt$/
+NEG_REGEX = /^neg$/
+AND_REGEX = /^and$/
+OR_REGEX = /^or$/
 
 ram = RAM.new
 path = ARGV[0].to_s
@@ -47,6 +54,20 @@ def parse(ram, line)
     ram.constant(result)
   elsif line.match? ADD_REGEX
     ram.add
+  elsif line.match? SUB_REGEX
+    ram.sub
+  elsif line.match? EQ_REGEX
+    ram.eq
+  elsif line.match? LT_REGEX
+    ram.lt
+  elsif line.match? GT_REGEX
+    ram.gt
+  elsif line.match? NEG_REGEX
+    ram.neg
+  elsif line.match? AND_REGEX
+    ram.and
+  elsif line.match? OR_REGEX
+    ram.or
   end
 end
 
