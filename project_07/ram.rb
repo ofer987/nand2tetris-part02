@@ -36,16 +36,18 @@ class RAM
       M=M+1
     COMMAND
     puts increment_stack.chomp
+
+    increment_go_to_counter
   end
 
   def decrement_stack
     pop = <<~POP
-      // Decrement the stack
+      // Decrement the Stack
       @#{Stack::STACK_ADDRESS_LOCATION}
       M=M-1
     POP
-
     puts pop.chomp
+
     stack.pop
   end
 
@@ -61,7 +63,6 @@ class RAM
     second_value = decrement_stack
     puts add_operation.chomp
 
-    increment_go_to_counter
     push(first_value + second_value)
   end
 
@@ -77,134 +78,46 @@ class RAM
     second_value = decrement_stack
     puts sub_operation.chomp
 
-    increment_go_to_counter
     push(second_value - first_value)
   end
 
-  # Return -1 if True
-  # return 0  if False
   def eq
-    reset_to_zero = <<~RESET
-      D=0
-    RESET
-    puts reset_to_zero.chomp
+    asm_binary_operation('JEQ') do |first_value, second_value|
+      result =
+        if second_value < first_value
+          -1
+        else
+          0
+        end
 
-    first_value = decrement_stack
-    operation = <<~EQUALITY
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      D=M-D
-    EQUALITY
-    puts operation.chomp
-
-    second_value = decrement_stack
-    puts operation.chomp
-
-    is_equal = <<~EQUALITY
-      @#{go_to_if_true}
-      D;JEQ
-
-      D=0
-      @#{go_to_end}
-
-      (#{go_to_if_true})
-      D=-1
-      (#{go_to_end})
-    EQUALITY
-
-    puts is_equal.chomp
-    is_equal_in_boolean =
-      if second_value == first_value
-        -1
-      else
-        0
-      end
-    push(is_equal_in_boolean)
-
-    increment_go_to_counter
+      push(result)
+    end
   end
 
-  # Return -1 if True
-  # return 0  if False
   def lt
-    reset_to_zero = <<~RESET
-      D=0
-    RESET
-    puts reset_to_zero.chomp
+    asm_binary_operation('JLT') do |first_value, second_value|
+      result =
+        if second_value < first_value
+          -1
+        else
+          0
+        end
 
-    first_value = decrement_stack
-    operation = <<~EQUALITY
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      D=M-D
-    EQUALITY
-    puts operation.chomp
-
-    second_value = decrement_stack
-    puts operation.chomp
-
-    is_lt = <<~EQUALITY
-      @#{go_to_if_true}
-      D;JLT
-
-      D=0
-      @#{go_to_end}
-
-      (#{go_to_if_true})
-      D=-1
-      (#{go_to_end})
-    EQUALITY
-
-    puts is_lt.chomp
-    is_equal_in_boolean =
-      if second_value < first_value
-        -1
-      else
-        0
-      end
-    push(is_equal_in_boolean)
-
-    increment_go_to_counter
+      push(result)
+    end
   end
 
-  # Return -1 if True
-  # return 0  if False
   def gt
-    reset_to_zero = <<~RESET
-      D=0
-    RESET
-    puts reset_to_zero.chomp
+    asm_binary_operation('JGT') do |first_value, second_value|
+      result =
+        if second_value < first_value
+          -1
+        else
+          0
+        end
 
-    first_value = decrement_stack
-    operation = <<~EQUALITY
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      D=M-D
-    EQUALITY
-    puts operation.chomp
-
-    second_value = decrement_stack
-    puts operation.chomp
-
-    is_gt = <<~EQUALITY
-      @#{go_to_if_true}
-      D;JGT
-
-      D=0
-      @#{go_to_end}
-
-      (#{go_to_if_true})
-      D=-1
-      (#{go_to_end})
-    EQUALITY
-
-    puts is_gt.chomp
-    is_equal_in_boolean =
-      if second_value > first_value
-        -1
-      else
-        0
-      end
-    push(is_equal_in_boolean)
-
-    increment_go_to_counter
+      push(result)
+    end
   end
 
   def and
@@ -220,15 +133,10 @@ class RAM
     puts and_operation.chomp
 
     push(first_value & second_value)
-
-    increment_go_to_counter
   end
 
   def or
-    reset_to_zero = <<~RESET
-      D=0
-    RESET
-    puts reset_to_zero.chomp
+    puts asm_reset_to_zero
 
     first_value = decrement_stack
     puts or_operation.chomp
@@ -237,28 +145,30 @@ class RAM
     puts or_operation.chomp
 
     push(first_value | second_value)
-
-    increment_go_to_counter
   end
 
   def neg
-    pre_operation = <<~NEGATE
-      @0
-      D=A
-    NEGATE
-    puts pre_operation.chomp
-
     value = decrement_stack
-
     operation = <<~NEGATE
-      D=D-M
+      @0
+      D=A-D
     NEGATE
     puts operation.chomp
 
     result = 0 - value
     push(result)
+  end
 
-    increment_go_to_counter
+  def not
+    value = decrement_stack
+    operation = <<~NEGATE
+      @0
+      D=!D
+    NEGATE
+    puts operation.chomp
+
+    result = ~value
+    push(result)
   end
 
   private
@@ -284,7 +194,8 @@ class RAM
       @#{Stack::STACK_ADDRESS_LOCATION}
       A=M
 
-      D=D+M
+      // Add
+      D=M+D
     VALUE
 
     result.chomp
@@ -295,7 +206,8 @@ class RAM
       @#{Stack::STACK_ADDRESS_LOCATION}
       A=M
 
-      D=D-M
+      // Sub
+      D=M-D
     VALUE
 
     result.chomp
@@ -306,7 +218,8 @@ class RAM
       @#{Stack::STACK_ADDRESS_LOCATION}
       A=M
 
-      D=D&M
+      // And
+      D=M&D
     VALUE
 
     result.chomp
@@ -317,9 +230,63 @@ class RAM
       @#{Stack::STACK_ADDRESS_LOCATION}
       A=M
 
-      D=D|M
+      // Or
+      D=M|D
     VALUE
 
     result.chomp
   end
+
+  def asm_binary_operation(operator, &block)
+    puts asm_reset_to_zero
+
+    first_value = decrement_stack
+    puts sub_operation
+
+    second_value = decrement_stack
+    puts sub_operation
+
+    execute = <<~EQUALITY
+      @#{go_to_if_true}
+      D;#{operator}
+
+      D=0
+      @#{go_to_end}
+      0;JMP
+
+      (#{go_to_if_true})
+      D=-1
+      (#{go_to_end})
+    EQUALITY
+    puts execute.chomp
+
+    block.call(first_value, second_value)
+  end
+
+  def asm_operation_result(binary_operator_type)
+    execute = <<~EQUALITY
+      @#{go_to_if_true}
+      D;#{binary_operator_type}
+
+      D=0
+      @#{go_to_end}
+      0;JMP
+
+      (#{go_to_if_true})
+      D=-1
+      (#{go_to_end})
+    EQUALITY
+
+    execute.chomp
+  end
+
+  def asm_reset_to_zero
+    reset_to_zero = <<~RESET
+      D=0
+    RESET
+
+    reset_to_zero.chomp
+  end
+
+  attr_reader :go_to_counter
 end

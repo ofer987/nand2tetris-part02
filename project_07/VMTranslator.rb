@@ -14,6 +14,7 @@ GT_REGEX = /^gt$/
 NEG_REGEX = /^neg$/
 AND_REGEX = /^and$/
 OR_REGEX = /^or$/
+NOT_REGEX = /^not$/
 
 ram = RAM.new
 path = ARGV[0].to_s
@@ -68,6 +69,8 @@ def parse(ram, line)
     ram.and
   elsif line.match? OR_REGEX
     ram.or
+  elsif line.match? NOT_REGEX
+    ram.not
   end
 end
 

@@ -21,6 +21,45 @@ class Stack
     self.index += 1
   end
 
+  def add(first_value, second_value)
+    push(second_value + first_value)
+  end
+
+  def sub(first_value, second_value)
+    push(second_value - first_value)
+  end
+
+  def equal(first_value, second_value)
+    is_equal_in_boolean =
+      if second_value == first_value
+        -1
+      else
+        0
+      end
+    push(is_equal_in_boolean)
+  end
+
+  def less_than(first_value, second_value)
+    is_equal_in_boolean =
+      if second_value < first_value
+        -1
+      else
+        0
+      end
+
+    push(is_equal_in_boolean)
+  end
+
+  def greater_than
+    is_equal_in_boolean =
+      if second_value > first_value
+        -1
+      else
+        0
+      end
+    push(is_equal_in_boolean)
+  end
+
   def pop
     self.index -= 1
     value = array.pop
