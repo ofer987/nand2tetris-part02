@@ -5,6 +5,7 @@ class RAM
 
   def initialize
     @stack = Stack.new
+    @go_to_counter = 0
   end
 
   def constant(integer)
@@ -60,6 +61,7 @@ class RAM
     second_value = decrement_stack
     puts add_operation.chomp
 
+    increment_go_to_counter
     push(first_value + second_value)
   end
 
@@ -75,6 +77,7 @@ class RAM
     second_value = decrement_stack
     puts sub_operation.chomp
 
+    increment_go_to_counter
     push(second_value - first_value)
   end
 
@@ -96,36 +99,16 @@ class RAM
     second_value = decrement_stack
     puts operation.chomp
 
-    is_equal_operation = <<~EQUALITY
-      @IS_EQUAL
-      D;JEQ
-
-      (IS_NOT_EQUAL)
-      D=0
-
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      A=M
-      0;JMP
-
-      (IS_EQUAL)
-      D=-1
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      A=M
-      0:JMP
-    EQUALITY
-
     is_equal = <<~EQUALITY
-      @EQUALITY
-      0;JMP
-      // Value is 0 if not equal
-      A=0
-
-      // Next value is -1 if equal
-      @-1
+      @#{go_to_if_true}
       D;JEQ
 
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      D=A
+      D=0
+      @#{go_to_end}
+
+      (#{go_to_if_true})
+      D=-1
+      (#{go_to_end})
     EQUALITY
 
     puts is_equal.chomp
@@ -136,6 +119,8 @@ class RAM
         0
       end
     push(is_equal_in_boolean)
+
+    increment_go_to_counter
   end
 
   # Return -1 if True
@@ -157,15 +142,15 @@ class RAM
     puts operation.chomp
 
     is_lt = <<~EQUALITY
-      // Value is 0 if not equal
-      A=0
-
-      // Next value is -1 if equal
-      @-1
+      @#{go_to_if_true}
       D;JLT
 
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      D=A
+      D=0
+      @#{go_to_end}
+
+      (#{go_to_if_true})
+      D=-1
+      (#{go_to_end})
     EQUALITY
 
     puts is_lt.chomp
@@ -176,6 +161,8 @@ class RAM
         0
       end
     push(is_equal_in_boolean)
+
+    increment_go_to_counter
   end
 
   # Return -1 if True
@@ -197,15 +184,15 @@ class RAM
     puts operation.chomp
 
     is_gt = <<~EQUALITY
-      // Value is 0 if not equal
-      A=0
-
-      // Next value is -1 if equal
-      @-1
+      @#{go_to_if_true}
       D;JGT
 
-      @#{Stack::STACK_ADDRESS_LOCATION}
-      D=A
+      D=0
+      @#{go_to_end}
+
+      (#{go_to_if_true})
+      D=-1
+      (#{go_to_end})
     EQUALITY
 
     puts is_gt.chomp
@@ -216,6 +203,8 @@ class RAM
         0
       end
     push(is_equal_in_boolean)
+
+    increment_go_to_counter
   end
 
   def and
@@ -231,6 +220,8 @@ class RAM
     puts and_operation.chomp
 
     push(first_value & second_value)
+
+    increment_go_to_counter
   end
 
   def or
@@ -246,6 +237,8 @@ class RAM
     puts or_operation.chomp
 
     push(first_value | second_value)
+
+    increment_go_to_counter
   end
 
   def neg
@@ -264,9 +257,27 @@ class RAM
 
     result = 0 - value
     push(result)
+
+    increment_go_to_counter
   end
 
   private
+
+  def go_to
+    @go_to ||= 'GO_TO'
+  end
+
+  def go_to_if_true
+    "#{go_to}_if_true_#{go_to_counter}"
+  end
+
+  def go_to_end
+    "#{go_to}_end_#{go_to_counter}"
+  end
+
+  def increment_go_to_counter
+    @go_to_counter += 1
+  end
 
   def add_operation
     result = <<~VALUE
