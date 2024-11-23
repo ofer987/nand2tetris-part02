@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative './stack'
-require_relative './ram'
+require_relative '../lib/vm_translator'
 
 CONSTANT_REGEX = /constant (\d+)/
 PUSH_REGEX = /^push (.+)$/
@@ -16,16 +15,16 @@ AND_REGEX = /^and$/
 OR_REGEX = /^or$/
 NOT_REGEX = /^not$/
 
-ram = RAM.new
+stack = VMTranslator::Stack.new
 path = ARGV[0].to_s
 
 def put_start_program
   output = <<~START_PROGRAM
     (START)
-    @#{Stack::STACK_START_RAM_INDEX}
+    @#{VMTranslator::Stack::STACK_START_RAM_INDEX}
     D=A
 
-    @#{Stack::STACK_ADDRESS_LOCATION}
+    @#{VMTranslator::Stack::STACK_ADDRESS_LOCATION}
     M=D
   START_PROGRAM
 
@@ -43,34 +42,34 @@ def put_end_program
   puts output.chomp
 end
 
-def parse(ram, line)
+def parse(stack, line)
   if line.match? PUSH_REGEX
     inner_match = line.match(PUSH_REGEX)[1].to_s
 
-    value = parse(ram, inner_match)
-    ram.push(value)
+    value = parse(stack, inner_match)
+    stack.push(value)
   elsif line.match? CONSTANT_REGEX
     result = line.match(CONSTANT_REGEX)[1].to_i
 
-    ram.constant(result)
+    stack.constant(result)
   elsif line.match? ADD_REGEX
-    ram.add
+    stack.add
   elsif line.match? SUB_REGEX
-    ram.sub
+    stack.sub
   elsif line.match? EQ_REGEX
-    ram.eq
+    stack.eq
   elsif line.match? LT_REGEX
-    ram.lt
+    stack.lt
   elsif line.match? GT_REGEX
-    ram.gt
+    stack.gt
   elsif line.match? NEG_REGEX
-    ram.neg
+    stack.neg
   elsif line.match? AND_REGEX
-    ram.and
+    stack.and
   elsif line.match? OR_REGEX
-    ram.or
+    stack.or
   elsif line.match? NOT_REGEX
-    ram.not
+    stack.not
   end
 end
 
@@ -79,11 +78,12 @@ begin
 
   File.readlines(path)
     .map(&:chomp)
-    .each { |line| parse(ram, line) }
+    .each { |line| parse(stack, line) }
 
   put_end_program
 rescue StandardError => e
   puts "Error converting VM to ASM: #{e}"
+  puts e.backtrace
 
   exit 1
 end
