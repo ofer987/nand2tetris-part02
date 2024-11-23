@@ -4,7 +4,13 @@
 require_relative '../lib/vm_translator'
 
 CONSTANT_REGEX = /constant (\d+)/
+LOCAL_REGEX = /local (\d+)/
+ARGUMENT_REGEX = /argument (\d+)/
+THIS_REGEX = /this (\d+)/
+THAT_REGEX = /that (\d+)/
+TEMP_REGEX = /temp (\d+)/
 PUSH_REGEX = /^push (.+)$/
+POP_REGEX = /^pop (.+)$/
 ADD_REGEX = /^add$/
 SUB_REGEX = /^sub$/
 EQ_REGEX = /^eq$/
@@ -17,6 +23,11 @@ NOT_REGEX = /^not$/
 
 STACK = VMTranslator::Stack.new
 CONSTANT_RAM = VMTranslator::Constant.new
+LOCAL_RAM = VMTranslator::Local.new
+ARGUMENT_RAM = VMTranslator::Argument.new
+THIS_RAM = VMTranslator::This.new
+THAT_RAM = VMTranslator::That.new
+TEMP_RAM = VMTranslator::Temp.new
 
 path = ARGV[0].to_s
 
@@ -51,11 +62,36 @@ def parse(line)
     ram, value = parse(inner_match)
     ram.pop(value)
     STACK.push(value)
+  elsif line.match? POP_REGEX
+    inner_match = line.match(POP_REGEX)[1].to_s
+
+    ram, value = parse(inner_match)
+    STACK.push(value)
+    ram.pop(value)
   elsif line.match? CONSTANT_REGEX
     value = line.match(CONSTANT_REGEX)[1].to_i
 
     [CONSTANT_RAM, value]
-    # STACK.constant(result)
+  elsif line.match? LOCAL_REGEX
+    value = line.match(LOCAL_REGEX)[1].to_i
+
+    [LOCAL_RAM, value]
+  elsif line.match? ARGUMENT_REGEX
+    value = line.match(ARGUMENT_REGEX)[1].to_i
+
+    [ARGUMENT_RAM, value]
+  elsif line.match? THIS_REGEX
+    value = line.match(THIS_REGEX)[1].to_i
+
+    [THIS_RAM, value]
+  elsif line.match? THAT_REGEX
+    value = line.match(THAT_REGEX)[1].to_i
+
+    [THAT_RAM, value]
+  elsif line.match? TEMP_REGEX
+    value = line.match(TEMP_REGEX)[1].to_i
+
+    [TEMP_RAM, value]
   elsif line.match? ADD_REGEX
     STACK.add
   elsif line.match? SUB_REGEX

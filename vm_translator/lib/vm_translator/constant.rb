@@ -4,10 +4,6 @@ module VMTranslator
   class Constant < RAM
     attr_reader :vm_stack
 
-    def ram_index
-      raise NotImplementedError
-    end
-
     def pop(value)
       command = <<~COMMAND
         @#{value}

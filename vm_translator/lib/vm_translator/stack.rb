@@ -7,10 +7,6 @@ module VMTranslator
     def address_local
       STACK_ADDRESS_LOCATION
     end
-    #
-    # def ram_index
-    #   STACK_START_RAM_INDEX + index
-    # end
 
     def initialize
       super
@@ -20,8 +16,6 @@ module VMTranslator
     end
 
     def push(value)
-      # binding.pry
-
       command = <<~COMMAND
         @#{address_local}
         A=M

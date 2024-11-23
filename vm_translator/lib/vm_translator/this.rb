@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module VMTranslator
-  class Local < RAM
+  class This < RAM
     attr_reader :vm_stack
 
     def address_local
-      LOCAL_ADDRESS_LOCATION
+      THIS_ADDRESS_LOCATION
     end
 
     def pop(value)

@@ -9,6 +9,18 @@ module VMTranslator
     STACK_ADDRESS_LOCATION = 0
     STACK_RAM_INDEX = 256
 
+    ARGUMENT_ADDRESS_LOCATION = 2
+    ARGUMENT_RAM_INDEX = 256
+
+    THIS_ADDRESS_LOCATION = 3
+    THIS_RAM_INDEX = 256
+
+    THAT_ADDRESS_LOCATION = 4
+    THAT_RAM_INDEX = 256
+
+    TEMP_ADDRESS_LOCATION = 5
+    TEMP_RAM_INDEX = 256
+
     attr_reader :vm_stack
 
     def address_local
