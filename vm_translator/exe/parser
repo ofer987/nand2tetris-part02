@@ -4,7 +4,13 @@
 require_relative '../lib/vm_translator'
 
 CONSTANT_REGEX = /constant (\d+)/
+LOCAL_REGEX = /local (\d+)/
+ARGUMENT_REGEX = /argument (\d+)/
+THIS_REGEX = /this (\d+)/
+THAT_REGEX = /that (\d+)/
+TEMP_REGEX = /temp (\d+)/
 PUSH_REGEX = /^push (.+)$/
+POP_REGEX = /^pop (.+)$/
 ADD_REGEX = /^add$/
 SUB_REGEX = /^sub$/
 EQ_REGEX = /^eq$/
@@ -15,16 +21,23 @@ AND_REGEX = /^and$/
 OR_REGEX = /^or$/
 NOT_REGEX = /^not$/
 
-stack = VMTranslator::Stack.new
+STACK = VMTranslator::Stack.new
+CONSTANT_RAM = VMTranslator::Constant.new
+LOCAL_RAM = VMTranslator::Local.new
+ARGUMENT_RAM = VMTranslator::Argument.new
+THIS_RAM = VMTranslator::This.new
+THAT_RAM = VMTranslator::That.new
+TEMP_RAM = VMTranslator::Temp.new
+
 path = ARGV[0].to_s
 
 def put_start_program
   output = <<~START_PROGRAM
     (START)
-    @#{VMTranslator::Stack::STACK_START_RAM_INDEX}
+    @#{VMTranslator::RAM::STACK_RAM_INDEX}
     D=A
 
-    @#{VMTranslator::Stack::STACK_ADDRESS_LOCATION}
+    @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
     M=D
   START_PROGRAM
 
@@ -42,34 +55,61 @@ def put_end_program
   puts output.chomp
 end
 
-def parse(stack, line)
+def parse(line)
   if line.match? PUSH_REGEX
     inner_match = line.match(PUSH_REGEX)[1].to_s
 
-    value = parse(stack, inner_match)
-    stack.push(value)
-  elsif line.match? CONSTANT_REGEX
-    result = line.match(CONSTANT_REGEX)[1].to_i
+    ram, value = parse(inner_match)
+    ram.pop(value)
+    STACK.push(value)
+  elsif line.match? POP_REGEX
+    inner_match = line.match(POP_REGEX)[1].to_s
 
-    stack.constant(result)
+    ram, value = parse(inner_match)
+    STACK.pop(value)
+    ram.push(value)
+  elsif line.match? CONSTANT_REGEX
+    value = line.match(CONSTANT_REGEX)[1].to_i
+
+    [CONSTANT_RAM, value]
+  elsif line.match? LOCAL_REGEX
+    value = line.match(LOCAL_REGEX)[1].to_i
+
+    [LOCAL_RAM, value]
+  elsif line.match? ARGUMENT_REGEX
+    value = line.match(ARGUMENT_REGEX)[1].to_i
+
+    [ARGUMENT_RAM, value]
+  elsif line.match? THIS_REGEX
+    value = line.match(THIS_REGEX)[1].to_i
+
+    [THIS_RAM, value]
+  elsif line.match? THAT_REGEX
+    value = line.match(THAT_REGEX)[1].to_i
+
+    [THAT_RAM, value]
+  elsif line.match? TEMP_REGEX
+    value = line.match(TEMP_REGEX)[1].to_i
+
+    [TEMP_RAM, value]
   elsif line.match? ADD_REGEX
-    stack.add
+    STACK.add
   elsif line.match? SUB_REGEX
-    stack.sub
+    STACK.sub
   elsif line.match? EQ_REGEX
-    stack.eq
+    STACK.eq
   elsif line.match? LT_REGEX
-    stack.lt
+    STACK.lt
   elsif line.match? GT_REGEX
-    stack.gt
+    STACK.gt
   elsif line.match? NEG_REGEX
-    stack.neg
+    STACK.neg
   elsif line.match? AND_REGEX
-    stack.and
+    STACK.and
   elsif line.match? OR_REGEX
-    stack.or
+    STACK.or
   elsif line.match? NOT_REGEX
-    stack.not
+    STACK.not
   end
 end
 
@@ -78,7 +118,7 @@ begin
 
   File.readlines(path)
     .map(&:chomp)
-    .each { |line| parse(stack, line) }
+    .each { |line| parse(line) }
 
   put_end_program
 rescue StandardError => e
