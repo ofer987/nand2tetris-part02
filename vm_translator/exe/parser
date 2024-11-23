@@ -57,8 +57,7 @@ def parse(line)
     [CONSTANT_RAM, value]
     # STACK.constant(result)
   elsif line.match? ADD_REGEX
-    value = STACK.add
-    STACK.push(value)
+    STACK.add
   elsif line.match? SUB_REGEX
     STACK.sub
   elsif line.match? EQ_REGEX

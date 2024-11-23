@@ -8,8 +8,13 @@ module VMTranslator
       raise NotImplementedError
     end
 
-    def pop(_value)
-      # raise NotImplementedError
+    def pop(value)
+      command = <<~COMMAND
+        @#{value}
+        D=A
+      COMMAND
+
+      puts command.chomp
     end
 
     def push(_value)
