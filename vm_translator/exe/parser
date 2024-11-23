@@ -15,7 +15,9 @@ AND_REGEX = /^and$/
 OR_REGEX = /^or$/
 NOT_REGEX = /^not$/
 
-stack = VMTranslator::Stack.new
+STACK = VMTranslator::Stack.new
+CONSTANT_RAM = VMTranslator::Constant.new
+
 path = ARGV[0].to_s
 
 def put_start_program
@@ -42,34 +44,37 @@ def put_end_program
   puts output.chomp
 end
 
-def parse(stack, line)
+def parse(line)
   if line.match? PUSH_REGEX
     inner_match = line.match(PUSH_REGEX)[1].to_s
 
-    value = parse(stack, inner_match)
-    stack.push(value)
+    ram, value = parse(inner_match)
+    ram.pop(value)
+    STACK.push(value)
   elsif line.match? CONSTANT_REGEX
-    result = line.match(CONSTANT_REGEX)[1].to_i
+    value = line.match(CONSTANT_REGEX)[1].to_i
 
-    stack.constant(result)
+    [CONSTANT_RAM, value]
+    # STACK.constant(result)
   elsif line.match? ADD_REGEX
-    stack.add
+    value = STACK.add
+    STACK.push(value)
   elsif line.match? SUB_REGEX
-    stack.sub
+    STACK.sub
   elsif line.match? EQ_REGEX
-    stack.eq
+    STACK.eq
   elsif line.match? LT_REGEX
-    stack.lt
+    STACK.lt
   elsif line.match? GT_REGEX
-    stack.gt
+    STACK.gt
   elsif line.match? NEG_REGEX
-    stack.neg
+    STACK.neg
   elsif line.match? AND_REGEX
-    stack.and
+    STACK.and
   elsif line.match? OR_REGEX
-    stack.or
+    STACK.or
   elsif line.match? NOT_REGEX
-    stack.not
+    STACK.not
   end
 end
 
@@ -78,7 +83,7 @@ begin
 
   File.readlines(path)
     .map(&:chomp)
-    .each { |line| parse(stack, line) }
+    .each { |line| parse(line) }
 
   put_end_program
 rescue StandardError => e

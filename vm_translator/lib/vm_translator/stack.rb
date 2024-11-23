@@ -1,30 +1,18 @@
 # frozen_string_literal: true
 
 module VMTranslator
-  # class Stack < RAM
-  class Stack
-    STACK_ADDRESS_LOCATION = 0
-    STACK_START_RAM_INDEX = 256
-
+  class Stack < RAM
     attr_reader :vm_stack
-
-    def ram_index
-      STACK_START_RAM_INDEX + index
-    end
+    #
+    # def ram_index
+    #   STACK_START_RAM_INDEX + index
+    # end
 
     def initialize
+      super
+
       @vm_stack = VMStack.new
       @go_to_counter = 0
-    end
-
-    def constant(integer)
-      value = <<~CONSTANT
-        @#{integer}
-        D=A
-      CONSTANT
-
-      puts value.chomp
-      integer
     end
 
     def push(value)
@@ -49,7 +37,7 @@ module VMTranslator
       increment_go_to_counter
     end
 
-    def decrement_stack
+    def pop
       pop = <<~POP
         // Decrement the Stack
         @#{Stack::STACK_ADDRESS_LOCATION}
@@ -66,10 +54,10 @@ module VMTranslator
       RESET
       puts reset_to_zero.chomp
 
-      first_value = decrement_stack
+      first_value = pop
       puts add_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop
       puts add_operation.chomp
 
       push(first_value + second_value)
@@ -81,10 +69,10 @@ module VMTranslator
       RESET
       puts reset_to_zero.chomp
 
-      first_value = decrement_stack
+      first_value = pop
       puts sub_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop
       puts sub_operation.chomp
 
       push(second_value - first_value)
@@ -135,10 +123,10 @@ module VMTranslator
       RESET
       puts reset_to_one.chomp
 
-      first_value = decrement_stack
+      first_value = pop
       puts and_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop
       puts and_operation.chomp
 
       push(first_value & second_value)
@@ -147,17 +135,17 @@ module VMTranslator
     def or
       puts asm_reset_to_zero
 
-      first_value = decrement_stack
+      first_value = pop
       puts or_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop
       puts or_operation.chomp
 
       push(first_value | second_value)
     end
 
     def neg
-      value = decrement_stack
+      value = pop
       operation = <<~NEGATE
         @0
         D=A-D
@@ -169,7 +157,7 @@ module VMTranslator
     end
 
     def not
-      value = decrement_stack
+      value = pop
       operation = <<~NEGATE
         @0
         D=!D
@@ -249,10 +237,10 @@ module VMTranslator
     def asm_binary_operation(operator, &block)
       puts asm_reset_to_zero
 
-      first_value = decrement_stack
+      first_value = pop
       puts sub_operation
 
-      second_value = decrement_stack
+      second_value = pop
       puts sub_operation
 
       execute = <<~EQUALITY
