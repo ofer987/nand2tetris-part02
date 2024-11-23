@@ -8,29 +8,40 @@ module VMTranslator
       TEMP_ADDRESS_LOCATION
     end
 
-    def pop(value)
-      raise ArgumentError "Value (#{value}) should be between 0 and 7" if value.negative? || value > 7
+    def pop(indexed_address)
+      validate_memory_address(indexed_address)
 
       command = <<~COMMAND
-        @#{address_local + value}
-        D=A
+        @#{address_local + indexed_address}
+        D=M
       COMMAND
 
       puts command.chomp
     end
 
-    def push(value)
-      raise ArgumentError "Value (#{value}) should be between 0 and 7" if value.negative? || value > 7
+    def push(indexed_address)
+      validate_memory_address(indexed_address)
 
       command = <<~COMMAND
+        // Retrieve the Popped value from the Stack
+        A=M
+        D=M
+
         // Set RAM to value
-        @#{address_local} + value
+        @#{address_local + indexed_address}
         M=D
       COMMAND
       puts command.chomp
-      vm_stack.pop
 
       increment_go_to_counter
+    end
+
+    protected
+
+    def validate_memory_address(indexed_address)
+      if indexed_address.negative? || indexed_address > 7
+        raise ArgumentError "(#{indexed_address}) should be between 0 and 7"
+      end
     end
   end
 end

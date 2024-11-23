@@ -4,22 +4,21 @@ module VMTranslator
   # class Stack < RAM
   class RAM
     LOCAL_ADDRESS_LOCATION = 1
-    LOCAL_RAM_INDEX = 1015
+    # LOCAL_RAM_INDEX = 300
 
     STACK_ADDRESS_LOCATION = 0
     STACK_RAM_INDEX = 256
 
     ARGUMENT_ADDRESS_LOCATION = 2
-    ARGUMENT_RAM_INDEX = 256
+    # ARGUMENT_RAM_INDEX = 400
 
     THIS_ADDRESS_LOCATION = 3
-    THIS_RAM_INDEX = 256
+    # THIS_RAM_INDEX = 3000
 
     THAT_ADDRESS_LOCATION = 4
-    THAT_RAM_INDEX = 256
+    # THAT_RAM_INDEX = 3010
 
     TEMP_ADDRESS_LOCATION = 5
-    TEMP_RAM_INDEX = 256
 
     attr_reader :vm_stack
 
@@ -35,27 +34,37 @@ module VMTranslator
       @go_to_counter = 0
     end
 
-    def push(value)
-      # binding.pry
+    def pop(indexed_address)
+      validate_memory_address
 
       command = <<~COMMAND
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local + indexed_address}
+        D=M
+      COMMAND
+
+      puts command.chomp
+    end
+
+    def push(indexed_address)
+      validate_memory_address
+
+      command = <<~COMMAND
+        // Retrieve the Popped value from the Stack
         A=M
+        D=M
 
         // Set RAM to value
+        @#{address_local + indexed_address}
         M=D
       COMMAND
       puts command.chomp
-      vm_stack.push(value)
-
-      increment_stack = <<~COMMAND
-        @#{Stack::STACK_ADDRESS_LOCATION}
-        M=M+1
-      COMMAND
-      puts increment_stack.chomp
 
       increment_go_to_counter
     end
+
+    protected
+
+    def validate_memory_address(_indexed_address); end
 
     private
 

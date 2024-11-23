@@ -4,16 +4,18 @@ module VMTranslator
   class Constant < RAM
     attr_reader :vm_stack
 
-    def pop(value)
+    def pop(indexed_address)
+      validate_memory_address(indexed_address)
+
       command = <<~COMMAND
-        @#{value}
+        @#{indexed_address}
         D=A
       COMMAND
 
       puts command.chomp
     end
 
-    def push(_value)
+    def push(_indexed_address)
       # raise NotImplementedError
     end
   end

@@ -8,17 +8,32 @@ module VMTranslator
       LOCAL_ADDRESS_LOCATION
     end
 
-    def pop(value)
+    def pop(indexed_address)
+      validate_memory_address(indexed_address)
+
       command = <<~COMMAND
-        @#{value}
-        D=A
+        @#{address_local + indexed_address}
+        D=M
       COMMAND
 
       puts command.chomp
     end
 
-    def push(_value)
-      # raise NotImplementedError
+    def push(indexed_address)
+      validate_memory_address(indexed_address)
+
+      command = <<~COMMAND
+        // Retrieve the Popped value from the Stack
+        A=M
+        D=M
+
+        // Set RAM to value
+        @#{address_local + indexed_address}
+        M=D
+      COMMAND
+      puts command.chomp
+
+      increment_go_to_counter
     end
   end
 end

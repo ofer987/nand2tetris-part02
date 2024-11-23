@@ -35,7 +35,7 @@ module VMTranslator
       increment_go_to_counter
     end
 
-    def pop
+    def pop(_value)
       pop = <<~POP
         // Decrement the Stack
         @#{address_local}
@@ -52,10 +52,10 @@ module VMTranslator
       RESET
       puts reset_to_zero.chomp
 
-      first_value = pop
+      first_value = pop(0)
       puts add_operation.chomp
 
-      second_value = pop
+      second_value = pop(0)
       puts add_operation.chomp
 
       push(first_value + second_value)
@@ -67,10 +67,10 @@ module VMTranslator
       RESET
       puts reset_to_zero.chomp
 
-      first_value = pop
+      first_value = pop(0)
       puts sub_operation.chomp
 
-      second_value = pop
+      second_value = pop(0)
       puts sub_operation.chomp
 
       push(second_value - first_value)
@@ -121,10 +121,10 @@ module VMTranslator
       RESET
       puts reset_to_one.chomp
 
-      first_value = pop
+      first_value = pop(0)
       puts and_operation.chomp
 
-      second_value = pop
+      second_value = pop(0)
       puts and_operation.chomp
 
       push(first_value & second_value)
@@ -133,17 +133,17 @@ module VMTranslator
     def or
       puts asm_reset_to_zero
 
-      first_value = pop
+      first_value = pop(0)
       puts or_operation.chomp
 
-      second_value = pop
+      second_value = pop(0)
       puts or_operation.chomp
 
       push(first_value | second_value)
     end
 
     def neg
-      value = pop
+      value = pop(0)
       operation = <<~NEGATE
         @0
         D=A-D
@@ -155,7 +155,7 @@ module VMTranslator
     end
 
     def not
-      value = pop
+      value = pop(0)
       operation = <<~NEGATE
         @0
         D=!D
@@ -235,10 +235,10 @@ module VMTranslator
     def asm_binary_operation(operator, &block)
       puts asm_reset_to_zero
 
-      first_value = pop
+      first_value = pop(0)
       puts sub_operation
 
-      second_value = pop
+      second_value = pop(0)
       puts sub_operation
 
       execute = <<~EQUALITY

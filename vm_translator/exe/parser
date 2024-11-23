@@ -66,8 +66,8 @@ def parse(line)
     inner_match = line.match(POP_REGEX)[1].to_s
 
     ram, value = parse(inner_match)
-    STACK.push(value)
-    ram.pop(value)
+    STACK.pop(value)
+    ram.push(value)
   elsif line.match? CONSTANT_REGEX
     value = line.match(CONSTANT_REGEX)[1].to_i
 
