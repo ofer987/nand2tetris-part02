@@ -16,7 +16,7 @@ module VMTranslator
     end
 
     def push(_indexed_address)
-      # raise NotImplementedError
+      raise NotImplementedError
     end
   end
 end

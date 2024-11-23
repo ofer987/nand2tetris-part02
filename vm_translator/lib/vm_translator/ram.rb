@@ -46,7 +46,7 @@ module VMTranslator
     end
 
     def push(indexed_address)
-      validate_memory_address
+      validate_memory_address(indexed_address)
 
       command = <<~COMMAND
         // Retrieve the Popped value from the Stack
@@ -55,6 +55,7 @@ module VMTranslator
 
         // Set RAM to value
         @#{address_local + indexed_address}
+        A=M
         M=D
       COMMAND
       puts command.chomp
