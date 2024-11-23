@@ -23,10 +23,10 @@ path = ARGV[0].to_s
 def put_start_program
   output = <<~START_PROGRAM
     (START)
-    @#{VMTranslator::Stack::STACK_START_RAM_INDEX}
+    @#{VMTranslator::RAM::STACK_RAM_INDEX}
     D=A
 
-    @#{VMTranslator::Stack::STACK_ADDRESS_LOCATION}
+    @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
     M=D
   START_PROGRAM
 

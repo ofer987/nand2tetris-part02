@@ -3,6 +3,10 @@
 module VMTranslator
   class Stack < RAM
     attr_reader :vm_stack
+
+    def address_local
+      STACK_ADDRESS_LOCATION
+    end
     #
     # def ram_index
     #   STACK_START_RAM_INDEX + index
@@ -19,7 +23,7 @@ module VMTranslator
       # binding.pry
 
       command = <<~COMMAND
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // Set RAM to value
@@ -29,7 +33,7 @@ module VMTranslator
       vm_stack.push(value)
 
       increment_stack = <<~COMMAND
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         M=M+1
       COMMAND
       puts increment_stack.chomp
@@ -40,7 +44,7 @@ module VMTranslator
     def pop
       pop = <<~POP
         // Decrement the Stack
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         M=M-1
       POP
       puts pop.chomp
@@ -188,7 +192,7 @@ module VMTranslator
 
     def add_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // Add
@@ -200,7 +204,7 @@ module VMTranslator
 
     def sub_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // Sub
@@ -212,7 +216,7 @@ module VMTranslator
 
     def and_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // And
@@ -224,7 +228,7 @@ module VMTranslator
 
     def or_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // Or

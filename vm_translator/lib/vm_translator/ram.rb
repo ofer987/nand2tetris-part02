@@ -3,10 +3,17 @@
 module VMTranslator
   # class Stack < RAM
   class RAM
+    LOCAL_ADDRESS_LOCATION = 1
+    LOCAL_RAM_INDEX = 1015
+
     STACK_ADDRESS_LOCATION = 0
-    STACK_START_RAM_INDEX = 256
+    STACK_RAM_INDEX = 256
 
     attr_reader :vm_stack
+
+    def address_local
+      raise NotImplementedError
+    end
 
     def ram_index
       raise NotImplementedError
