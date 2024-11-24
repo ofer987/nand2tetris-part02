@@ -33,9 +33,9 @@ module VMTranslator
     protected
 
     def validate_memory_address(indexed_address)
-      if indexed_address.negative? || indexed_address > 7
-        raise ArgumentError "(#{indexed_address}) should be between 0 and 7"
-      end
+      return if indexed_address.positive? && indexed_address <= 7
+
+      raise ArgumentError "(#{indexed_address}) should be between 0 and 7"
     end
   end
 end
