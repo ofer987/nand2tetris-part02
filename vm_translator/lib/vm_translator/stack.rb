@@ -1,63 +1,48 @@
 # frozen_string_literal: true
 
 module VMTranslator
-  # class Stack < RAM
-  class Stack
-    STACK_ADDRESS_LOCATION = 0
-    STACK_START_RAM_INDEX = 256
-
+  class Stack < RAM
     attr_reader :vm_stack
 
-    def ram_index
-      STACK_START_RAM_INDEX + index
+    def address_local
+      STACK_ADDRESS_LOCATION
     end
 
     def initialize
+      super
+
       @vm_stack = VMStack.new
       @go_to_counter = 0
     end
 
-    def constant(integer)
-      value = <<~CONSTANT
-        @#{integer}
-        D=A
-      CONSTANT
+    def pop(_value)
+      pop = <<~POP
+        // Decrement the Stack
+        @#{address_local}
+        M=M-1
+      POP
+      puts pop.chomp
 
-      puts value.chomp
-      integer
+      vm_stack.pop
     end
 
     def push(value)
-      # binding.pry
-
       command = <<~COMMAND
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        // Set Stack to the D Register
+        @#{address_local}
         A=M
-
-        // Set RAM to value
         M=D
       COMMAND
       puts command.chomp
       vm_stack.push(value)
 
       increment_stack = <<~COMMAND
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         M=M+1
       COMMAND
       puts increment_stack.chomp
 
       increment_go_to_counter
-    end
-
-    def decrement_stack
-      pop = <<~POP
-        // Decrement the Stack
-        @#{Stack::STACK_ADDRESS_LOCATION}
-        M=M-1
-      POP
-      puts pop.chomp
-
-      vm_stack.pop
     end
 
     def add
@@ -66,10 +51,10 @@ module VMTranslator
       RESET
       puts reset_to_zero.chomp
 
-      first_value = decrement_stack
+      first_value = pop(0)
       puts add_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop(0)
       puts add_operation.chomp
 
       push(first_value + second_value)
@@ -81,10 +66,10 @@ module VMTranslator
       RESET
       puts reset_to_zero.chomp
 
-      first_value = decrement_stack
+      first_value = pop(0)
       puts sub_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop(0)
       puts sub_operation.chomp
 
       push(second_value - first_value)
@@ -135,10 +120,10 @@ module VMTranslator
       RESET
       puts reset_to_one.chomp
 
-      first_value = decrement_stack
+      first_value = pop(0)
       puts and_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop(0)
       puts and_operation.chomp
 
       push(first_value & second_value)
@@ -147,17 +132,17 @@ module VMTranslator
     def or
       puts asm_reset_to_zero
 
-      first_value = decrement_stack
+      first_value = pop(0)
       puts or_operation.chomp
 
-      second_value = decrement_stack
+      second_value = pop(0)
       puts or_operation.chomp
 
       push(first_value | second_value)
     end
 
     def neg
-      value = decrement_stack
+      value = pop(0)
       operation = <<~NEGATE
         @0
         D=A-D
@@ -169,7 +154,7 @@ module VMTranslator
     end
 
     def not
-      value = decrement_stack
+      value = pop(0)
       operation = <<~NEGATE
         @0
         D=!D
@@ -200,7 +185,7 @@ module VMTranslator
 
     def add_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // Add
@@ -212,7 +197,7 @@ module VMTranslator
 
     def sub_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // Sub
@@ -224,7 +209,7 @@ module VMTranslator
 
     def and_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // And
@@ -236,7 +221,7 @@ module VMTranslator
 
     def or_operation
       result = <<~VALUE
-        @#{Stack::STACK_ADDRESS_LOCATION}
+        @#{address_local}
         A=M
 
         // Or
@@ -249,10 +234,10 @@ module VMTranslator
     def asm_binary_operation(operator, &block)
       puts asm_reset_to_zero
 
-      first_value = decrement_stack
+      first_value = pop(0)
       puts sub_operation
 
-      second_value = decrement_stack
+      second_value = pop(0)
       puts sub_operation
 
       execute = <<~EQUALITY
