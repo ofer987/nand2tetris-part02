@@ -184,7 +184,7 @@ module VMTranslator
         D=M&D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def or_operation
@@ -248,6 +248,13 @@ module VMTranslator
       RESET
 
       puts reset_to_zero.chomp
+    end
+
+    def asm_reset_to_one
+      reset_to_one = <<~RESET
+        D=-1
+      RESET
+      puts reset_to_one.chomp
     end
 
     attr_reader :go_to_counter
