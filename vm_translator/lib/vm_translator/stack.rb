@@ -196,7 +196,7 @@ module VMTranslator
         D=M|D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def asm_binary_operation(operator, &block)

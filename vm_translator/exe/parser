@@ -131,7 +131,15 @@ def parse(line)
 
     STACK.push(second_value & first_value)
   elsif line.match? OR_REGEX
-    STACK.or
+    STACK.asm_reset_to_zero
+
+    first_value = STACK.pop(0)
+    STACK.or_operation
+
+    second_value = STACK.pop(0)
+    STACK.or_operation
+
+    STACK.push(second_value | first_value)
   elsif line.match? NOT_REGEX
     STACK.not
   end
