@@ -135,22 +135,6 @@ module VMTranslator
       push(result)
     end
 
-    def go_to
-      @go_to ||= 'GO_TO'
-    end
-
-    def go_to_if_true
-      "#{go_to}_if_true_#{go_to_counter}"
-    end
-
-    def go_to_end
-      "#{go_to}_end_#{go_to_counter}"
-    end
-
-    def increment_go_to_counter
-      @go_to_counter += 1
-    end
-
     def add_operation
       result = <<~VALUE
         @#{address_local}
@@ -255,6 +239,24 @@ module VMTranslator
         D=-1
       RESET
       puts reset_to_one.chomp
+    end
+
+    private
+
+    def go_to
+      @go_to ||= 'GO_TO'
+    end
+
+    def go_to_if_true
+      "#{go_to}_if_true_#{go_to_counter}"
+    end
+
+    def go_to_end
+      "#{go_to}_end_#{go_to_counter}"
+    end
+
+    def increment_go_to_counter
+      @go_to_counter += 1
     end
 
     attr_reader :go_to_counter
