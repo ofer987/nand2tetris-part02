@@ -45,36 +45,6 @@ module VMTranslator
       increment_go_to_counter
     end
 
-    def add
-      reset_to_zero = <<~RESET
-        D=0
-      RESET
-      puts reset_to_zero.chomp
-
-      first_value = pop(0)
-      puts add_operation.chomp
-
-      second_value = pop(0)
-      puts add_operation.chomp
-
-      push(first_value + second_value)
-    end
-
-    def sub
-      reset_to_zero = <<~RESET
-        D=0
-      RESET
-      puts reset_to_zero.chomp
-
-      first_value = pop(0)
-      puts sub_operation.chomp
-
-      second_value = pop(0)
-      puts sub_operation.chomp
-
-      push(second_value - first_value)
-    end
-
     def eq
       asm_binary_operation('JEQ') do |first_value, second_value|
         result =
@@ -165,24 +135,6 @@ module VMTranslator
       push(result)
     end
 
-    private
-
-    def go_to
-      @go_to ||= 'GO_TO'
-    end
-
-    def go_to_if_true
-      "#{go_to}_if_true_#{go_to_counter}"
-    end
-
-    def go_to_end
-      "#{go_to}_end_#{go_to_counter}"
-    end
-
-    def increment_go_to_counter
-      @go_to_counter += 1
-    end
-
     def add_operation
       result = <<~VALUE
         @#{address_local}
@@ -192,7 +144,7 @@ module VMTranslator
         D=M+D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def sub_operation
@@ -204,7 +156,7 @@ module VMTranslator
         D=M-D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def and_operation
@@ -216,7 +168,7 @@ module VMTranslator
         D=M&D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def or_operation
@@ -228,7 +180,7 @@ module VMTranslator
         D=M|D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def asm_binary_operation(operator, &block)
@@ -279,7 +231,32 @@ module VMTranslator
         D=0
       RESET
 
-      reset_to_zero.chomp
+      puts reset_to_zero.chomp
+    end
+
+    def asm_reset_to_one
+      reset_to_one = <<~RESET
+        D=-1
+      RESET
+      puts reset_to_one.chomp
+    end
+
+    private
+
+    def go_to
+      @go_to ||= 'GO_TO'
+    end
+
+    def go_to_if_true
+      "#{go_to}_if_true_#{go_to_counter}"
+    end
+
+    def go_to_end
+      "#{go_to}_end_#{go_to_counter}"
+    end
+
+    def increment_go_to_counter
+      @go_to_counter += 1
     end
 
     attr_reader :go_to_counter

@@ -93,9 +93,25 @@ def parse(line)
 
     [TEMP_RAM, value]
   elsif line.match? ADD_REGEX
-    STACK.add
+    STACK.asm_reset_to_zero
+
+    first_value = STACK.pop(0)
+    STACK.add_operation
+
+    second_value = STACK.pop(0)
+    STACK.add_operation
+
+    STACK.push(second_value + first_value)
   elsif line.match? SUB_REGEX
-    STACK.sub
+    STACK.asm_reset_to_zero
+
+    first_value = STACK.pop(0)
+    STACK.sub_operation
+
+    second_value = STACK.pop(0)
+    STACK.sub_operation
+
+    STACK.push(second_value - first_value)
   elsif line.match? EQ_REGEX
     STACK.eq
   elsif line.match? LT_REGEX
@@ -105,9 +121,25 @@ def parse(line)
   elsif line.match? NEG_REGEX
     STACK.neg
   elsif line.match? AND_REGEX
-    STACK.and
+    STACK.asm_reset_to_one
+
+    first_value = STACK.pop(0)
+    STACK.and_operation
+
+    second_value = STACK.pop(0)
+    STACK.and_operation
+
+    STACK.push(second_value & first_value)
   elsif line.match? OR_REGEX
-    STACK.or
+    STACK.asm_reset_to_zero
+
+    first_value = STACK.pop(0)
+    STACK.or_operation
+
+    second_value = STACK.pop(0)
+    STACK.or_operation
+
+    STACK.push(second_value | first_value)
   elsif line.match? NOT_REGEX
     STACK.not
   end
