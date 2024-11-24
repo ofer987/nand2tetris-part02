@@ -103,7 +103,15 @@ def parse(line)
 
     STACK.push(second_value + first_value)
   elsif line.match? SUB_REGEX
-    STACK.sub
+    STACK.asm_reset_to_zero
+
+    first_value = STACK.pop(0)
+    STACK.sub_operation
+
+    second_value = STACK.pop(0)
+    STACK.sub_operation
+
+    STACK.push(second_value - first_value)
   elsif line.match? EQ_REGEX
     STACK.eq
   elsif line.match? LT_REGEX

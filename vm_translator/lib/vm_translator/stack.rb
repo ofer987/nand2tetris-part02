@@ -45,21 +45,6 @@ module VMTranslator
       increment_go_to_counter
     end
 
-    def sub
-      reset_to_zero = <<~RESET
-        D=0
-      RESET
-      puts reset_to_zero.chomp
-
-      first_value = pop(0)
-      puts sub_operation.chomp
-
-      second_value = pop(0)
-      puts sub_operation.chomp
-
-      push(second_value - first_value)
-    end
-
     def eq
       asm_binary_operation('JEQ') do |first_value, second_value|
         result =
@@ -187,7 +172,7 @@ module VMTranslator
         D=M-D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def and_operation
