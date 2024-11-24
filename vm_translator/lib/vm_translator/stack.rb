@@ -45,21 +45,6 @@ module VMTranslator
       increment_go_to_counter
     end
 
-    def add
-      reset_to_zero = <<~RESET
-        D=0
-      RESET
-      puts reset_to_zero.chomp
-
-      first_value = pop(0)
-      puts add_operation.chomp
-
-      second_value = pop(0)
-      puts add_operation.chomp
-
-      push(first_value + second_value)
-    end
-
     def sub
       reset_to_zero = <<~RESET
         D=0
@@ -165,8 +150,6 @@ module VMTranslator
       push(result)
     end
 
-    private
-
     def go_to
       @go_to ||= 'GO_TO'
     end
@@ -192,7 +175,7 @@ module VMTranslator
         D=M+D
       VALUE
 
-      result.chomp
+      puts result.chomp
     end
 
     def sub_operation
@@ -279,7 +262,7 @@ module VMTranslator
         D=0
       RESET
 
-      reset_to_zero.chomp
+      puts reset_to_zero.chomp
     end
 
     attr_reader :go_to_counter
