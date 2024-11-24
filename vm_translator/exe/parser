@@ -10,6 +10,7 @@ THIS_REGEX = /this (\d+)/
 THAT_REGEX = /that (\d+)/
 TEMP_REGEX = /temp (\d+)/
 POINTER_REGEX = /pointer (\d+)/
+STATIC_REGEX = /static (\d+)/
 PUSH_REGEX = /^push (.+)$/
 POP_REGEX = /^pop (.+)$/
 ADD_REGEX = /^add$/
@@ -30,6 +31,7 @@ THIS_RAM = VMTranslator::This.new
 THAT_RAM = VMTranslator::That.new
 TEMP_RAM = VMTranslator::Temp.new
 POINTER_RAM = VMTranslator::Pointer.new
+STATIC_RAM = VMTranslator::Static.new
 
 path = ARGV[0].to_s
 
@@ -98,6 +100,10 @@ def parse(line)
     value = line.match(POINTER_REGEX)[1].to_i
 
     [POINTER_RAM, value]
+  elsif line.match? STATIC_REGEX
+    value = line.match(STATIC_REGEX)[1].to_i
+
+    [STATIC_RAM, value]
   elsif line.match? ADD_REGEX
     STACK.asm_reset_to_zero
 
