@@ -273,7 +273,17 @@ module VMTranslator
       puts label_statement.chomp
     end
 
-    def if_go_to(name, ram)
+    def go_to_now(name)
+      go_to_statement = <<~COMMAND
+        @#{name}
+        0;JMP
+      COMMAND
+
+      puts go_to_statement.chomp
+      puts
+    end
+
+    def go_to_if(name, ram)
       go_to_statement = <<~COMMAND
         // The D Register stores the value
         @#{ram.address_local}

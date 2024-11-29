@@ -139,11 +139,16 @@ module VMTranslator
         label_name = line.match(VMTranslator::Commands::LABEL_REGEX)[1].to_s
 
         stack.add_label(label_name, program_counter)
+      elsif line.match? VMTranslator::Commands::GO_TO_REGEX
+        label_name = line.match(VMTranslator::Commands::GO_TO_REGEX)[1].to_s
+
+        stack.pop(0)
+        stack.go_to_now(label_name)
       elsif line.match? VMTranslator::Commands::IF_GO_TO_REGEX
         label_name = line.match(VMTranslator::Commands::IF_GO_TO_REGEX)[1].to_s
 
         stack.pop(0)
-        stack.if_go_to(label_name, argument_ram)
+        stack.go_to_if(label_name, argument_ram)
       end
     ensure
       @program_counter += 1 if VMTranslator::Commands.statement?(line)
