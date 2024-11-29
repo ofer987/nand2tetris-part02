@@ -2265,7 +2265,7 @@ Metrics/AbcSize:
   Reference:
     - http://c2.com/cgi/wiki?AbcMetric
     - https://en.wikipedia.org/wiki/ABC_Software_Metric
-  Enabled: true
+  Enabled: false
   VersionAdded: '0.27'
   VersionChanged: '1.5'
   # The ABC size is a calculated magnitude, so this number can be an Integer or
@@ -2300,7 +2300,7 @@ Metrics/BlockNesting:
 
 Metrics/ClassLength:
   Description: 'Avoid classes longer than 100 lines of code.'
-  Enabled: true
+  Enabled: false
   VersionAdded: '0.25'
   VersionChanged: '0.87'
   CountComments: false  # count full line comments?
@@ -2312,7 +2312,7 @@ Metrics/CyclomaticComplexity:
   Description: >-
                  A complexity metric that is strongly correlated to the number
                  of test cases needed to validate a method.
-  Enabled: true
+  Enabled: false
   VersionAdded: '0.25'
   VersionChanged: '0.81'
   IgnoredMethods: []
@@ -2321,7 +2321,7 @@ Metrics/CyclomaticComplexity:
 Metrics/MethodLength:
   Description: 'Avoid methods longer than 20 lines of code.'
   StyleGuide: '#short-methods'
-  Enabled: true
+  Enabled: false
   VersionAdded: '0.25'
   VersionChanged: '1.5'
   CountComments: false  # count full line comments?
@@ -2352,7 +2352,7 @@ Metrics/PerceivedComplexity:
   Description: >-
                  A complexity metric geared towards measuring complexity for a
                  human reader.
-  Enabled: true
+  Enabled: false
   VersionAdded: '0.25'
   VersionChanged: '0.81'
   IgnoredMethods: []
@@ -2694,7 +2694,7 @@ Style/AccessModifierDeclarations:
 
 Style/AccessorGrouping:
   Description: 'Checks for grouping of accessors in `class` and `module` bodies.'
-  Enabled: true
+  Enabled: false
   VersionAdded: '0.87'
   EnforcedStyle: grouped
   SupportedStyles:
