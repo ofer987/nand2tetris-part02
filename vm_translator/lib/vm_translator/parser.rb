@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'pry-byebug'
-
 module VMTranslator
   class Parser
     def put_start_program
@@ -30,7 +28,6 @@ module VMTranslator
     end
 
     def initialize
-      # binding.pry
       @program_counter = 0
       @stack = VMTranslator::Stack.new
       @constant_ram = VMTranslator::Constant.new
@@ -44,7 +41,6 @@ module VMTranslator
     end
 
     def parse(line)
-      # binding.pry
       if line.match? VMTranslator::Commands::PUSH_REGEX
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
