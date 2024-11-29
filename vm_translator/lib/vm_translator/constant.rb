@@ -13,6 +13,7 @@ module VMTranslator
       COMMAND
 
       puts command.chomp
+      puts
     end
 
     def push(_indexed_address)

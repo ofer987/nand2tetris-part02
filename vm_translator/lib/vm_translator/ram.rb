@@ -44,6 +44,7 @@ module VMTranslator
         D=M
       COMMAND
       puts command.chomp
+      puts
 
       increment_go_to_counter
     end
@@ -78,6 +79,7 @@ module VMTranslator
         M=M-D
       COMMAND
       puts command.chomp
+      puts
 
       increment_go_to_counter
     end

@@ -17,6 +17,7 @@ module VMTranslator
       COMMAND
 
       puts command.chomp
+      puts
     end
 
     def push(indexed_address)
@@ -28,6 +29,7 @@ module VMTranslator
       COMMAND
 
       puts command.chomp
+      puts
     end
 
     protected

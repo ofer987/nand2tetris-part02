@@ -23,6 +23,7 @@ module VMTranslator
         M=M-1
       POP
       puts pop.chomp
+      puts
 
       vm_stack.pop
     end
@@ -35,6 +36,7 @@ module VMTranslator
         M=D
       COMMAND
       puts command.chomp
+      puts
       vm_stack.push(value)
 
       increment_stack = <<~COMMAND
@@ -42,6 +44,7 @@ module VMTranslator
         M=M+1
       COMMAND
       puts increment_stack.chomp
+      puts
 
       increment_go_to_counter
     end
@@ -90,24 +93,30 @@ module VMTranslator
         D=-1
       RESET
       puts reset_to_one.chomp
+      puts
 
       first_value = pop(0)
       puts and_operation.chomp
+      puts
 
       second_value = pop(0)
       puts and_operation.chomp
+      puts
 
       push(first_value & second_value)
     end
 
     def or
       puts asm_reset_to_zero
+      puts
 
       first_value = pop(0)
       puts or_operation.chomp
+      puts
 
       second_value = pop(0)
       puts or_operation.chomp
+      puts
 
       push(first_value | second_value)
     end
@@ -119,6 +128,7 @@ module VMTranslator
         D=A-D
       NEGATE
       puts operation.chomp
+      puts
 
       result = 0 - value
       push(result)
@@ -131,6 +141,7 @@ module VMTranslator
         D=!D
       NEGATE
       puts operation.chomp
+      puts
 
       result = ~value
       push(result)
@@ -146,6 +157,7 @@ module VMTranslator
       VALUE
 
       puts result.chomp
+      puts
     end
 
     def sub_operation
@@ -158,6 +170,7 @@ module VMTranslator
       VALUE
 
       puts result.chomp
+      puts
     end
 
     def and_operation
@@ -170,6 +183,7 @@ module VMTranslator
       VALUE
 
       puts result.chomp
+      puts
     end
 
     def or_operation
@@ -182,16 +196,20 @@ module VMTranslator
       VALUE
 
       puts result.chomp
+      puts
     end
 
     def asm_binary_operation(operator, &block)
       puts asm_reset_to_zero
+      puts
 
       first_value = pop(0)
       puts sub_operation
+      puts
 
       second_value = pop(0)
       puts sub_operation
+      puts
 
       execute = <<~EQUALITY
         @#{go_to_if_true}
@@ -206,6 +224,7 @@ module VMTranslator
         (#{go_to_end})
       EQUALITY
       puts execute.chomp
+      puts
 
       block.call(first_value, second_value)
     end
@@ -233,6 +252,7 @@ module VMTranslator
       RESET
 
       puts reset_to_zero.chomp
+      puts
     end
 
     def asm_reset_to_one
@@ -240,6 +260,7 @@ module VMTranslator
         D=-1
       RESET
       puts reset_to_one.chomp
+      puts
     end
 
     def add_label(name, program_counter)
@@ -250,6 +271,7 @@ module VMTranslator
       LABEL
 
       puts label_statement.chomp
+      puts
     end
 
     def if_go_to(name)
@@ -264,6 +286,7 @@ module VMTranslator
       COMMAND
 
       puts go_to_statement.chomp
+      puts
     end
 
     private
