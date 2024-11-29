@@ -3,6 +3,7 @@
 
 require_relative '../lib/vm_translator'
 
+LABEL_REGEX = /^label\s(.+)$/
 CONSTANT_REGEX = /constant (\d+)/
 LOCAL_REGEX = /local (\d+)/
 ARGUMENT_REGEX = /argument (\d+)/
@@ -33,6 +34,21 @@ TEMP_RAM = VMTranslator::Temp.new
 POINTER_RAM = VMTranslator::Pointer.new
 STATIC_RAM = VMTranslator::Static.new
 
+STATEMENTS = [
+  LABEL_REGEX,
+  PUSH_REGEX,
+  POP_REGEX,
+  ADD_REGEX,
+  SUB_REGEX,
+  EQ_REGEX,
+  LT_REGEX,
+  GT_REGEX,
+  NEG_REGEX,
+  AND_REGEX,
+  OR_REGEX,
+  NOT_REGEX
+].freeze
+
 path = ARGV[0].to_s
 
 def put_start_program
@@ -57,6 +73,14 @@ def put_end_program
   END_PROGRAM
 
   puts output.chomp
+end
+
+def statement?(line)
+  STATEMENTS.each do |statement|
+    return true if line.match? statement
+  end
+
+  false
 end
 
 def parse(line)
@@ -154,14 +178,21 @@ def parse(line)
     STACK.push(second_value | first_value)
   elsif line.match? NOT_REGEX
     STACK.not
+  elsif line.match? LABEL_REGEX
+    result = line.match(LABEL_REGEX)[1].to_s
+
+    STACK.add_label(result, global_program_counter)
   end
+ensure
+  global_program_counter += 1 if statement?(line)
 end
 
 begin
+  global_program_counter = 0
   put_start_program
 
   File.readlines(path)
-    .map(&:chomp)
+    .map(&:strip)
     .each { |line| parse(line) }
 
   put_end_program
