@@ -267,21 +267,20 @@ module VMTranslator
       labels[name] = program_counter.to_i
 
       label_statement = <<~LABEL
-        #{name}
+        (#{name})
       LABEL
 
       puts label_statement.chomp
-      puts
     end
 
-    def if_go_to(name)
+    def if_go_to(name, ram)
       go_to_statement = <<~COMMAND
-        // The D Register stores the value of Argument
-        @#{address_local})
+        // The D Register stores the value
+        @#{ram.address_local}
         A=M
         D=M
 
-        (#{name})
+        @#{name}
         D;JGT
       COMMAND
 

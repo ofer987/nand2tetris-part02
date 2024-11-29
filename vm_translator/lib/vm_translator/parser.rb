@@ -146,7 +146,8 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::IF_GO_TO_REGEX
         label_name = line.match(VMTranslator::Commands::IF_GO_TO_REGEX)[1].to_s
 
-        stack.if_go_to(label_name)
+        stack.pop(0)
+        stack.if_go_to(label_name, argument_ram)
       end
     ensure
       @program_counter += 1 if VMTranslator::Commands.statement?(line)
