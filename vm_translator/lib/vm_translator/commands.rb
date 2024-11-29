@@ -5,7 +5,8 @@ require 'pry-byebug'
 
 module VMTranslator
   class Commands
-    LABEL_REGEX = /^label\s(.+)$/
+    LABEL_REGEX = /^label (\S+)/
+    IF_GO_TO_REGEX = /^if-goto (\S+)/
     CONSTANT_REGEX = /constant (\d+)/
     LOCAL_REGEX = /local (\d+)/
     ARGUMENT_REGEX = /argument (\d+)/
@@ -28,6 +29,7 @@ module VMTranslator
 
     STATEMENTS = [
       LABEL_REGEX,
+      IF_GO_TO_REGEX,
       PUSH_REGEX,
       POP_REGEX,
       ADD_REGEX,

@@ -11,6 +11,7 @@ module VMTranslator
     def initialize
       super
 
+      @labels = {}
       @vm_stack = VMStack.new
       @go_to_counter = 0
     end
@@ -241,6 +242,30 @@ module VMTranslator
       puts reset_to_one.chomp
     end
 
+    def add_label(name, program_counter)
+      labels[name] = program_counter.to_i
+
+      label_statement = <<~LABEL
+        #{name}
+      LABEL
+
+      puts label_statement.chomp
+    end
+
+    def if_go_to(name)
+      go_to_statement = <<~COMMAND
+        // The D Register stores the value of Argument
+        @#{address_local})
+        A=M
+        D=M
+
+        (#{name})
+        D;JGT
+      COMMAND
+
+      puts go_to_statement.chomp
+    end
+
     private
 
     def go_to
@@ -259,6 +284,6 @@ module VMTranslator
       @go_to_counter += 1
     end
 
-    attr_reader :go_to_counter
+    attr_reader :go_to_counter, :labels
   end
 end

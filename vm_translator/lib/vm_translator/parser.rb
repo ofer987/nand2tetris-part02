@@ -140,9 +140,13 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::NOT_REGEX
         stack.not
       elsif line.match? VMTranslator::Commands::LABEL_REGEX
-        result = line.match(VMTranslator::Commands::LABEL_REGEX)[1].to_s
+        label_name = line.match(VMTranslator::Commands::LABEL_REGEX)[1].to_s
 
-        stack.add_label(result, program_counter)
+        stack.add_label(label_name, program_counter)
+      elsif line.match? VMTranslator::Commands::IF_GO_TO_REGEX
+        label_name = line.match(VMTranslator::Commands::IF_GO_TO_REGEX)[1].to_s
+
+        stack.if_go_to(label_name)
       end
     ensure
       @program_counter += 1 if VMTranslator::Commands.statement?(line)
