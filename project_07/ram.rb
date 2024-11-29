@@ -19,8 +19,6 @@ class RAM
   end
 
   def push(value)
-    # binding.pry
-
     command = <<~COMMAND
       @#{Stack::STACK_ADDRESS_LOCATION}
       A=M

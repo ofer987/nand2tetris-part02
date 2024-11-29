@@ -39,15 +39,6 @@ module VMTranslator
       increment_go_to_counter
     end
 
-    # protected
-    #
-    # def validate_memory_address(indexed_address)
-    #   return true
-    #   # return if indexed_address.negative? || indexed_address > 239
-    #   #
-    #   # raise ArgumentError "(#{indexed_address}) should be either between 0 to 239"
-    # end
-
     private
 
     def label(indexed_address)

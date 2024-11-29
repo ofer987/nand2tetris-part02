@@ -7,7 +7,6 @@ module VMTranslator
     end
 
     def initialize
-      # binding.pry
       @index = 0
       @array = []
     end
@@ -15,7 +14,6 @@ module VMTranslator
     def push(value)
       array << value
 
-      # binding.pry
       self.index += 1
     end
 
