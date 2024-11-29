@@ -4,8 +4,8 @@
 module VMTranslator
   class Commands
     LABEL_REGEX = /^label (\S+)/
-    IF_GO_TO_REGEX = /^if-goto (\S+)/
-    GO_TO_REGEX = /^goto (\S+)/
+    GO_TO_IF_REGEX = /^if-goto (\S+)/
+    GO_TO_NOW_REGEX = /^goto (\S+)/
     CONSTANT_REGEX = /constant (\d+)/
     LOCAL_REGEX = /local (\d+)/
     ARGUMENT_REGEX = /argument (\d+)/
@@ -14,21 +14,22 @@ module VMTranslator
     TEMP_REGEX = /temp (\d+)/
     POINTER_REGEX = /pointer (\d+)/
     STATIC_REGEX = /static (\d+)/
-    PUSH_REGEX = /^push (.+)$/
-    POP_REGEX = /^pop (.+)$/
-    ADD_REGEX = /^add$/
-    SUB_REGEX = /^sub$/
-    EQ_REGEX = /^eq$/
-    LT_REGEX = /^lt$/
-    GT_REGEX = /^gt$/
-    NEG_REGEX = /^neg$/
-    AND_REGEX = /^and$/
-    OR_REGEX = /^or$/
-    NOT_REGEX = /^not$/
+    PUSH_REGEX = /^push (.+)/
+    POP_REGEX = /^pop (.+)/
+    ADD_REGEX = /^add/
+    SUB_REGEX = /^sub/
+    EQ_REGEX = /^eq/
+    LT_REGEX = /^lt/
+    GT_REGEX = /^gt/
+    NEG_REGEX = /^neg/
+    AND_REGEX = /^and/
+    OR_REGEX = /^or/
+    NOT_REGEX = /^not/
 
     STATEMENTS = [
       LABEL_REGEX,
-      IF_GO_TO_REGEX,
+      GO_TO_IF_REGEX,
+      GO_TO_NOW_REGEX,
       PUSH_REGEX,
       POP_REGEX,
       ADD_REGEX,

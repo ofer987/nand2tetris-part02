@@ -35,7 +35,7 @@ module VMTranslator
       validate_memory_address(indexed_address)
 
       command = <<~COMMAND
-        // Set the D Register the value of the Memory Segment
+        // Set the D Register the value of the #{self.class} Memory Segment
         @#{indexed_address}
         D=A
 
@@ -54,7 +54,7 @@ module VMTranslator
       validate_memory_address(indexed_address)
 
       command = <<~COMMAND
-        // Set the M Pointer of #{self.class} Memory Segment to the value of #{address_local} + #{indexed_address}
+        // Set the M Pointer of the #{self.class} Memory Segment to the value of #{address_local} + #{indexed_address}
         @#{address_local}
         D=M
         @#{indexed_address}
@@ -67,12 +67,12 @@ module VMTranslator
         A=M
         D=M
 
-        // Set the M Pointer of #{self.class} Memory Segment to the D Register
+        // Set the M Pointer of the #{self.class} Memory Segment to the D Register
         @#{address_local}
         A=M
         M=D
 
-        // Reset the M Pointer of #{self.class} Memory Segment back to #{address_local}
+        // Reset the M Pointer of the #{self.class} Memory Segment back to #{address_local}
         @#{indexed_address}
         D=A
         @#{address_local}

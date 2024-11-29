@@ -12,6 +12,8 @@ begin
 
   File.readlines(path)
     .map(&:strip)
+    .reject { |line| line.start_with? '//' }
+    .reject(&:empty?)
     .each { |line| parser.parse(line) }
 
   parser.put_end_program

@@ -4,25 +4,25 @@
 module VMTranslator
   class Parser
     def put_start_program
-      output = <<~START_PROGRAM
-        (START)
+      output = <<~PROGRAM_START
+        (PROGRAM_START)
         @#{VMTranslator::RAM::STACK_RAM_INDEX}
         D=A
 
         @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
         M=D
-      START_PROGRAM
+      PROGRAM_START
 
       puts output.chomp
     end
 
     def put_end_program
-      output = <<~END_PROGRAM
-        (END)
+      output = <<~PROGRAM_END
+        (PROGRAM_END)
 
-        @END
+        @PROGRAM_END
         0;JMP
-      END_PROGRAM
+      PROGRAM_END
 
       puts output.chomp
     end
@@ -139,13 +139,12 @@ module VMTranslator
         label_name = line.match(VMTranslator::Commands::LABEL_REGEX)[1].to_s
 
         stack.add_label(label_name, program_counter)
-      elsif line.match? VMTranslator::Commands::GO_TO_REGEX
-        label_name = line.match(VMTranslator::Commands::GO_TO_REGEX)[1].to_s
+      elsif line.match? VMTranslator::Commands::GO_TO_NOW_REGEX
+        label_name = line.match(VMTranslator::Commands::GO_TO_NOW_REGEX)[1].to_s
 
-        stack.pop(0)
         stack.go_to_now(label_name)
-      elsif line.match? VMTranslator::Commands::IF_GO_TO_REGEX
-        label_name = line.match(VMTranslator::Commands::IF_GO_TO_REGEX)[1].to_s
+      elsif line.match? VMTranslator::Commands::GO_TO_IF_REGEX
+        label_name = line.match(VMTranslator::Commands::GO_TO_IF_REGEX)[1].to_s
 
         stack.pop(0)
         stack.go_to_if(label_name, argument_ram)
