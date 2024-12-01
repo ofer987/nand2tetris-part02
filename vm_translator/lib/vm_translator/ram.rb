@@ -16,6 +16,17 @@ module VMTranslator
 
     TEMP_ADDRESS_LOCATION = 5
 
+    def self.pop_value(address)
+      pop = <<~COMMAND
+        // Pop the value of the RAM's address into the D Register
+        @#{address}
+        D=M
+      COMMAND
+
+      puts pop.chomp
+      puts
+    end
+
     attr_reader :vm_stack
 
     def address_local

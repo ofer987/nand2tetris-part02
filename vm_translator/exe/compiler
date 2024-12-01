@@ -6,15 +6,16 @@ require_relative '../lib/vm_translator'
 path = ARGV[0].to_s
 
 begin
-  parser = VMTranslator::Parser.new
-
-  parser.put_start_program
-
-  File.readlines(path)
+  lines = File.readlines(path)
     .map(&:strip)
     .reject { |line| line.start_with? '//' }
     .reject(&:empty?)
-    .each { |line| parser.parse(line) }
+
+  parser = VMTranslator::Parser.new(lines)
+
+  parser.put_start_program
+
+  parser = Parser.new(lines)
 
   parser.put_end_program
 rescue StandardError => e

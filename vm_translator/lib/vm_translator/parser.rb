@@ -27,7 +27,9 @@ module VMTranslator
       puts output.chomp
     end
 
-    def initialize
+    def initialize(lines)
+      @lines = lines
+      @functions = []
       @program_counter = 0
       @stack = VMTranslator::Stack.new
       @constant_ram = VMTranslator::Constant.new
@@ -40,7 +42,18 @@ module VMTranslator
       @static_ram = VMTranslator::Static.new
     end
 
-    def parse(line)
+    def parse
+      lines.size.times
+        .each do |index|
+          parse_line(index)
+        end
+    end
+
+    private
+
+    def parse_line(index)
+      line = lines[index]
+
       if line.match? VMTranslator::Commands::PUSH_REGEX
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
@@ -152,19 +165,73 @@ module VMTranslator
         function_name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i
 
-        stack.declare_function(function_name, argument_total)
+        function = VMTranslator::Function.new(name, lines[index..], functions.size)
+        functions << function
+        function_size = functions.size
+        local_total = function.count_local_total
+
+        # Store RAM state on the stack
+        ram_classes = [
+          VMTranslator::Stack,
+          VMTranslator::Local,
+          VMTranslator::Argument,
+          VMTranslator::This,
+          VMTranslator::That
+        ]
+
+        ram_classes.each do |klazz|
+          klazz.pop
+
+          stack.push(0)
+        end
+
+        # Now, allocate RAM for the function
+        # Ignore the Stack RAM
+        index = 0
+
+        ram_size = ram_classes[1..].size
+        ram_classes[1..].each do |klazz|
+          constant_ram.pop(((function_size * ram_size) + index) * 1000)
+          klazz.push
+
+          index += 1
+        end
+        function.initialize
+
+        stack.push
+        function.generate_argument_ram(function_size)
+
+        stack.declare_function(function_name, argument_total, local_total)
       elsif line.match? VMTranslator::Commands::CALL_REGEX
         function_name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
 
         stack.call_function(function_name, 1)
+
+        # Reset the Stack back to its original address when the function returns
+        VMTranslator::Local.pop
+        VMTranslator::Stack.push
+        stack.pop(0)
+
+        ram_classes = [
+          VMTranslator::That,
+          VMTranslator::This,
+          VMTranslator::Argument,
+          VMTranslator::Local
+        ]
+
+        ram_classes.each do |klazz|
+          stack.pop(0)
+
+          klazz.push(0)
+        end
+
+        # TODO: Generate return label
       end
     ensure
       # TODO: Should the program_counter be reset back to 0
       # when for each function?
       @program_counter += 1 if VMTranslator::Commands.statement?(line)
     end
-
-    private
 
     attr_reader :stack, :program_counter
     attr_reader :constant_ram, :local_ram, :argument_ram, :this_ram, :that_ram, :temp_ram, :pointer_ram, :static_ram
