@@ -148,8 +148,19 @@ module VMTranslator
 
         stack.pop(0)
         stack.go_to_if(label_name, argument_ram)
+      elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
+        function_name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
+        argument_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i
+
+        stack.declare_function(function_name, argument_total)
+      elsif line.match? VMTranslator::Commands::CALL_REGEX
+        function_name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
+
+        stack.call_function(function_name, 1)
       end
     ensure
+      # TODO: Should the program_counter be reset back to 0
+      # when for each function?
       @program_counter += 1 if VMTranslator::Commands.statement?(line)
     end
 

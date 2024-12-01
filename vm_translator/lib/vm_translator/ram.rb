@@ -84,6 +84,34 @@ module VMTranslator
       increment_go_to_counter
     end
 
+    def reset_pointer(address)
+      command = <<~COMMAND
+        // Reset the pointer of #{self.class} to #{address}
+        @#{address}
+        D=A
+
+        @#{address_local}
+        M=D
+      COMMAND
+
+      puts command.chomp
+      puts
+    end
+
+    def set(indexed_address, value)
+      command = <<~COMMAND
+        // Set the value of Address (#{address_local + indexed_address}) to Value (#{value})
+        @#{value}
+        D=A
+
+        @#{address_local + indexed_address}
+        M=D
+      COMMAND
+
+      puts command.chomp
+      puts
+    end
+
     protected
 
     def validate_memory_address(_indexed_address); end

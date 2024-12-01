@@ -14,6 +14,7 @@ module VMTranslator
       @labels = {}
       @vm_stack = VMStack.new
       @go_to_counter = 0
+      @function_counter = 0
     end
 
     def pop(_value)
@@ -298,6 +299,44 @@ module VMTranslator
       puts
     end
 
+    def declare_function(name, argument_total, local_ram, argument_ram, this_ram, that_ram)
+      function_statements = <<~COMMAND
+        (#{name})
+      COMMAND
+      puts function_statements.chomp
+
+      argument_ram.reset_pointer(5000)
+      argument_total.times
+        .map do |index|
+          # Pop the Stack into the Argument memory
+          pop(0)
+          argument_ram.push(index)
+        end
+
+      local_ram.reset_pointer(6000)
+      local_ram_total = 10
+      local_ram_total.times
+        .each { |index| local_ram.set(index, 0) }
+
+      this_ram.reset_pointer(7000)
+      that_ram.reset_pointer(7000)
+
+      puts
+      increment_function_counter
+    end
+
+    def call_function(name, function_counter)
+      call_statements = <<~COMMAND
+        @#{name}
+        0;JMP
+
+        (#{name}$#{function_counter})
+      COMMAND
+
+      puts call_statements.chomp
+      puts
+    end
+
     private
 
     def go_to
@@ -316,6 +355,10 @@ module VMTranslator
       @go_to_counter += 1
     end
 
-    attr_reader :go_to_counter, :labels
+    def increment_function_counter
+      @function_counter += 1
+    end
+
+    attr_reader :go_to_counter, :labels, :function_counter
   end
 end
