@@ -12,6 +12,8 @@ require_relative './vm_translator/that'
 require_relative './vm_translator/temp'
 require_relative './vm_translator/pointer'
 require_relative './vm_translator/static'
+require_relative './vm_translator/commands'
+require_relative './vm_translator/parser'
 
 module VMTranslator
   class Error < StandardError; end

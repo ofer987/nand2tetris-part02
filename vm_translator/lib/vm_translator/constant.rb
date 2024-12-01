@@ -8,11 +8,13 @@ module VMTranslator
       validate_memory_address(indexed_address)
 
       command = <<~COMMAND
+        // Set the D Register the value of the #{self.class} Memory Segment
         @#{indexed_address}
         D=A
       COMMAND
 
       puts command.chomp
+      puts
     end
 
     def push(_indexed_address)

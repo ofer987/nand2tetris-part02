@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../lib/vm_translator'
+
+path = ARGV[0].to_s
+
+begin
+  parser = VMTranslator::Parser.new
+
+  parser.put_start_program
+
+  File.readlines(path)
+    .map(&:strip)
+    .reject { |line| line.start_with? '//' }
+    .reject(&:empty?)
+    .each { |line| parser.parse(line) }
+
+  parser.put_end_program
+rescue StandardError => e
+  puts "Error converting VM to ASM: #{e}"
+  puts e.backtrace
+
+  exit 1
+end
+
+exit 0
