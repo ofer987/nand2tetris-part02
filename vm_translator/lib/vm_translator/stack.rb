@@ -2,9 +2,7 @@
 
 module VMTranslator
   class Stack < RAM
-    attr_reader :vm_stack
-
-    def address_local
+    def address
       STACK_ADDRESS_LOCATION
     end
 
@@ -12,204 +10,200 @@ module VMTranslator
       super
 
       @labels = {}
-      @vm_stack = VMStack.new
       @go_to_counter = 0
+      @function_counter = 0
     end
 
     def pop(_value)
+      statements = []
+
       pop = <<~POP
         // Decrement the Stack
-        @#{address_local}
+        @#{address}
         M=M-1
       POP
-      puts pop.chomp
-      puts
+      statements.concat pop.split("\n")
+      statements << "\n"
 
-      vm_stack.pop
+      statements
     end
 
-    def push(value)
+    def push(_indexed_address)
+      statements = []
+
       command = <<~COMMAND
         // Set Stack to the D Register
-        @#{address_local}
+        @#{address}
         A=M
         M=D
       COMMAND
-      puts command.chomp
-      puts
-      vm_stack.push(value)
+      statements.concat command.split("\n")
+      statements << "\n"
 
       increment_stack = <<~COMMAND
-        @#{address_local}
+        @#{address}
         M=M+1
       COMMAND
-      puts increment_stack.chomp
-      puts
+      statements.concat increment_stack.split("\n")
+      statements << "\n"
 
       increment_go_to_counter
+
+      statements
     end
 
     def eq
-      asm_binary_operation('JEQ') do |first_value, second_value|
-        result =
-          if second_value < first_value
-            -1
-          else
-            0
-          end
-
-        push(result)
-      end
+      asm_binary_operation('JEQ')
     end
 
     def lt
-      asm_binary_operation('JLT') do |first_value, second_value|
-        result =
-          if second_value < first_value
-            -1
-          else
-            0
-          end
-
-        push(result)
-      end
+      asm_binary_operation('JLT')
     end
 
     def gt
-      asm_binary_operation('JGT') do |first_value, second_value|
-        result =
-          if second_value < first_value
-            -1
-          else
-            0
-          end
-
-        push(result)
-      end
-    end
-
-    def and
-      reset_to_one = <<~RESET
-        D=-1
-      RESET
-      puts reset_to_one.chomp
-      puts
-
-      first_value = pop(0)
-      puts and_operation.chomp
-      puts
-
-      second_value = pop(0)
-      puts and_operation.chomp
-      puts
-
-      push(first_value & second_value)
-    end
-
-    def or
-      puts asm_reset_to_zero
-      puts
-
-      first_value = pop(0)
-      puts or_operation.chomp
-      puts
-
-      second_value = pop(0)
-      puts or_operation.chomp
-      puts
-
-      push(first_value | second_value)
+      asm_binary_operation('JGT')
     end
 
     def neg
-      value = pop(0)
+      statements = []
+
+      statements.concat pop(0)
       operation = <<~NEGATE
         @0
         D=A-D
       NEGATE
-      puts operation.chomp
-      puts
+      statements.concat operation.split("\n")
+      statements << "\n"
 
-      result = 0 - value
-      push(result)
+      statements.concat push(0)
+
+      statements
     end
 
     def not
-      value = pop(0)
+      statements = []
+
+      statements.concat pop(0)
       operation = <<~NEGATE
         @0
         D=!D
       NEGATE
-      puts operation.chomp
-      puts
+      statements.concat operation.split("\n")
+      statements << "\n"
 
-      result = ~value
-      push(result)
+      statements.concat push(0)
+
+      statements
+    end
+
+    def add
+      statements = []
+
+      statements.concat asm_reset_to_zero
+
+      statements.concat pop(0)
+      statements.concat add_operation
+
+      statements.concat pop(0)
+      statements.concat add_operation
+
+      statements.concat push(0)
+
+      statements
     end
 
     def add_operation
+      statements = []
+
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // Add
         D=M+D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
+    def sub
+      statements = []
+
+      statements.concat asm_reset_to_zero
+
+      statements.concat pop(0)
+      statements.concat sub_operation
+
+      statements.concat pop(0)
+      statements.concat sub_operation
+
+      statements.concat push(0)
     end
 
     def sub_operation
+      statements = []
+
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // Sub
         D=M-D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def and_operation
+      statements = []
+
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // And
         D=M&D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def or_operation
+      statements = []
+
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // Or
         D=M|D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
+
+      statements
     end
 
-    def asm_binary_operation(operator, &block)
-      puts asm_reset_to_zero
-      puts
+    def asm_binary_operation(operator)
+      statements = []
 
-      first_value = pop(0)
-      puts sub_operation
-      puts
+      statements.concat asm_reset_to_zero
 
-      second_value = pop(0)
-      puts sub_operation
-      puts
+      statements.concat pop(0)
+      statements.concat sub_operation
+
+      statements.concat pop(0)
+      statements.concat sub_operation
 
       execute = <<~EQUALITY
         @#{go_to_if_true}
@@ -223,70 +217,91 @@ module VMTranslator
         D=-1
         (#{go_to_end})
       EQUALITY
-      puts execute.chomp
-      puts
+      statements.concat execute.split("\n")
+      statements << "\n"
 
-      block.call(first_value, second_value)
-    end
+      statements.concat push(0)
 
-    def asm_operation_result(binary_operator_type)
-      execute = <<~EQUALITY
-        @#{go_to_if_true}
-        D;#{binary_operator_type}
-
-        D=0
-        @#{go_to_end}
-        0;JMP
-
-        (#{go_to_if_true})
-        D=-1
-        (#{go_to_end})
-      EQUALITY
-
-      execute.chomp
+      statements
     end
 
     def asm_reset_to_zero
+      statements = []
+
       reset_to_zero = <<~RESET
         D=0
       RESET
 
-      puts reset_to_zero.chomp
-      puts
+      statements.concat reset_to_zero.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def asm_reset_to_one
+      statements = []
+
       reset_to_one = <<~RESET
         D=-1
       RESET
-      puts reset_to_one.chomp
-      puts
+
+      statements.concat reset_to_one.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def add_label(name, program_counter)
+      statements = []
+
       labels[name] = program_counter.to_i
 
       label_statement = <<~LABEL
         (#{name})
       LABEL
 
-      puts label_statement.chomp
+      statements.concat label_statement.split("\n")
+
+      statements
+    end
+
+    def return
+      statements = []
+
+      go_to_statement = <<~COMMAND
+        // Return
+        @#{address}
+        A=M
+        A=M
+        0;JMP
+      COMMAND
+
+      statements.concat go_to_statement.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def go_to_now(name)
+      statements = []
+
       go_to_statement = <<~COMMAND
         @#{name}
         0;JMP
       COMMAND
 
-      puts go_to_statement.chomp
-      puts
+      statements.concat go_to_statement.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def go_to_if(name, ram)
+      statements = []
+
       go_to_statement = <<~COMMAND
         // The D Register stores the value
-        @#{ram.address_local}
+        @#{ram.address}
         A=M
         D=M
 
@@ -294,8 +309,24 @@ module VMTranslator
         D;JGT
       COMMAND
 
-      puts go_to_statement.chomp
-      puts
+      statements.concat go_to_statement.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
+    def call_function(function)
+      call_statements = <<~COMMAND
+        @#{name}
+        0;JMP
+
+        (#{function.return_label})
+      COMMAND
+
+      function.increment_return_counter
+
+      puts call_statements.chomp
+      statements << "\n"
     end
 
     private
@@ -316,6 +347,10 @@ module VMTranslator
       @go_to_counter += 1
     end
 
-    attr_reader :go_to_counter, :labels
+    def increment_function_counter
+      @function_counter += 1
+    end
+
+    attr_reader :go_to_counter, :labels, :function_counter
   end
 end

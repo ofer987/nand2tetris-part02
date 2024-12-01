@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+number = ARGV[0].to_i
+
+test_files = File.join('..', 'nand2tetris', 'projects', number.to_s, '**', '*.tst')
+
+success = true
+Dir.glob(test_files).each do |test_file|
+  test_extension = File.extname test_file
+  next if File.basename(test_file).end_with? "VME#{test_extension}"
+
+  puts "Testing\t#{test_file}"
+
+  given_vm_file = test_file.gsub(test_extension, '.vm')
+  actual_asm_file = test_file.gsub(test_extension, '.asm')
+
+  result = system("./exe/compiler #{given_vm_file} > #{actual_asm_file}")
+  raise "Failed to compile #{given_vm_file}" unless result
+
+  result = system("../nand2tetris/tools/CPUEmulator.sh #{test_file}")
+  raise "Test failed: #{given_vm_file}" unless result
+
+  puts
+rescue StandardError => e
+  success = false
+  puts e
+
+  puts
+end
+
+exit 1 unless success
