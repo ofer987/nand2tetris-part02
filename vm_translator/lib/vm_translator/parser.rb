@@ -29,7 +29,8 @@ module VMTranslator
 
     def initialize(lines)
       @lines = lines
-      @functions = []
+      @functions = {}
+      @last_function_end_address_space_index = nil
       @program_counter = 0
       @stack = VMTranslator::Stack.new
       @constant_ram = VMTranslator::Constant.new
@@ -162,17 +163,77 @@ module VMTranslator
         stack.pop(0)
         stack.go_to_if(label_name, argument_ram)
       elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
-        function_name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
-        argument_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i
+        name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
+        argument_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i + 1
 
-        function = VMTranslator::Function.new(name, lines[index..], functions.size)
-        functions << function
-        function_size = functions.size
-        local_total = function.count_local_total
+        function = VMTranslator::Function.new(name, lines[index..])
+        if functions.key? function.name
+          puts "Error: #{function.name} has already been defined"
+
+          exit 1
+        end
+
+        functions[function.name] = function
+        # function_size = functions.size
+        # function.allocate_ram(@last_function_end_address_space_index, argument_total)
+
+        function.initialize_local_ram(local_ram)
+        function.initialize_argument_ram(argument_ram, argument_total)
+        function.initialize_this_ram
+        function.initialize_that_ram
+        # @last_function_end_address_space_index = function.end_ram_address_space_index
+
+        # local_total = function.initialize_local_ram(stack, @last_function_end_address_space_index + 1)
+        # function.create_local_ram
 
         # Store RAM state on the stack
+        # ram_classes = [
+        #   VMTranslator::Stack,
+        #   VMTranslator::Local,
+        #   VMTranslator::Argument,
+        #   VMTranslator::This,
+        #   VMTranslator::That
+        # ]
+
+        # ram_classes.each do |klazz|
+        #   klazz.pop
+        #
+        #   stack.push(0)
+        # end
+
+        # Now, allocate RAM for the function
+        # Ignore the Stack RAM
+        # index = 0
+
+        # ram_size = ram_classes[1..].size
+        # ram_classes[1..].each do |klazz|
+        #   constant_ram.pop(((function_size * ram_size) + index) * 1000)
+        #   klazz.push
+        #
+        #   index += 1
+        # end
+        # function.initialize
+        #
+        # stack.push
+        # function.generate_argument_ram(function_size)
+        #
+        # stack.declare_function(function_name, argument_total, local_total)
+      elsif line.match? VMTranslator::Commands::CALL_REGEX
+        function_name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
+        # argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
+
+        function = functions[function_name]
+        if function.nil?
+          puts "The function #{function_name} has not been defined yet"
+
+          exit 1
+        end
+
+        # Reset the Stack back to its original address when the function returns
+        constant_ram.pop(@program_counter)
+        stack.push
+
         ram_classes = [
-          VMTranslator::Stack,
           VMTranslator::Local,
           VMTranslator::Argument,
           VMTranslator::This,
@@ -185,47 +246,51 @@ module VMTranslator
           stack.push(0)
         end
 
-        # Now, allocate RAM for the function
-        # Ignore the Stack RAM
-        index = 0
+        # Allocate Local, Argument, This, and That here
+        # function.allocate_ram(VMTranslator::Stack.pop, argument_total)
 
-        ram_size = ram_classes[1..].size
-        ram_classes[1..].each do |klazz|
-          constant_ram.pop(((function_size * ram_size) + index) * 1000)
-          klazz.push
+        # VMTranslator::Stack.pop
+        # @local_ram = function.initialize_local_ram
+        # @argument_ram = function.initialize_argument_ram(stack, argument_total)
+        # @this_ram = function.initialize_this_ram
+        # @that_ram = function.initialize_that_ram
 
-          index += 1
-        end
-        function.initialize
+        # Store the Stack, and RAM into the stack
+        # ram_classes = [
+        #   VMTranslator::Stack,
+        #   VMTranslator::Local,
+        #   VMTranslator::Argument,
+        #   VMTranslator::This,
+        #   VMTranslator::That
+        # ]
+        #
+        # ram_classes.each do |klazz|
+        #   klazz.pop
+        #
+        #   stack.push(0)
+        # end
 
-        stack.push
-        function.generate_argument_ram(function_size)
+        stack.call_function(function_name, function.label)
 
-        stack.declare_function(function_name, argument_total, local_total)
-      elsif line.match? VMTranslator::Commands::CALL_REGEX
-        function_name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
-
-        stack.call_function(function_name, 1)
-
-        # Reset the Stack back to its original address when the function returns
         VMTranslator::Local.pop
         VMTranslator::Stack.push
         stack.pop(0)
 
-        ram_classes = [
+        restore_ram_classes = [
           VMTranslator::That,
           VMTranslator::This,
           VMTranslator::Argument,
-          VMTranslator::Local
+          VMTranslator::Local,
+          VMTranslator::Stack
         ]
 
-        ram_classes.each do |klazz|
+        restore_ram_classes.each do |klazz|
           stack.pop(0)
 
-          klazz.push(0)
+          klazz.push
         end
-
-        # TODO: Generate return label
+        # TODO: Function's return command
+        # elsif
       end
     ensure
       # TODO: Should the program_counter be reset back to 0

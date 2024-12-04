@@ -35,7 +35,7 @@ module VMTranslator
 
     # Functions
     FUNCTION_REGEX = /^function (.+) (\d+)/
-    CALL_REGEX = /^call (.+)/
+    CALL_REGEX = /^call (.+) (\d+)/
 
     STATEMENTS = [
       LABEL_REGEX,

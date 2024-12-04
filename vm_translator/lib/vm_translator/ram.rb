@@ -16,16 +16,27 @@ module VMTranslator
 
     TEMP_ADDRESS_LOCATION = 5
 
-    def self.pop_value(address)
-      pop = <<~COMMAND
-        // Pop the value of the RAM's address into the D Register
-        @#{address}
-        D=M
-      COMMAND
-
-      puts pop.chomp
-      puts
-    end
+    # def self.pop_value(address)
+    #   pop = <<~COMMAND
+    #     // Pop the value of the RAM's address into the D Register
+    #     @#{address}
+    #     D=M
+    #   COMMAND
+    #
+    #   puts pop.chomp
+    #   puts
+    # end
+    #
+    # def self.push_value(address)
+    #   pop = <<~COMMAND
+    #     // Push the value of the D Register into
+    #     @#{address}
+    #     M=D
+    #   COMMAND
+    #
+    #   puts pop.chomp
+    #   puts
+    # end
 
     attr_reader :vm_stack
 
@@ -37,8 +48,11 @@ module VMTranslator
       raise NotImplementedError
     end
 
-    def initialize
+    def initialize(address_local: nil, address_space_size: nil)
       @go_to_counter = 0
+
+      @address_local = address_local unless address_local.nil?
+      @address_space_size = address_space_size unless address_space_size.nil?
     end
 
     # Set the D Register the value of the Memory Segment

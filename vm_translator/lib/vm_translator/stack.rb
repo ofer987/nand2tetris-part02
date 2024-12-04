@@ -2,11 +2,15 @@
 
 module VMTranslator
   class Stack < RAM
-    def self.pop
+    def self.pop(negative_offset_index)
       pop = <<~COMMAND
+        // Negative Offset index of #{negative_offset_index}
+        @#{negative_offset_index}
+        D=A
+
         // Store the value of RAM[#{STACK_ADDRESS_LOCATION}] into the D Register
         #{STACK_ADDRESS_LOCATION}
-        D=M
+        D=M-D
       COMMAND
 
       puts pop.chomp
@@ -321,39 +325,15 @@ module VMTranslator
       puts
     end
 
-    def declare_function(name, argument_total, local_total, local_ram, argument_ram, this_ram, that_ram)
-      function_statements = <<~COMMAND
-        (#{name})
-      COMMAND
-      puts function_statements.chomp
-
-      argument_ram.reset_pointer(5000)
-      argument_total.times
-        .map do |index|
-          # Pop the Stack into the Argument memory
-          pop(0)
-          argument_ram.push(index)
-        end
-
-      local_ram.reset_pointer(6000)
-      local_ram_total = 10
-      local_ram_total.times
-        .each { |index| local_ram.set(index, 0) }
-
-      this_ram.reset_pointer(7000)
-      that_ram.reset_pointer(7000)
-
-      puts
-      increment_function_counter
-    end
-
-    def call_function(name, function_counter)
+    def call_function(function)
       call_statements = <<~COMMAND
         @#{name}
         0;JMP
 
-        (#{name}$#{function_counter})
+        (#{function.return_label})
       COMMAND
+
+      function.increment_return_counter
 
       puts call_statements.chomp
       puts
