@@ -160,13 +160,13 @@ module VMTranslator
     end
 
     def count_lines(command)
-      command
+      result = command
         .split("\n")
-        .map(&:split)
-        .reject(&:blank?)
+        .map(&:strip)
+        .reject(&:empty?)
         .reject { |line| line.start_with? '//' }
 
-      command.size
+      result.size
     end
 
     attr_reader :go_to_counter

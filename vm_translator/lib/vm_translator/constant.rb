@@ -15,6 +15,8 @@ module VMTranslator
 
       puts command.chomp
       puts
+
+      count_lines(command)
     end
 
     def push(_indexed_address)

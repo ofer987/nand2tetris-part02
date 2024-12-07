@@ -19,6 +19,8 @@ module VMTranslator
       puts command.chomp
 
       increment_go_to_counter
+
+      count_lines(command)
     end
 
     def push(indexed_address)
@@ -37,6 +39,8 @@ module VMTranslator
       puts command.chomp
 
       increment_go_to_counter
+
+      count_lines(command)
     end
 
     private

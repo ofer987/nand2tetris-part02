@@ -14,9 +14,7 @@ begin
   parser = VMTranslator::Parser.new(lines)
 
   parser.put_start_program
-
-  parser = Parser.new(lines)
-
+  parser.parse
   parser.put_end_program
 rescue StandardError => e
   puts "Error converting VM to ASM: #{e}"

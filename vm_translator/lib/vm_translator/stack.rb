@@ -44,7 +44,7 @@ module VMTranslator
       @function_counter = 0
     end
 
-    def pop
+    def pop(_value)
       pop = <<~POP
         // Decrement the Stack
         @#{address_local}
@@ -56,7 +56,7 @@ module VMTranslator
       count_lines(pop)
     end
 
-    def push
+    def push(_indexed_address)
       command = <<~COMMAND
         // Set Stack to the D Register
         @#{address_local}
@@ -79,42 +79,15 @@ module VMTranslator
     end
 
     def eq
-      asm_binary_operation('JEQ') do |first_value, second_value|
-        result =
-          if second_value < first_value
-            -1
-          else
-            0
-          end
-
-        push(result)
-      end
+      asm_binary_operation('JEQ')
     end
 
     def lt
-      asm_binary_operation('JLT') do |first_value, second_value|
-        result =
-          if second_value < first_value
-            -1
-          else
-            0
-          end
-
-        push(result)
-      end
+      asm_binary_operation('JLT')
     end
 
     def gt
-      asm_binary_operation('JGT') do |first_value, second_value|
-        result =
-          if second_value < first_value
-            -1
-          else
-            0
-          end
-
-        push(result)
-      end
+      asm_binary_operation('JGT')
     end
 
     def and
@@ -123,48 +96,50 @@ module VMTranslator
       RESET
       puts reset_to_one.chomp
       puts
+      result = count_lines(reset_to_one)
 
-      first_value = pop(0)
-      puts and_operation.chomp
-      puts
+      result += pop(0)
+      result += and_operation
 
-      second_value = pop(0)
-      puts and_operation.chomp
-      puts
+      result += pop(0)
+      result += and_operation
 
-      push(first_value & second_value)
+      result += push(0)
+
+      result
     end
 
     def or
-      puts asm_reset_to_zero
-      puts
+      result = asm_reset_to_zero
 
-      first_value = pop(0)
-      puts or_operation.chomp
-      puts
+      result += pop(0)
+      result += or_operation
 
-      second_value = pop(0)
-      puts or_operation.chomp
-      puts
+      result += pop(0)
+      result += or_operation
 
-      push(first_value | second_value)
+      result += push(0)
+
+      result
     end
 
     def neg
-      value = pop(0)
+      result = pop(0)
       operation = <<~NEGATE
         @0
         D=A-D
       NEGATE
       puts operation.chomp
       puts
+      result += count_lines(operation)
 
-      result = 0 - value
-      push(result)
+      result += push(0)
+
+      result
     end
 
     def not
-      result = pop
+      result = pop(0)
       operation = <<~NEGATE
         @0
         D=!D
@@ -173,7 +148,7 @@ module VMTranslator
       puts
       result += count_lines(operation)
 
-      result += push
+      result += push(0)
 
       result
     end
@@ -219,6 +194,8 @@ module VMTranslator
 
       puts result.chomp
       puts
+
+      count_lines(result)
     end
 
     def or_operation
@@ -232,18 +209,18 @@ module VMTranslator
 
       puts result.chomp
       puts
+
+      count_lines(result)
     end
 
-    def asm_binary_operation(operator, &block)
+    def asm_binary_operation(operator)
       result = asm_reset_to_zero
 
-      result += pop
-      puts sub_operation
-      puts
+      result += pop(0)
+      result += sub_operation
 
-      second_value = pop(0)
-      puts sub_operation
-      puts
+      result += pop(0)
+      result += sub_operation
 
       execute = <<~EQUALITY
         @#{go_to_if_true}
@@ -259,8 +236,11 @@ module VMTranslator
       EQUALITY
       puts execute.chomp
       puts
+      result += count_lines(execute)
 
-      block.call(first_value, second_value)
+      result += push(0)
+
+      result
     end
 
     # def asm_operation_result(binary_operator_type)

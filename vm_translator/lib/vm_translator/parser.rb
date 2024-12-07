@@ -28,7 +28,7 @@ module VMTranslator
     end
 
     def initialize(lines)
-      @lines = lines
+      @lines = Array(lines)
       @functions = {}
       @last_function_end_address_space_index = nil
       @program_counter = 0
@@ -46,29 +46,30 @@ module VMTranslator
     def parse
       lines.size.times
         .each do |index|
-          parse_line(index)
+          line = lines[index]
+
+          parse_line(index, line)
         end
     end
 
     private
 
-    def parse_line(index)
-      line = lines[index]
+    def parse_line(index, line)
 
       if line.match? VMTranslator::Commands::PUSH_REGEX
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
-        ram, value = parse(inner_match)
+        ram, value = parse_line(index, inner_match)
 
         @program_counter += ram.pop(value)
-        @program_counter += stack.push
+        @program_counter += stack.push(value)
       elsif line.match? VMTranslator::Commands::POP_REGEX
         inner_match = line.match(VMTranslator::Commands::POP_REGEX)[1].to_s
 
-        ram, value = parse(inner_match)
+        ram, value = parse_line(index, inner_match)
 
         @program_counter += stack.pop(value)
-        @program_counter += ram.push
+        @program_counter += ram.push(value)
       elsif line.match? VMTranslator::Commands::CONSTANT_REGEX
         value = line.match(VMTranslator::Commands::CONSTANT_REGEX)[1].to_i
 
@@ -110,11 +111,11 @@ module VMTranslator
         result += stack.pop(0)
         result += stack.add_operation
 
-        result += stack.push
+        result += stack.push(0)
 
         @program_counter += result
       elsif line.match? VMTranslator::Commands::SUB_REGEX
-        result += stack.asm_reset_to_zero
+        result = stack.asm_reset_to_zero
 
         result += stack.pop(0)
         result += stack.sub_operation
@@ -122,7 +123,7 @@ module VMTranslator
         result += stack.pop(0)
         result += stack.sub_operation
 
-        result += stack.push
+        result += stack.push(0)
 
         @program_counter += result
       elsif line.match? VMTranslator::Commands::EQ_REGEX
@@ -142,7 +143,7 @@ module VMTranslator
         result += stack.pop(0)
         result += stack.and_operation
 
-        result += stack.push
+        result += stack.push(0)
 
         @program_counter += result
       elsif line.match? VMTranslator::Commands::OR_REGEX
@@ -154,7 +155,7 @@ module VMTranslator
         result += stack.pop(0)
         result += stack.or_operation
 
-        result += stack.push
+        result += stack.push(0)
 
         @program_counter = result
       elsif line.match? VMTranslator::Commands::NOT_REGEX
@@ -242,7 +243,7 @@ module VMTranslator
 
         # Reset the Stack back to its original address when the function returns
         constant_ram.pop(@program_counter)
-        stack.push
+        stack.push(0)
 
         ram_classes = [
           VMTranslator::Local,
@@ -254,7 +255,7 @@ module VMTranslator
         ram_classes.each do |klazz|
           klazz.pop
 
-          stack.push
+          stack.push(0)
         end
 
         # Allocate Local, Argument, This, and That here
@@ -306,10 +307,10 @@ module VMTranslator
     ensure
       # TODO: Should the program_counter be reset back to 0
       # when for each function?
-      @program_counter += 1 if VMTranslator::Commands.statement?(line)
+      @program_counter += 1 if Commands.statement?(line)
     end
 
-    attr_reader :stack, :program_counter
+    attr_reader :lines, :stack, :program_counter
     attr_reader :constant_ram, :local_ram, :argument_ram, :this_ram, :that_ram, :temp_ram, :pointer_ram, :static_ram
   end
 end
