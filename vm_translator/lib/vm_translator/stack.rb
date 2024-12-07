@@ -90,39 +90,6 @@ module VMTranslator
       asm_binary_operation('JGT')
     end
 
-    def and
-      reset_to_one = <<~RESET
-        D=-1
-      RESET
-      puts reset_to_one.chomp
-      puts
-      result = count_lines(reset_to_one)
-
-      result += pop(0)
-      result += and_operation
-
-      result += pop(0)
-      result += and_operation
-
-      result += push(0)
-
-      result
-    end
-
-    def or
-      result = asm_reset_to_zero
-
-      result += pop(0)
-      result += or_operation
-
-      result += pop(0)
-      result += or_operation
-
-      result += push(0)
-
-      result
-    end
-
     def neg
       result = pop(0)
       operation = <<~NEGATE
@@ -242,23 +209,6 @@ module VMTranslator
 
       result
     end
-
-    # def asm_operation_result(binary_operator_type)
-    #   execute = <<~EQUALITY
-    #     @#{go_to_if_true}
-    #     D;#{binary_operator_type}
-    #
-    #     D=0
-    #     @#{go_to_end}
-    #     0;JMP
-    #
-    #     (#{go_to_if_true})
-    #     D=-1
-    #     (#{go_to_end})
-    #   EQUALITY
-    #
-    #   execute.chomp
-    # end
 
     def asm_reset_to_zero
       reset_to_zero = <<~RESET
