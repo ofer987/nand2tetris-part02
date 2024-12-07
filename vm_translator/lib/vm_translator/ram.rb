@@ -159,6 +159,16 @@ module VMTranslator
       @go_to_counter += 1
     end
 
+    def count_lines(command)
+      command
+        .split("\n")
+        .map(&:split)
+        .reject(&:blank?)
+        .reject { |line| line.start_with? '//' }
+
+      command.size
+    end
+
     attr_reader :go_to_counter
   end
 end

@@ -59,14 +59,16 @@ module VMTranslator
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
         ram, value = parse(inner_match)
-        ram.pop(value)
-        stack.push(value)
+
+        @program_counter += ram.pop(value)
+        @program_counter += stack.push
       elsif line.match? VMTranslator::Commands::POP_REGEX
         inner_match = line.match(VMTranslator::Commands::POP_REGEX)[1].to_s
 
         ram, value = parse(inner_match)
-        stack.pop(value)
-        ram.push(value)
+
+        @program_counter += stack.pop(value)
+        @program_counter += ram.push
       elsif line.match? VMTranslator::Commands::CONSTANT_REGEX
         value = line.match(VMTranslator::Commands::CONSTANT_REGEX)[1].to_i
 
@@ -100,68 +102,77 @@ module VMTranslator
 
         [static_ram, value]
       elsif line.match? VMTranslator::Commands::ADD_REGEX
-        stack.asm_reset_to_zero
+        result = stack.asm_reset_to_zero
 
-        first_value = stack.pop(0)
-        stack.add_operation
+        result += stack.pop(0)
+        result += stack.add_operation
 
-        second_value = stack.pop(0)
-        stack.add_operation
+        result += stack.pop(0)
+        result += stack.add_operation
 
-        stack.push(second_value + first_value)
+        result += stack.push
+
+        @program_counter += result
       elsif line.match? VMTranslator::Commands::SUB_REGEX
-        stack.asm_reset_to_zero
+        result += stack.asm_reset_to_zero
 
-        first_value = stack.pop(0)
-        stack.sub_operation
+        result += stack.pop(0)
+        result += stack.sub_operation
 
-        second_value = stack.pop(0)
-        stack.sub_operation
+        result += stack.pop(0)
+        result += stack.sub_operation
 
-        stack.push(second_value - first_value)
+        result += stack.push
+
+        @program_counter += result
       elsif line.match? VMTranslator::Commands::EQ_REGEX
-        stack.eq
+        @program_counter += stack.eq
       elsif line.match? VMTranslator::Commands::LT_REGEX
-        stack.lt
+        @program_counter += stack.lt
       elsif line.match? VMTranslator::Commands::GT_REGEX
-        stack.gt
+        @program_counter += stack.gt
       elsif line.match? VMTranslator::Commands::NEG_REGEX
-        stack.neg
+        @program_counter += stack.neg
       elsif line.match? VMTranslator::Commands::AND_REGEX
-        stack.asm_reset_to_one
+        result = stack.asm_reset_to_one
 
-        first_value = stack.pop(0)
-        stack.and_operation
+        result += stack.pop(0)
+        result += stack.and_operation
 
-        second_value = stack.pop(0)
-        stack.and_operation
+        result += stack.pop(0)
+        result += stack.and_operation
 
-        stack.push(second_value & first_value)
+        result += stack.push
+
+        @program_counter += result
       elsif line.match? VMTranslator::Commands::OR_REGEX
-        stack.asm_reset_to_zero
+        result = stack.asm_reset_to_zero
 
-        first_value = stack.pop(0)
-        stack.or_operation
+        result += stack.pop(0)
+        result += stack.or_operation
 
-        second_value = stack.pop(0)
-        stack.or_operation
+        result += stack.pop(0)
+        result += stack.or_operation
 
-        stack.push(second_value | first_value)
+        result += stack.push
+
+        @program_counter = result
       elsif line.match? VMTranslator::Commands::NOT_REGEX
-        stack.not
+        @program_counter += stack.not
+        # Should I also push here? instead of within the #not method?
       elsif line.match? VMTranslator::Commands::LABEL_REGEX
         label_name = line.match(VMTranslator::Commands::LABEL_REGEX)[1].to_s
 
-        stack.add_label(label_name, program_counter)
+        @program_counter += stack.add_label(label_name, program_counter)
       elsif line.match? VMTranslator::Commands::GO_TO_NOW_REGEX
         label_name = line.match(VMTranslator::Commands::GO_TO_NOW_REGEX)[1].to_s
 
-        stack.go_to_now(label_name)
+        @program_counter += stack.go_to_now(label_name)
       elsif line.match? VMTranslator::Commands::GO_TO_IF_REGEX
         label_name = line.match(VMTranslator::Commands::GO_TO_IF_REGEX)[1].to_s
 
         stack.pop(0)
-        stack.go_to_if(label_name, argument_ram)
+        @program_counter += stack.go_to_if(label_name, argument_ram)
       elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
         name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i + 1
@@ -198,7 +209,7 @@ module VMTranslator
         # ram_classes.each do |klazz|
         #   klazz.pop
         #
-        #   stack.push(0)
+        #   stack.push
         # end
 
         # Now, allocate RAM for the function
@@ -243,7 +254,7 @@ module VMTranslator
         ram_classes.each do |klazz|
           klazz.pop
 
-          stack.push(0)
+          stack.push
         end
 
         # Allocate Local, Argument, This, and That here
@@ -267,7 +278,7 @@ module VMTranslator
         # ram_classes.each do |klazz|
         #   klazz.pop
         #
-        #   stack.push(0)
+        #   stack.push
         # end
 
         stack.call_function(function_name, function.label)

@@ -15,6 +15,8 @@ module VMTranslator
 
       puts pop.chomp
       puts
+
+      count_lines(pop)
     end
 
     def self.push
@@ -26,9 +28,9 @@ module VMTranslator
 
       puts push.chomp
       puts
-    end
 
-    attr_reader :vm_stack
+      count_lines(push)
+    end
 
     def address_local
       STACK_ADDRESS_LOCATION
@@ -38,12 +40,11 @@ module VMTranslator
       super
 
       @labels = {}
-      @vm_stack = VMStack.new
       @go_to_counter = 0
       @function_counter = 0
     end
 
-    def pop(_value)
+    def pop
       pop = <<~POP
         // Decrement the Stack
         @#{address_local}
@@ -52,10 +53,10 @@ module VMTranslator
       puts pop.chomp
       puts
 
-      vm_stack.pop
+      count_lines(pop)
     end
 
-    def push(value)
+    def push
       command = <<~COMMAND
         // Set Stack to the D Register
         @#{address_local}
@@ -64,7 +65,6 @@ module VMTranslator
       COMMAND
       puts command.chomp
       puts
-      vm_stack.push(value)
 
       increment_stack = <<~COMMAND
         @#{address_local}
@@ -74,6 +74,8 @@ module VMTranslator
       puts
 
       increment_go_to_counter
+
+      count_lines("#{command}\n#{increment_stack}")
     end
 
     def eq
@@ -162,16 +164,18 @@ module VMTranslator
     end
 
     def not
-      value = pop(0)
+      result = pop
       operation = <<~NEGATE
         @0
         D=!D
       NEGATE
       puts operation.chomp
       puts
+      result += count_lines(operation)
 
-      result = ~value
-      push(result)
+      result += push
+
+      result
     end
 
     def add_operation
@@ -185,6 +189,8 @@ module VMTranslator
 
       puts result.chomp
       puts
+
+      count_lines(result)
     end
 
     def sub_operation
@@ -198,6 +204,8 @@ module VMTranslator
 
       puts result.chomp
       puts
+
+      count_lines(result)
     end
 
     def and_operation
@@ -227,10 +235,9 @@ module VMTranslator
     end
 
     def asm_binary_operation(operator, &block)
-      puts asm_reset_to_zero
-      puts
+      result = asm_reset_to_zero
 
-      first_value = pop(0)
+      result += pop
       puts sub_operation
       puts
 
@@ -256,22 +263,22 @@ module VMTranslator
       block.call(first_value, second_value)
     end
 
-    def asm_operation_result(binary_operator_type)
-      execute = <<~EQUALITY
-        @#{go_to_if_true}
-        D;#{binary_operator_type}
-
-        D=0
-        @#{go_to_end}
-        0;JMP
-
-        (#{go_to_if_true})
-        D=-1
-        (#{go_to_end})
-      EQUALITY
-
-      execute.chomp
-    end
+    # def asm_operation_result(binary_operator_type)
+    #   execute = <<~EQUALITY
+    #     @#{go_to_if_true}
+    #     D;#{binary_operator_type}
+    #
+    #     D=0
+    #     @#{go_to_end}
+    #     0;JMP
+    #
+    #     (#{go_to_if_true})
+    #     D=-1
+    #     (#{go_to_end})
+    #   EQUALITY
+    #
+    #   execute.chomp
+    # end
 
     def asm_reset_to_zero
       reset_to_zero = <<~RESET
@@ -280,6 +287,8 @@ module VMTranslator
 
       puts reset_to_zero.chomp
       puts
+
+      count_lines(reset_to_zero)
     end
 
     def asm_reset_to_one
@@ -288,6 +297,8 @@ module VMTranslator
       RESET
       puts reset_to_one.chomp
       puts
+
+      count_lines(reset_to_one)
     end
 
     def add_label(name, program_counter)
@@ -298,6 +309,8 @@ module VMTranslator
       LABEL
 
       puts label_statement.chomp
+
+      count_lines(label_statement)
     end
 
     def go_to_now(name)
@@ -308,6 +321,8 @@ module VMTranslator
 
       puts go_to_statement.chomp
       puts
+
+      count_lines(go_to_now)
     end
 
     def go_to_if(name, ram)
@@ -323,6 +338,8 @@ module VMTranslator
 
       puts go_to_statement.chomp
       puts
+
+      count_lines(go_to_statement)
     end
 
     def call_function(function)
@@ -337,6 +354,8 @@ module VMTranslator
 
       puts call_statements.chomp
       puts
+
+      count_lines(call_statements)
     end
 
     private
