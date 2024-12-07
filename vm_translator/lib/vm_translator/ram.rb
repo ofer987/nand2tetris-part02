@@ -24,7 +24,7 @@ module VMTranslator
     #   COMMAND
     #
     #   puts pop.chomp
-    #   puts
+    #   statements << "\n"
     # end
     #
     # def self.push_value(address)
@@ -35,7 +35,7 @@ module VMTranslator
     #   COMMAND
     #
     #   puts pop.chomp
-    #   puts
+    #   statements << "\n"
     # end
 
     attr_reader :vm_stack
@@ -59,6 +59,7 @@ module VMTranslator
     def pop(indexed_address)
       validate_memory_address(indexed_address)
 
+      statements = []
       command = <<~COMMAND
         // Set the D Register the value of the #{self.class} Memory Segment
         @#{indexed_address}
@@ -68,16 +69,17 @@ module VMTranslator
         A=M+D
         D=M
       COMMAND
-      puts command.chomp
-      puts
+      statements.concat command.split("\n")
+      statements << "\n"
 
-      increment_go_to_counter
+      statements
     end
 
     # Set RAM to value that had been previously popped from Stack
     def push(indexed_address)
       validate_memory_address(indexed_address)
 
+      statements = []
       command = <<~COMMAND
         // Set the M Pointer of the #{self.class} Memory Segment to the value of #{address_local} + #{indexed_address}
         @#{address_local}
@@ -103,13 +105,14 @@ module VMTranslator
         @#{address_local}
         M=M-D
       COMMAND
-      puts command.chomp
-      puts
+      statements.concat command.split("\n")
+      statements << "\n"
 
-      increment_go_to_counter
+      statements
     end
 
     def reset_pointer(address)
+      statements = []
       command = <<~COMMAND
         // Reset the pointer of #{self.class} to #{address}
         @#{address}
@@ -119,11 +122,14 @@ module VMTranslator
         M=D
       COMMAND
 
-      puts command.chomp
-      puts
+      statements << command.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def set(indexed_address, value)
+      statements = []
       command = <<~COMMAND
         // Set the value of Address (#{address_local + indexed_address}) to Value (#{value})
         @#{value}
@@ -133,8 +139,10 @@ module VMTranslator
         M=D
       COMMAND
 
-      puts command.chomp
-      puts
+      statements.concat command.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     protected

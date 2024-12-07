@@ -55,21 +55,22 @@ module VMTranslator
     private
 
     def parse_line(index, line)
+      statements = []
 
       if line.match? VMTranslator::Commands::PUSH_REGEX
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
         ram, value = parse_line(index, inner_match)
 
-        @program_counter += ram.pop(value)
-        @program_counter += stack.push(value)
+        statements.concat ram.pop(value)
+        statements.concat stack.push(value)
       elsif line.match? VMTranslator::Commands::POP_REGEX
         inner_match = line.match(VMTranslator::Commands::POP_REGEX)[1].to_s
 
         ram, value = parse_line(index, inner_match)
 
-        @program_counter += stack.pop(value)
-        @program_counter += ram.push(value)
+        statements.concat stack.pop(value)
+        statements.concat ram.push(value)
       elsif line.match? VMTranslator::Commands::CONSTANT_REGEX
         value = line.match(VMTranslator::Commands::CONSTANT_REGEX)[1].to_i
 
@@ -103,77 +104,68 @@ module VMTranslator
 
         [static_ram, value]
       elsif line.match? VMTranslator::Commands::ADD_REGEX
-        result = stack.asm_reset_to_zero
+        statements.concat stack.asm_reset_to_zero
 
-        result += stack.pop(0)
-        result += stack.add_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.add_operation
 
-        result += stack.pop(0)
-        result += stack.add_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.add_operation
 
-        result += stack.push(0)
-
-        @program_counter += result
+        statements.concat stack.push(0)
       elsif line.match? VMTranslator::Commands::SUB_REGEX
-        result = stack.asm_reset_to_zero
+        statements.concat stack.asm_reset_to_zero
 
-        result += stack.pop(0)
-        result += stack.sub_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.sub_operation
 
-        result += stack.pop(0)
-        result += stack.sub_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.sub_operation
 
-        result += stack.push(0)
-
-        @program_counter += result
+        statements.concat stack.push(0)
       elsif line.match? VMTranslator::Commands::EQ_REGEX
-        @program_counter += stack.eq
+        statements.concat stack.eq
       elsif line.match? VMTranslator::Commands::LT_REGEX
-        @program_counter += stack.lt
+        statements.concat stack.lt
       elsif line.match? VMTranslator::Commands::GT_REGEX
-        @program_counter += stack.gt
+        statements.concat stack.gt
       elsif line.match? VMTranslator::Commands::NEG_REGEX
-        @program_counter += stack.neg
+        statements.concat stack.neg
       elsif line.match? VMTranslator::Commands::AND_REGEX
-        result = stack.asm_reset_to_one
+        statements.concat stack.asm_reset_to_one
 
-        result += stack.pop(0)
-        result += stack.and_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.and_operation
 
-        result += stack.pop(0)
-        result += stack.and_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.and_operation
 
-        result += stack.push(0)
-
-        @program_counter += result
+        statements.concat stack.push(0)
       elsif line.match? VMTranslator::Commands::OR_REGEX
-        result = stack.asm_reset_to_zero
+        statements.concat stack.asm_reset_to_zero
 
-        result += stack.pop(0)
-        result += stack.or_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.or_operation
 
-        result += stack.pop(0)
-        result += stack.or_operation
+        statements.concat stack.pop(0)
+        statements.concat stack.or_operation
 
-        result += stack.push(0)
-
-        @program_counter = result
+        statements.concat stack.push(0)
       elsif line.match? VMTranslator::Commands::NOT_REGEX
-        @program_counter += stack.not
-        # Should I also push here? instead of within the #not method?
+        statements.concat stack.not
       elsif line.match? VMTranslator::Commands::LABEL_REGEX
         label_name = line.match(VMTranslator::Commands::LABEL_REGEX)[1].to_s
 
-        @program_counter += stack.add_label(label_name, program_counter)
+        statements.concat stack.add_label(label_name, program_counter)
       elsif line.match? VMTranslator::Commands::GO_TO_NOW_REGEX
         label_name = line.match(VMTranslator::Commands::GO_TO_NOW_REGEX)[1].to_s
 
-        @program_counter += stack.go_to_now(label_name)
+        statements.concat stack.go_to_now(label_name)
       elsif line.match? VMTranslator::Commands::GO_TO_IF_REGEX
         label_name = line.match(VMTranslator::Commands::GO_TO_IF_REGEX)[1].to_s
 
-        stack.pop(0)
-        @program_counter += stack.go_to_if(label_name, argument_ram)
+        statements.concat stack.pop(0)
+        statements.concat stack.go_to_if(label_name, argument_ram)
       elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
         name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i + 1
@@ -305,9 +297,24 @@ module VMTranslator
         # elsif
       end
     ensure
-      # TODO: Should the program_counter be reset back to 0
-      # when for each function?
-      @program_counter += 1 if Commands.statement?(line)
+      print(statements)
+    end
+
+    def print(statements)
+      statements = Array(statements).map(&:strip)
+
+      statements.size.times.each do |index|
+        statement = statements[index]
+
+        is_empty = false
+        is_empty = true if statement.empty?
+        is_empty = true if statement.start_with? '//'
+
+        puts "// PC: #{program_counter}" unless is_empty
+        puts statement
+
+        @program_counter += 1 unless is_empty
+      end
     end
 
     attr_reader :lines, :stack, :program_counter

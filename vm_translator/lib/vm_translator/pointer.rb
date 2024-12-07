@@ -11,31 +11,35 @@ module VMTranslator
     def pop(indexed_address)
       validate_memory_address(indexed_address)
 
+      statements = []
       command = <<~COMMAND
         // Set the D Register the value of the Memory Segment
         @#{address_local + indexed_address}
         D=M
       COMMAND
-      puts command.chomp
+      statements.concat command.split("\n")
+      statements << "\n"
 
       increment_go_to_counter
 
-      count_lines(command)
+      statements
     end
 
     def push(indexed_address)
       validate_memory_address(indexed_address)
 
+      statements = []
       command = <<~COMMAND
         // Set the M Pointer of #{self.class} Memory Segment to the value of #{address_local} + #{indexed_address}
         @#{address_local + indexed_address}
         M=D
       COMMAND
-      puts command.chomp
+      statements.concat command.split("\n")
+      statements << "\n"
 
       increment_go_to_counter
 
-      count_lines(command)
+      statements
     end
 
     protected

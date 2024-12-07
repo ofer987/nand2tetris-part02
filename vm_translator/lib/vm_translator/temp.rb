@@ -11,29 +11,31 @@ module VMTranslator
     def pop(indexed_address)
       validate_memory_address(indexed_address)
 
+      statements = []
       command = <<~COMMAND
         @#{address_local + indexed_address}
         D=M
       COMMAND
 
-      puts command.chomp
-      puts
+      statements.concat command.split("\n")
+      statements << "\n"
 
-      count_lines(command)
+      statements
     end
 
     def push(indexed_address)
       validate_memory_address(indexed_address)
 
+      statements = []
       command = <<~COMMAND
         @#{address_local + indexed_address}
         M=D
       COMMAND
 
-      puts command.chomp
-      puts
+      statements.concat command.split("\n")
+      statements << "\n"
 
-      count_lines(command)
+      statements
     end
 
     protected

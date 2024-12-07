@@ -14,9 +14,9 @@ module VMTranslator
       COMMAND
 
       puts pop.chomp
-      puts
+      statements << "\n"
 
-      count_lines(pop)
+      # count_lines(pop)
     end
 
     def self.push
@@ -27,9 +27,9 @@ module VMTranslator
       COMMAND
 
       puts push.chomp
-      puts
+      statements << "\n"
 
-      count_lines(push)
+      # count_lines(push)
     end
 
     def address_local
@@ -45,37 +45,41 @@ module VMTranslator
     end
 
     def pop(_value)
+      statements = []
+
       pop = <<~POP
         // Decrement the Stack
         @#{address_local}
         M=M-1
       POP
-      puts pop.chomp
-      puts
+      statements.concat pop.split("\n")
+      statements << "\n"
 
-      count_lines(pop)
+      statements
     end
 
     def push(_indexed_address)
+      statements = []
+
       command = <<~COMMAND
         // Set Stack to the D Register
         @#{address_local}
         A=M
         M=D
       COMMAND
-      puts command.chomp
-      puts
+      statements.concat command.split("\n")
+      statements << "\n"
 
       increment_stack = <<~COMMAND
         @#{address_local}
         M=M+1
       COMMAND
-      puts increment_stack.chomp
-      puts
+      statements.concat increment_stack.split("\n")
+      statements << "\n"
 
       increment_go_to_counter
 
-      count_lines("#{command}\n#{increment_stack}")
+      statements
     end
 
     def eq
@@ -91,36 +95,40 @@ module VMTranslator
     end
 
     def neg
-      result = pop(0)
+      statements = []
+
+      statements.concat pop(0)
       operation = <<~NEGATE
         @0
         D=A-D
       NEGATE
-      puts operation.chomp
-      puts
-      result += count_lines(operation)
+      statements.concat operation.split("\n")
+      statements << "\n"
 
-      result += push(0)
+      statements.concat push(0)
 
-      result
+      statements
     end
 
     def not
-      result = pop(0)
+      statements = []
+
+      statements.concat pop(0)
       operation = <<~NEGATE
         @0
         D=!D
       NEGATE
-      puts operation.chomp
-      puts
-      result += count_lines(operation)
+      statements.concat operation.split("\n")
+      statements << "\n"
 
-      result += push(0)
+      statements.concat push(0)
 
-      result
+      statements
     end
 
     def add_operation
+      statements = []
+
       result = <<~VALUE
         @#{address_local}
         A=M
@@ -129,13 +137,15 @@ module VMTranslator
         D=M+D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
 
-      count_lines(result)
+      statements
     end
 
     def sub_operation
+      statements = []
+
       result = <<~VALUE
         @#{address_local}
         A=M
@@ -144,13 +154,15 @@ module VMTranslator
         D=M-D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
 
-      count_lines(result)
+      statements
     end
 
     def and_operation
+      statements = []
+
       result = <<~VALUE
         @#{address_local}
         A=M
@@ -159,13 +171,15 @@ module VMTranslator
         D=M&D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
 
-      count_lines(result)
+      statements
     end
 
     def or_operation
+      statements = []
+
       result = <<~VALUE
         @#{address_local}
         A=M
@@ -174,20 +188,22 @@ module VMTranslator
         D=M|D
       VALUE
 
-      puts result.chomp
-      puts
+      statements.concat result.split("\n")
+      statements << "\n"
 
-      count_lines(result)
+      statements
     end
 
     def asm_binary_operation(operator)
-      result = asm_reset_to_zero
+      statements = []
 
-      result += pop(0)
-      result += sub_operation
+      statements.concat asm_reset_to_zero
 
-      result += pop(0)
-      result += sub_operation
+      statements.concat pop(0)
+      statements.concat sub_operation
+
+      statements.concat pop(0)
+      statements.concat sub_operation
 
       execute = <<~EQUALITY
         @#{go_to_if_true}
@@ -201,61 +217,71 @@ module VMTranslator
         D=-1
         (#{go_to_end})
       EQUALITY
-      puts execute.chomp
-      puts
-      result += count_lines(execute)
+      statements.concat execute.split("\n")
+      statements << "\n"
 
-      result += push(0)
+      statements.concat push(0)
 
-      result
+      statements
     end
 
     def asm_reset_to_zero
+      statements = []
+
       reset_to_zero = <<~RESET
         D=0
       RESET
 
-      puts reset_to_zero.chomp
-      puts
+      statements.concat reset_to_zero.split("\n")
+      statements << "\n"
 
-      count_lines(reset_to_zero)
+      statements
     end
 
     def asm_reset_to_one
+      statements = []
+
       reset_to_one = <<~RESET
         D=-1
       RESET
-      puts reset_to_one.chomp
-      puts
 
-      count_lines(reset_to_one)
+      statements.concat reset_to_one.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def add_label(name, program_counter)
+      statements = []
+
       labels[name] = program_counter.to_i
 
       label_statement = <<~LABEL
         (#{name})
       LABEL
 
-      puts label_statement.chomp
+      statements.concat label_statement.split("\n")
 
-      count_lines(label_statement)
+      statements
     end
 
     def go_to_now(name)
+      statements = []
+
       go_to_statement = <<~COMMAND
         @#{name}
         0;JMP
       COMMAND
 
-      puts go_to_statement.chomp
-      puts
+      statements.concat go_to_statement.split("\n")
+      statements << "\n"
 
-      count_lines(go_to_now)
+      statements
     end
 
     def go_to_if(name, ram)
+      statements = []
+
       go_to_statement = <<~COMMAND
         // The D Register stores the value
         @#{ram.address_local}
@@ -266,10 +292,10 @@ module VMTranslator
         D;JGT
       COMMAND
 
-      puts go_to_statement.chomp
-      puts
+      statements.concat go_to_statement.split("\n")
+      statements << "\n"
 
-      count_lines(go_to_statement)
+      statements
     end
 
     def call_function(function)
@@ -283,9 +309,7 @@ module VMTranslator
       function.increment_return_counter
 
       puts call_statements.chomp
-      puts
-
-      count_lines(call_statements)
+      statements << "\n"
     end
 
     private
