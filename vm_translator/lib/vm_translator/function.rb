@@ -22,7 +22,7 @@ module VMTranslator
     def local_total
       return @local_total if defined? @local_total
 
-      local_variable_address_indices = body[..find_end_body_index]
+      local_variable_address_indices = body[..end_body_index]
         .select { |line| line.match? line.match? VMTranslator::Commands::LOCAL_REGEX }
         .map { |line| line.match(VMTranslator::Commands::LOCAL_REGEX)[1].to_i }
 
@@ -46,6 +46,14 @@ module VMTranslator
         @is_argument_ram_initialized &&
         @is_this_ram_initialized &&
         @is_that_ram_initialized
+    end
+
+    def body_statements
+      return @body_statements if defined? @body_statements
+
+      @body_statements = end_body_index.times.map do |index|
+        @body[index]
+      end
     end
 
     def initialize(name, body)
@@ -90,7 +98,8 @@ module VMTranslator
     def initialize_local_ram(stack, ram)
       statements = []
 
-      statements.concat stack.pointer(0)
+      statements.concat stack.pointer
+      # TODO: use reset_pointer_by_new_address
       statements.concat VMTranslator::Local.push
 
       local_total.times.each do |_index|
@@ -98,7 +107,6 @@ module VMTranslator
       end
 
       @is_local_ram_initialized = true
-
       statements
     rescue StandardError => e
       puts "Error: Program crashed: #{e}"
@@ -111,14 +119,17 @@ module VMTranslator
       @argument_total = argument_total
 
       statements = []
-      statements.concat stack.pointer(local_total)
+      statements.concat stack.pointer
+      # TODO: use reset_pointer_by_new_address
       statements.concat VMTranslator::Argument.push
 
       argument_total.times.each do |index|
+        # TODO: use object method instead of class method
         statements.concat VMTranslator::Stack.pop(5 + argument_total + 1 + index)
         statements.concat ram.push
       end
 
+      # What is this for?
       statements.concat VMTranslator::Stack.push
 
       @is_argument_ram_initialized = true
@@ -148,7 +159,6 @@ module VMTranslator
       statements.concat VMTranslator::That.push(START_THAT_ADDRESS_INDEX)
 
       @is_that_ram_initialized = true
-
       statements
     rescue StandardError => e
       puts "Error: Program crashed: #{e}"
@@ -167,15 +177,15 @@ module VMTranslator
 
     private
 
-    def find_end_body_index
-      return @find_end_body_index if defined? @find_end_body_index
+    def end_body_index
+      return @end_body_index if defined? @end_body_index
 
       index = 0
       @body.each do |line|
         if line.match? RETURN_REGEX
-          @find_end_body_index = index
+          @end_body_index = index
 
-          return @find_end_body_index
+          return @end_body_index
         end
 
         index += 1

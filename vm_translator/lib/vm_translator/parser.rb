@@ -187,6 +187,10 @@ module VMTranslator
         statements.concat function.initialize_that_ram
 
         statements.concat stack.reset_pointer_by_offset(function.local_total + function.argument_total)
+
+        # TODO: review this
+        # statements.concat function.body_statements
+
         # @last_function_end_address_space_index = function.end_ram_address_space_index
 
         # local_total = function.initialize_local_ram(stack, @last_function_end_address_space_index + 1)
@@ -295,8 +299,8 @@ module VMTranslator
 
           klazz.push
         end
-        # TODO: Function's return command
-        # elsif
+
+        # TODO: Write the JUMP Assembly command to return to the @program_counter
       end
     ensure
       print(statements)
