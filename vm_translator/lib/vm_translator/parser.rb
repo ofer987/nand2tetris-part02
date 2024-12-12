@@ -181,10 +181,12 @@ module VMTranslator
         # function_size = functions.size
         # function.allocate_ram(@last_function_end_address_space_index, argument_total)
 
-        function.initialize_local_ram(local_ram)
-        function.initialize_argument_ram(argument_ram, argument_total)
-        function.initialize_this_ram
-        function.initialize_that_ram
+        statements.concat function.initialize_local_ram(stack, local_ram)
+        statements.concat function.initialize_argument_ram(stack, argument_ram, argument_total)
+        statements.concat function.initialize_this_ram
+        statements.concat function.initialize_that_ram
+
+        statements.concat stack.reset_pointer_by_offset(function.local_total + function.argument_total)
         # @last_function_end_address_space_index = function.end_ram_address_space_index
 
         # local_total = function.initialize_local_ram(stack, @last_function_end_address_space_index + 1)

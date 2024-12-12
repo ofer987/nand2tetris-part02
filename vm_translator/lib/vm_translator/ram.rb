@@ -111,7 +111,38 @@ module VMTranslator
       statements
     end
 
-    def reset_pointer(address)
+    def pointer
+      statements = []
+
+      command = <<~COMMAND
+        // Get the address that #{self.class} points to
+        @#{address_local}
+        D=M
+      COMMAND
+
+      statements.concat command.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
+    def reset_pointer_by_offset(offset)
+      statements = []
+
+      command = <<~COMMAND
+        // Offset the pointer #{self.class} by #{offset}
+        @#{offset}
+        D=A
+
+        @#{address_local}
+        M=M+D
+      COMMAND
+
+      statements.concat command.split("\n")
+      statements << "\n"
+    end
+
+    def reset_pointer_by_new_address(address)
       statements = []
       command = <<~COMMAND
         // Reset the pointer of #{self.class} to #{address}
