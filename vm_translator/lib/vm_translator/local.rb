@@ -11,6 +11,8 @@ module VMTranslator
       COMMAND
 
       statements.concat pop.split("\n")
+      statements << "\n"
+
       statements
     end
 
@@ -23,6 +25,8 @@ module VMTranslator
       COMMAND
 
       statements.concat push.split("\n")
+      statements << "\n"
+
       statements
     end
 

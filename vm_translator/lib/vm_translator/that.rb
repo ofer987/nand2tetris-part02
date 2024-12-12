@@ -3,25 +3,31 @@
 module VMTranslator
   class That < RAM
     def self.pop
+      statements = []
       pop = <<~COMMAND
         // Store the value of RAM[#{THAT_ADDRESS_LOCATION}] into the D Register
         #{THAT_ADDRESS_LOCATION}
         D=M
       COMMAND
 
-      puts pop.chomp
-      puts
+      statements.concat pop.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     def self.push
+      statements = []
       push = <<~COMMAND
         // Store the value of the D Register into RAM[#{THAT_ADDRESS_LOCATION}]
         @#{THAT_ADDRESS_LOCATION}
         M=D
       COMMAND
 
-      puts push.chomp
-      puts
+      statements.concat push.split("\n")
+      statements << "\n"
+
+      statements
     end
 
     attr_reader :vm_stack
