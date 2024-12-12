@@ -50,7 +50,7 @@ module VMTranslator
     private
 
     def label(indexed_address)
-      "Foo.#{indexed_address}"
+      "Foo.$#{indexed_address}"
     end
   end
 end
