@@ -181,6 +181,7 @@ module VMTranslator
         # function_size = functions.size
         # function.allocate_ram(@last_function_end_address_space_index, argument_total)
 
+        statements << function.label
         statements.concat function.initialize_local_ram(stack, local_ram)
         statements.concat function.initialize_argument_ram(stack, argument_ram, argument_total)
         statements.concat function.initialize_this_ram
@@ -239,7 +240,8 @@ module VMTranslator
           exit 1
         end
 
-        # Reset the Stack back to its original address when the function returns
+        # Push the current stack address (i.e., the Program Counter)
+        # Into the Stack
         constant_ram.pop(@program_counter)
         stack.push(0)
 
@@ -250,11 +252,14 @@ module VMTranslator
           VMTranslator::That
         ]
 
+        # Push the locations of RAM into the Stack
         ram_classes.each do |klazz|
           klazz.pop
 
           stack.push(0)
         end
+
+        function.execute
 
         # Allocate Local, Argument, This, and That here
         # function.allocate_ram(VMTranslator::Stack.pop, argument_total)
@@ -280,12 +285,28 @@ module VMTranslator
         #   stack.push
         # end
 
-        stack.call_function(function_name, function.label)
+        # stack.call_function(function_name, function.label)
 
+        # Store the return value in the Stack
+
+        # Store the return value into the temp
+        stack.pop
+        temp_ram.push(0)
+        # stack.reset_pointer_to_d_register
+        # local_ram.push
+        # argument_ram.push
+
+        # Reset the Stack to Local's address
         VMTranslator::Local.pop
-        VMTranslator::Stack.push
-        stack.pop(0)
+        stack.reset_pointer_to_d_register
+        # stack.reset_pointer_by_offset(5)
+        # stack.pop
+        # stack.push
+        # VMTranslator::Argument
 
+        # VMTranslator::Stack.push
+
+        # stack.reset_pointer_to_d_register
         restore_ram_classes = [
           VMTranslator::That,
           VMTranslator::This,
@@ -294,13 +315,25 @@ module VMTranslator
           VMTranslator::Stack
         ]
 
+        # Restore the RAMs and the Stack
+        stack.pop(0)
         restore_ram_classes.each do |klazz|
           stack.pop(0)
 
           klazz.push
         end
 
-        # TODO: Write the JUMP Assembly command to return to the @program_counter
+        # The Stack should now be pointing to the Return Address
+
+        # Push (i.e., store) the current address in Temp 1
+        stack.pop(0)
+        temp_ram.push(1)
+
+        stack.pop(0)
+        argument_ram.push(0)
+
+        temp_ram.pop(1)
+        stack.push(0)
       end
     ensure
       print(statements)

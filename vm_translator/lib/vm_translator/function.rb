@@ -48,13 +48,27 @@ module VMTranslator
         @is_that_ram_initialized
     end
 
-    def body_statements
-      return @body_statements if defined? @body_statements
+    def execute
+      statements = []
 
-      @body_statements = end_body_index.times.map do |index|
-        @body[index]
-      end
+      command = <<~COMMAND
+        @#{name}
+        0;JMP
+      COMMAND
+
+      statements.concat command.split("\n")
+      statements << "\n"
+
+      statements
     end
+    #
+    # def body_statements
+    #   return @body_statements if defined? @body_statements
+    #
+    #   @body_statements = end_body_index.times.map do |index|
+    #     @body[index]
+    #   end
+    # end
 
     def initialize(name, body)
       @name = name
@@ -165,6 +179,10 @@ module VMTranslator
       puts e.backtrace
 
       exit 1
+    end
+
+    def label
+      @label ||= "(#{name})"
     end
 
     def return_label

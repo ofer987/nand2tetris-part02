@@ -55,6 +55,20 @@ module VMTranslator
       @address_space_size = address_space_size unless address_space_size.nil?
     end
 
+    # TODO: Rename
+    def set_first_memory_register
+      statements = []
+      command = <<~COMMAND
+        // Set the D Register the value of the #{self.class} Memory Segment
+        @#{address_local}
+        D=M
+      COMMAND
+      statements.concat command.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
     # Set the D Register the value of the Memory Segment
     def pop(indexed_address)
       validate_memory_address(indexed_address)
@@ -142,13 +156,10 @@ module VMTranslator
       statements << "\n"
     end
 
-    def reset_pointer_by_new_address(address)
+    def reset_pointer_to_d_register
       statements = []
       command = <<~COMMAND
-        // Reset the pointer of #{self.class} to #{address}
-        @#{address}
-        D=A
-
+        // Reset the pointer of #{self.class} to the value in the D Register
         @#{address_local}
         M=D
       COMMAND

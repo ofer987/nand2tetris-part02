@@ -50,8 +50,11 @@ module VMTranslator
       statements = []
 
       pop = <<~POP
-        // Decrement the Stack
+        // Set the D Register to the value stored at #{address_local}
         @#{address_local}
+        D=M
+
+        // Decrement the Stack
         M=M-1
       POP
       statements.concat pop.split("\n")
