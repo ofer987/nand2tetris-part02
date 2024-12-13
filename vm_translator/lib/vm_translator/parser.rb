@@ -116,25 +116,9 @@ module VMTranslator
 
         [static_ram, value]
       elsif line.match? VMTranslator::Commands::ADD_REGEX
-        statements.concat stack.asm_reset_to_zero
-
-        statements.concat stack.pop(0)
-        statements.concat stack.add_operation
-
-        statements.concat stack.pop(0)
-        statements.concat stack.add_operation
-
-        statements.concat stack.push(0)
+        statements.concat stack.add
       elsif line.match? VMTranslator::Commands::SUB_REGEX
-        statements.concat stack.asm_reset_to_zero
-
-        statements.concat stack.pop(0)
-        statements.concat stack.sub_operation
-
-        statements.concat stack.pop(0)
-        statements.concat stack.sub_operation
-
-        statements.concat stack.push(0)
+        statements.concat stack.sub
       elsif line.match? VMTranslator::Commands::EQ_REGEX
         statements.concat stack.eq
       elsif line.match? VMTranslator::Commands::LT_REGEX
@@ -385,19 +369,15 @@ module VMTranslator
         statements.concat temp_ram.pop(0)
         statements.concat VMTranslator::Stack.push
 
-        # Sub seven (7) for the return address
+        # TODO: add one to argument_ram.value
+        # And then Stack#reset_pointer_by_offset
+        # Sub seven (6) for the return address
         statements.concat temp_ram.pop(0)
         statements.concat stack.push(0)
 
         statements.concat constant_ram.pop(6)
         statements.concat stack.push(0)
-        statements.concat stack.asm_reset_to_zero
-
-        statements.concat stack.pop(0)
-        statements.concat stack.sub_operation
-
-        statements.concat stack.pop(0)
-        statements.concat stack.sub_operation
+        statements.concat stack.sub
 
         statements.concat VMTranslator::Stack.push
       end

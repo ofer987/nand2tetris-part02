@@ -144,6 +144,22 @@ module VMTranslator
       statements
     end
 
+    def add
+      statements = []
+
+      statements.concat asm_reset_to_zero
+
+      statements.concat pop(0)
+      statements.concat add_operation
+
+      statements.concat pop(0)
+      statements.concat add_operation
+
+      statements.concat push(0)
+
+      statements
+    end
+
     def add_operation
       statements = []
 
@@ -159,6 +175,20 @@ module VMTranslator
       statements << "\n"
 
       statements
+    end
+
+    def sub
+      statements = []
+
+      statements.concat asm_reset_to_zero
+
+      statements.concat pop(0)
+      statements.concat sub_operation
+
+      statements.concat pop(0)
+      statements.concat sub_operation
+
+      statements.concat push(0)
     end
 
     def sub_operation
