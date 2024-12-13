@@ -334,7 +334,7 @@ module VMTranslator
         # binding.pry
         statements.concat stack.pop(0)
         statements.concat argument_ram.push(0)
-        statements.concat stack.value
+        statements.concat argument_ram.value
         statements.concat temp_ram.push(0)
         # stack.reset_pointer_to_d_register
         # local_ram.push
@@ -367,16 +367,22 @@ module VMTranslator
           statements.concat ram_memory.set_value_to_d_register
         end
 
-        statements.concat temp_ram.pop(0)
-        statements.concat stack.set_value_to_d_register
+        # statements.concat temp_ram.pop(0)
+        # statements.concat stack.set_value_to_d_register
 
-        # Sub seven (6) for the return address
+        # Add +1 to ARG and store in Stack value
         statements.concat temp_ram.pop(0)
         statements.concat stack.push(0)
 
-        statements.concat constant_ram.pop(6)
+        statements.concat constant_ram.pop(1)
         statements.concat stack.push(0)
-        statements.concat stack.sub
+
+        statements.concat stack.asm_reset_to_zero
+        statements.concat stack.pop(0)
+        statements.concat stack.add_operation
+
+        statements.concat stack.pop(0)
+        statements.concat stack.add_operation
 
         statements.concat stack.set_value_to_d_register
       end

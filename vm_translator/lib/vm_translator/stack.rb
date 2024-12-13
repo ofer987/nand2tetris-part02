@@ -96,37 +96,6 @@ module VMTranslator
       statements
     end
 
-    def value
-      statements = []
-
-      result = <<~VALUE
-        // Read the address of the Stack
-        @#{address}
-        D=M
-      VALUE
-
-      statements.concat result.split("\n")
-      statements << "\n"
-
-      statements
-    end
-
-    def dereferenced_value
-      statements = []
-
-      result = <<~VALUE
-        // Read the value on the Stack (without popping it)
-        @#{address}
-        A=M
-        D=M
-      VALUE
-
-      statements.concat result.split("\n")
-      statements << "\n"
-
-      statements
-    end
-
     def add
       statements = []
 
