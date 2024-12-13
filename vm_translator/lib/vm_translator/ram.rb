@@ -56,12 +56,13 @@ module VMTranslator
     end
 
     # TODO: Rename
-    def set_first_memory_register
+    def set_first_memory_register_to_d_register
       statements = []
       command = <<~COMMAND
         // Set the D Register the value of the #{self.class} Memory Segment
         @#{address_local}
-        D=M
+        A=M
+        M=D
       COMMAND
       statements.concat command.split("\n")
       statements << "\n"
