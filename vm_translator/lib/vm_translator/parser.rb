@@ -351,26 +351,25 @@ module VMTranslator
         # VMTranslator::Stack.push
 
         # stack.reset_pointer_to_d_register
-        restore_ram_classes = [
-          VMTranslator::That,
-          VMTranslator::This,
-          VMTranslator::Argument,
-          VMTranslator::Local
+
+        restore_rams = [
+          that_ram,
+          this_ram,
+          argument_ram,
+          local_ram
         ]
 
         # Restore the RAMs and the Stack
-        restore_ram_classes.each do |klazz|
+        restore_rams.each do |ram_memory|
           statements.concat stack.pop(0)
           statements.concat stack.value
 
-          statements.concat klazz.push
+          statements.concat ram_memory.set_value_to_d_register
         end
 
         statements.concat temp_ram.pop(0)
-        statements.concat VMTranslator::Stack.push
+        statements.concat stack.set_value_to_d_register
 
-        # TODO: add one to argument_ram.value
-        # And then Stack#reset_pointer_by_offset
         # Sub seven (6) for the return address
         statements.concat temp_ram.pop(0)
         statements.concat stack.push(0)
