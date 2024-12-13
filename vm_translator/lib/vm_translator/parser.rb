@@ -334,7 +334,7 @@ module VMTranslator
         # binding.pry
         statements.concat stack.pop(0)
         statements.concat argument_ram.push(0)
-        statements.concat VMTranslator::Stack.pop(0)
+        statements.concat stack.value
         statements.concat temp_ram.push(0)
         # stack.reset_pointer_to_d_register
         # local_ram.push
@@ -362,7 +362,7 @@ module VMTranslator
         # Restore the RAMs and the Stack
         restore_rams.each do |ram_memory|
           statements.concat stack.pop(0)
-          statements.concat stack.value
+          statements.concat stack.dereferenced_value
 
           statements.concat ram_memory.set_value_to_d_register
         end

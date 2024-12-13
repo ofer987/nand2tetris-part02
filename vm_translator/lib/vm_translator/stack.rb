@@ -2,38 +2,6 @@
 
 module VMTranslator
   class Stack < RAM
-    def self.pop(negative_offset_index)
-      statements = []
-      pop = <<~COMMAND
-        // Negative Offset index of #{negative_offset_index}
-        @#{negative_offset_index}
-        D=A
-
-        // Store the value of RAM[#{STACK_ADDRESS_LOCATION}] into the D Register
-        #{STACK_ADDRESS_LOCATION}
-        D=M-D
-      COMMAND
-
-      statements.concat pop.split("\n")
-      statements << "\n"
-
-      statements
-    end
-
-    def self.push
-      statements = []
-      push = <<~COMMAND
-        // Store the value of the D Register into RAM[#{STACK_ADDRESS_LOCATION}]
-        @#{STACK_ADDRESS_LOCATION}
-        M=D
-      COMMAND
-
-      statements.concat push.split("\n")
-      statements << "\n"
-
-      statements
-    end
-
     def address_local
       STACK_ADDRESS_LOCATION
     end
@@ -129,6 +97,21 @@ module VMTranslator
     end
 
     def value
+      statements = []
+
+      result = <<~VALUE
+        // Read the address of the Stack
+        @#{address_local}
+        D=M
+      VALUE
+
+      statements.concat result.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
+    def dereferenced_value
       statements = []
 
       result = <<~VALUE
