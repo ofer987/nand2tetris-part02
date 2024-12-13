@@ -165,7 +165,7 @@ module VMTranslator
         M=D
       COMMAND
 
-      statements << command.split("\n")
+      statements.concat command.split("\n")
       statements << "\n"
 
       statements

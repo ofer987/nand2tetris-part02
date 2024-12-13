@@ -23,7 +23,7 @@ module VMTranslator
       return @local_total if defined? @local_total
 
       local_variable_address_indices = body[..end_body_index]
-        .select { |line| line.match? line.match? VMTranslator::Commands::LOCAL_REGEX }
+        .select { |line| line.match? VMTranslator::Commands::LOCAL_REGEX }
         .map { |line| line.match(VMTranslator::Commands::LOCAL_REGEX)[1].to_i }
 
       total = Array(local_variable_address_indices).max
@@ -75,7 +75,6 @@ module VMTranslator
       @body = Array(body)
       @end_body_index = 0
       @return_counter = 0
-      @function_index = function_index
       # @start_ram_address_index = start_ram_address_index
       @is_ram_allocated = false
 
@@ -140,7 +139,7 @@ module VMTranslator
       argument_total.times.each do |index|
         # TODO: use object method instead of class method
         statements.concat VMTranslator::Stack.pop(5 + argument_total + 1 + index)
-        statements.concat ram.push
+        statements.concat ram.push(index)
       end
 
       # What is this for?
@@ -155,9 +154,10 @@ module VMTranslator
       exit 1
     end
 
-    def initialize_this_ram
+    def initialize_this_ram(constant_ram)
       statements = []
-      statements.concat VMTranslator::This.push(START_THIS_ADDRESS_INDEX)
+      statements.concat constant_ram.pop(START_THIS_ADDRESS_INDEX)
+      statements.concat VMTranslator::This.push
 
       @is_this_ram_initialized = true
       statements
@@ -168,9 +168,10 @@ module VMTranslator
       exit 1
     end
 
-    def initialize_that_ram
+    def initialize_that_ram(constant_ram)
       statements = []
-      statements.concat VMTranslator::That.push(START_THAT_ADDRESS_INDEX)
+      statements.concat constant_ram.pop(START_THAT_ADDRESS_INDEX)
+      statements.concat VMTranslator::That.push
 
       @is_that_ram_initialized = true
       statements
@@ -199,7 +200,7 @@ module VMTranslator
       return @end_body_index if defined? @end_body_index
 
       index = 0
-      @body.each do |line|
+      body.each do |line|
         if line.match? RETURN_REGEX
           @end_body_index = index
 
@@ -209,5 +210,7 @@ module VMTranslator
         index += 1
       end
     end
+
+    attr_reader :body
   end
 end

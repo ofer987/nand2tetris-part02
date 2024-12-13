@@ -133,6 +133,8 @@ module VMTranslator
 
       result = <<~VALUE
         // Read the value on the Stack (without popping it)
+        @#{address_local}
+        A=M
         D=M
       VALUE
 

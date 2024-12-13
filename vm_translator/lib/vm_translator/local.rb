@@ -6,7 +6,7 @@ module VMTranslator
       statements = []
       pop = <<~COMMAND
         // Store the value of RAM[#{LOCAL_ADDRESS_LOCATION}] into the D Register
-        #{LOCAL_ADDRESS_LOCATION}
+        @#{LOCAL_ADDRESS_LOCATION}
         D=M
       COMMAND
 
