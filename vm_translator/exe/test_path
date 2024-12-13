@@ -1,12 +1,9 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-number = ARGV[0].to_i
+test_file = ARGV[0].to_s
 
-test_files = File.join('..', 'nand2tetris', 'projects', number.to_s, '**', '*.tst')
-
-success = true
-Dir.glob(test_files).each do |test_file|
+begin
   puts "Testing\t#{test_file}"
 
   test_extension = File.extname test_file
@@ -20,10 +17,9 @@ Dir.glob(test_files).each do |test_file|
   result = system("../nand2tetris/tools/CPUEmulator.sh #{test_file}")
   raise "Test failed: #{given_vm_file}" unless result
 rescue StandardError => e
-  success = false
   puts e
-ensure
-  puts
+
+  exit 1
 end
 
-exit 1 unless success
+exit 0
