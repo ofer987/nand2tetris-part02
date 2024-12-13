@@ -379,7 +379,7 @@ module VMTranslator
         statements.concat stack.push(0)
         statements.concat stack.sub
 
-        statements.concat VMTranslator::Stack.push
+        statements.concat stack.set_value_to_d_register
       end
     ensure
       print(statements)

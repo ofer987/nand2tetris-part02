@@ -157,10 +157,10 @@ module VMTranslator
       statements << "\n"
     end
 
-    def reset_pointer_to_d_register
+    def set_value_to_d_register
       statements = []
       command = <<~COMMAND
-        // Reset the pointer of #{self.class} to the value in the D Register
+        // Set the value of #{self.class} to the value in the D Register
         @#{address_local}
         M=D
       COMMAND
