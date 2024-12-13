@@ -2,7 +2,7 @@
 
 module VMTranslator
   class Stack < RAM
-    def address_local
+    def address
       STACK_ADDRESS_LOCATION
     end
 
@@ -19,7 +19,7 @@ module VMTranslator
 
       pop = <<~POP
         // Decrement the Stack
-        @#{address_local}
+        @#{address}
         M=M-1
       POP
       statements.concat pop.split("\n")
@@ -33,7 +33,7 @@ module VMTranslator
 
       command = <<~COMMAND
         // Set Stack to the D Register
-        @#{address_local}
+        @#{address}
         A=M
         M=D
       COMMAND
@@ -41,7 +41,7 @@ module VMTranslator
       statements << "\n"
 
       increment_stack = <<~COMMAND
-        @#{address_local}
+        @#{address}
         M=M+1
       COMMAND
       statements.concat increment_stack.split("\n")
@@ -101,7 +101,7 @@ module VMTranslator
 
       result = <<~VALUE
         // Read the address of the Stack
-        @#{address_local}
+        @#{address}
         D=M
       VALUE
 
@@ -116,7 +116,7 @@ module VMTranslator
 
       result = <<~VALUE
         // Read the value on the Stack (without popping it)
-        @#{address_local}
+        @#{address}
         A=M
         D=M
       VALUE
@@ -147,7 +147,7 @@ module VMTranslator
       statements = []
 
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // Add
@@ -178,7 +178,7 @@ module VMTranslator
       statements = []
 
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // Sub
@@ -195,7 +195,7 @@ module VMTranslator
       statements = []
 
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // And
@@ -212,7 +212,7 @@ module VMTranslator
       statements = []
 
       result = <<~VALUE
-        @#{address_local}
+        @#{address}
         A=M
 
         // Or
@@ -315,7 +315,7 @@ module VMTranslator
 
       go_to_statement = <<~COMMAND
         // The D Register stores the value
-        @#{ram.address_local}
+        @#{ram.address}
         A=M
         D=M
 

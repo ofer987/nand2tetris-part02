@@ -32,7 +32,7 @@ module VMTranslator
 
     attr_reader :vm_stack
 
-    def address_local
+    def address
       LOCAL_ADDRESS_LOCATION
     end
   end

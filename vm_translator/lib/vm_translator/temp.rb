@@ -4,7 +4,7 @@ module VMTranslator
   class Temp < RAM
     attr_reader :vm_stack
 
-    def address_local
+    def address
       TEMP_ADDRESS_LOCATION
     end
 
@@ -13,7 +13,7 @@ module VMTranslator
 
       statements = []
       command = <<~COMMAND
-        @#{address_local + indexed_address}
+        @#{address + indexed_address}
         D=M
       COMMAND
 
@@ -28,7 +28,7 @@ module VMTranslator
 
       statements = []
       command = <<~COMMAND
-        @#{address_local + indexed_address}
+        @#{address + indexed_address}
         M=D
       COMMAND
 

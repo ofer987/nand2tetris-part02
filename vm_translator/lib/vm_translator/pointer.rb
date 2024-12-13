@@ -4,7 +4,7 @@ module VMTranslator
   class Pointer < RAM
     attr_reader :vm_stack
 
-    def address_local
+    def address
       THIS_ADDRESS_LOCATION
     end
 
@@ -14,7 +14,7 @@ module VMTranslator
       statements = []
       command = <<~COMMAND
         // Set the D Register the value of the Memory Segment
-        @#{address_local + indexed_address}
+        @#{address + indexed_address}
         D=M
       COMMAND
       statements.concat command.split("\n")
@@ -30,8 +30,8 @@ module VMTranslator
 
       statements = []
       command = <<~COMMAND
-        // Set the M Pointer of #{self.class} Memory Segment to the value of #{address_local} + #{indexed_address}
-        @#{address_local + indexed_address}
+        // Set the M Pointer of #{self.class} Memory Segment to the value of #{address} + #{indexed_address}
+        @#{address + indexed_address}
         M=D
       COMMAND
       statements.concat command.split("\n")

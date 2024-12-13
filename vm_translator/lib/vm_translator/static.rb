@@ -4,7 +4,7 @@ module VMTranslator
   class Static < RAM
     attr_reader :vm_stack
 
-    def address_local
+    def address
       THIS_ADDRESS_LOCATION
     end
 

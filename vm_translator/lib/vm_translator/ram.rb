@@ -40,7 +40,7 @@ module VMTranslator
 
     attr_reader :vm_stack
 
-    def address_local
+    def address
       raise NotImplementedError
     end
 
@@ -48,10 +48,10 @@ module VMTranslator
       raise NotImplementedError
     end
 
-    def initialize(address_local: nil, address_space_size: nil)
+    def initialize(address: nil, address_space_size: nil)
       @go_to_counter = 0
 
-      @address_local = address_local unless address_local.nil?
+      @address = address unless address.nil?
       @address_space_size = address_space_size unless address_space_size.nil?
     end
 
@@ -60,7 +60,7 @@ module VMTranslator
       statements = []
       command = <<~COMMAND
         // Set the D Register the value of the #{self.class} Memory Segment
-        @#{address_local}
+        @#{address}
         A=M
         M=D
       COMMAND
@@ -80,7 +80,7 @@ module VMTranslator
         @#{indexed_address}
         D=A
 
-        @#{address_local}
+        @#{address}
         A=M+D
         D=M
       COMMAND
@@ -96,12 +96,12 @@ module VMTranslator
 
       statements = []
       command = <<~COMMAND
-        // Set the M Pointer of the #{self.class} Memory Segment to the value of #{address_local} + #{indexed_address}
-        @#{address_local}
+        // Set the M Pointer of the #{self.class} Memory Segment to the value of #{address} + #{indexed_address}
+        @#{address}
         D=M
         @#{indexed_address}
         D=D+A
-        @#{address_local}
+        @#{address}
         M=D
 
         // Set the D Register to the value of the Stack
@@ -110,14 +110,14 @@ module VMTranslator
         D=M
 
         // Set the M Pointer of the #{self.class} Memory Segment to the D Register
-        @#{address_local}
+        @#{address}
         A=M
         M=D
 
-        // Reset the M Pointer of the #{self.class} Memory Segment back to #{address_local}
+        // Reset the M Pointer of the #{self.class} Memory Segment back to #{address}
         @#{indexed_address}
         D=A
-        @#{address_local}
+        @#{address}
         M=M-D
       COMMAND
       statements.concat command.split("\n")
@@ -131,7 +131,7 @@ module VMTranslator
 
       command = <<~COMMAND
         // Get the address that #{self.class} points to
-        @#{address_local}
+        @#{address}
         D=M
       COMMAND
 
@@ -149,7 +149,7 @@ module VMTranslator
         @#{offset}
         D=A
 
-        @#{address_local}
+        @#{address}
         M=M+D
       COMMAND
 
@@ -161,7 +161,7 @@ module VMTranslator
       statements = []
       command = <<~COMMAND
         // Set the value of #{self.class} to the value in the D Register
-        @#{address_local}
+        @#{address}
         M=D
       COMMAND
 
@@ -174,11 +174,11 @@ module VMTranslator
     def set(indexed_address, value)
       statements = []
       command = <<~COMMAND
-        // Set the value of Address (#{address_local + indexed_address}) to Value (#{value})
+        // Set the value of Address (#{address + indexed_address}) to Value (#{value})
         @#{value}
         D=A
 
-        @#{address_local + indexed_address}
+        @#{address + indexed_address}
         M=D
       COMMAND
 
