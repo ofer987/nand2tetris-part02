@@ -7,9 +7,10 @@ test_files = File.join('..', 'nand2tetris', 'projects', number.to_s, '**', '*.ts
 
 success = true
 Dir.glob(test_files).each do |test_file|
-  puts "Testing\t#{test_file}"
-
   test_extension = File.extname test_file
+  next if File.basename(test_file).end_with? "VME#{test_extension}"
+
+  puts "Testing\t#{test_file}"
 
   given_vm_file = test_file.gsub(test_extension, '.vm')
   actual_asm_file = test_file.gsub(test_extension, '.asm')
@@ -19,10 +20,12 @@ Dir.glob(test_files).each do |test_file|
 
   result = system("../nand2tetris/tools/CPUEmulator.sh #{test_file}")
   raise "Test failed: #{given_vm_file}" unless result
+
+  puts
 rescue StandardError => e
   success = false
   puts e
-ensure
+
   puts
 end
 
