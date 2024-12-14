@@ -200,14 +200,14 @@ module VMTranslator
 
         # Reserve RAM for the Function's return value
         if argument_total.zero?
-          constant_ram.pop(0)
-          stack.push(0)
+          statements.concat constant_ram.pop(0)
+          statements.concat stack.push(0)
         end
 
         # Push the current stack address (i.e., the Program Counter)
         # Into the Stack
-        constant_ram.pop(@program_counter)
-        stack.push(0)
+        statements.concat constant_ram.pop(@program_counter)
+        statements.concat stack.push(0)
 
         ram_objects = [
           local_ram,
@@ -218,12 +218,12 @@ module VMTranslator
 
         # Push the locations of RAM into the Stack
         ram_objects.each do |ram_object|
-          ram_object.value
+          statements.concat ram_object.value
 
-          stack.push(0)
+          statements.concat stack.push(0)
         end
 
-        function.execute
+        statements.concat function.execute
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
         statements.concat stack.pop(0)
         statements.concat argument_ram.push(0)
