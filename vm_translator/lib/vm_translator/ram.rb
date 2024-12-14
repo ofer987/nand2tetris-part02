@@ -145,7 +145,9 @@ module VMTranslator
       statements = []
 
       result = <<~VALUE
-        // Read the value on the Stack (without popping it)
+        // Dereference the value of the RAM
+        // i.e., Treat the value of the RAM as an address,
+        // and the return the value at that address
         @#{address}
         A=M
         D=M

@@ -164,76 +164,41 @@ module VMTranslator
         statements.concat stack.go_to_if(label_name, argument_ram)
       elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
         name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
-        argument_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i + 1
+        local_ram_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i
 
-        function = VMTranslator::Function.new(name, lines[index..])
-        if @functions.key? function.name
-          puts "Error: #{function.name} has already been defined"
+        # Assumptions:
+        # 1. Function is only defined once
+        # 2. Function _always_ accepts the same amount of arguments
+        function =
+          if @functions.key? name
+            @functions[name]
+          else
+            VMTranslator::Function.new(name)
+          end
 
-          exit 1
-        end
-
-        @functions[function.name] = function
-        # function_size = @functions.size
-        # function.allocate_ram(@last_function_end_address_space_index, argument_total)
+        function.local_total = local_ram_total
 
         statements << function.label
-        # statements.concat function.initialize_local_ram(stack, local_ram)
-        # statements.concat function.initialize_argument_ram(stack, argument_ram, argument_total)
-        # statements.concat function.initialize_this_ram(constant_ram)
-        # statements.concat function.initialize_that_ram(constant_ram)
-        #
-        # statements.concat stack.reset_pointer_by_offset(function.local_total + function.argument_total)
-
-        # TODO: review this
-        # statements.concat function.body_statements
-
-        # @last_function_end_address_space_index = function.end_ram_address_space_index
-
-        # local_total = function.initialize_local_ram(stack, @last_function_end_address_space_index + 1)
-        # function.create_local_ram
-
-        # Store RAM state on the stack
-        # ram_classes = [
-        #   VMTranslator::Stack,
-        #   VMTranslator::Local,
-        #   VMTranslator::Argument,
-        #   VMTranslator::This,
-        #   VMTranslator::That
-        # ]
-
-        # ram_classes.each do |klazz|
-        #   klazz.pop
-        #
-        #   stack.push
-        # end
-
-        # Now, allocate RAM for the function
-        # Ignore the Stack RAM
-        # index = 0
-
-        # ram_size = ram_classes[1..].size
-        # ram_classes[1..].each do |klazz|
-        #   constant_ram.pop(((function_size * ram_size) + index) * 1000)
-        #   klazz.push
-        #
-        #   index += 1
-        # end
-        # function.initialize
-        #
-        # stack.push
-        # function.generate_argument_ram(function_size)
-        #
-        # stack.declare_function(function_name, argument_total, local_total)
       elsif line.match? VMTranslator::Commands::CALL_REGEX
-        function_name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
-        # argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
+        name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
+        argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
 
-        function = @functions[function_name]
-        if function.nil?
-          puts "The function #{function_name} has not been defined yet"
+        # Assumptions:
+        # 1. Function is only defined once
+        # 2. Function _always_ accepts the same amount of arguments
+        function =
+          if @functions.key? name
+            @functions[name]
+          else
+            VMTranslator::Function.new(name)
+          end
 
-          exit 1
+        function.argument_total = argument_total
+
+        # Reserve RAM for the Function's return value
+        if argument_total.zero?
+          constant_ram.pop(0)
+          stack.push(0)
         end
 
         # Push the current stack address (i.e., the Program Counter)
@@ -241,116 +206,26 @@ module VMTranslator
         constant_ram.pop(@program_counter)
         stack.push(0)
 
-        ram_classes = [
-          VMTranslator::Local,
-          VMTranslator::Argument,
-          VMTranslator::This,
-          VMTranslator::That
+        ram_objects = [
+          local_ram,
+          argument_ram,
+          this_ram,
+          that_ram
         ]
 
         # Push the locations of RAM into the Stack
-        ram_classes.each do |klazz|
-          klazz.pop
+        ram_objects.each do |ram_object|
+          ram_object.value
 
           stack.push(0)
         end
 
         function.execute
-
-        # Allocate Local, Argument, This, and That here
-        # function.allocate_ram(VMTranslator::Stack.pop, argument_total)
-
-        # VMTranslator::Stack.pop
-        # @local_ram = function.initialize_local_ram
-        # @argument_ram = function.initialize_argument_ram(stack, argument_total)
-        # @this_ram = function.initialize_this_ram
-        # @that_ram = function.initialize_that_ram
-
-        # Store the Stack, and RAM into the stack
-        # ram_classes = [
-        #   VMTranslator::Stack,
-        #   VMTranslator::Local,
-        #   VMTranslator::Argument,
-        #   VMTranslator::This,
-        #   VMTranslator::That
-        # ]
-        #
-        # ram_classes.each do |klazz|
-        #   klazz.pop
-        #
-        #   stack.push
-        # end
-
-        # stack.call_function(function_name, function.label)
-
-        # Store the return value in the Stack
-
-        # Store the return value into the temp
-        stack.pop
-        temp_ram.push(0)
-        # stack.reset_pointer_to_d_register
-        # local_ram.push
-        # argument_ram.push
-
-        # Reset the Stack to Local's address
-        VMTranslator::Local.pop
-        stack.reset_pointer_to_d_register
-        # stack.reset_pointer_by_offset(5)
-        # stack.pop
-        # stack.push
-        # VMTranslator::Argument
-
-        # VMTranslator::Stack.push
-
-        # stack.reset_pointer_to_d_register
-        restore_ram_classes = [
-          VMTranslator::That,
-          VMTranslator::This,
-          VMTranslator::Argument,
-          VMTranslator::Local,
-          VMTranslator::Stack
-        ]
-
-        # Restore the RAMs and the Stack
-        stack.pop(0)
-        restore_ram_classes.each do |klazz|
-          stack.pop(0)
-
-          klazz.push
-        end
-
-        # The Stack should now be pointing to the Return Address
-
-        # Push (i.e., store) the current address in Temp 1
-        stack.pop(0)
-        temp_ram.push(1)
-
-        stack.pop(0)
-        argument_ram.push(0)
-
-        temp_ram.pop(1)
-        stack.push(0)
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
-        # binding.pry
         statements.concat stack.pop(0)
         statements.concat argument_ram.push(0)
         statements.concat argument_ram.value
         statements.concat temp_ram.push(0)
-        # stack.reset_pointer_to_d_register
-        # local_ram.push
-        # argument_ram.push
-
-        # Reset the Stack to Local's address
-        # statements.concat VMTranslator::Local.pop
-        # statements.concat stack.reset_pointer_to_d_register
-        # stack.reset_pointer_by_offset(5)
-        # stack.pop
-        # stack.push
-        # VMTranslator::Argument
-
-        # VMTranslator::Stack.push
-
-        # stack.reset_pointer_to_d_register
 
         restore_rams = [
           that_ram,
@@ -369,9 +244,6 @@ module VMTranslator
 
         stack.pop(0)
         stack.go_to_now(stack.value)
-
-        # statements.concat temp_ram.pop(0)
-        # statements.concat stack.set_value_to_d_register
 
         # Add +1 to ARG and store in Stack value
         statements.concat temp_ram.pop(0)

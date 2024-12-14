@@ -11,33 +11,14 @@ module VMTranslator
 
     RETURN_REGEX = /^return/
 
-    attr_reader :name,
-      :start_ram_address_space_index,
-      :end_ram_address_space_index,
-      :start_local_address_index,
-      :start_argument_address_index,
-      :start_this_address_index,
-      :start_that_address_index
+    attr_reader :name, :argument_total
+    attr_accessor :local_total
 
-    def local_total
-      return @local_total if defined? @local_total
+    # Reserve at at least one argument for the return value
+    def argument_total=(value)
+      @argument_total = value
 
-      local_variable_address_indices = body[..end_body_index]
-        .select { |line| line.match? VMTranslator::Commands::LOCAL_REGEX }
-        .map { |line| line.match(VMTranslator::Commands::LOCAL_REGEX)[1].to_i }
-
-      total = Array(local_variable_address_indices).max
-      @local_total = total.to_i
-    end
-
-    def argument_total
-      raise 'Argument RAM has not been initialized yet' unless defined? @argument_total
-
-      @argument_total
-    end
-
-    def function_initialized?
-      @is_ram_allocated && ram_initialized?
+      @argument_total = 1 if value.zero?
     end
 
     def ram_initialized?
@@ -70,18 +51,8 @@ module VMTranslator
     #   end
     # end
 
-    def initialize(name, body)
+    def initialize(name)
       @name = name
-      @body = Array(body)
-      @end_body_index = 0
-      @return_counter = 0
-      # @start_ram_address_index = start_ram_address_index
-      @is_ram_allocated = false
-
-      @is_local_ram_initialized = false
-      @is_argument_ram_initialized = false
-      @is_this_ram_initialized = false
-      @is_that_ram_initialized = false
     end
 
     # def allocate_ram(start_ram_address_space_index, argument_total)
