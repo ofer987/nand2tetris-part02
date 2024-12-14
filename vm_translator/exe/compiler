@@ -4,6 +4,7 @@
 require_relative '../lib/vm_translator'
 
 path = ARGV[0].to_s
+initialize = ARGV[1] == 'true'
 
 begin
   lines = File.readlines(path)
@@ -13,8 +14,8 @@ begin
 
   parser = VMTranslator::Parser.new(lines)
 
-  parser.put_start_program
   parser.parse
+  parser.parse(init: initialize)
   parser.put_end_program
 rescue StandardError => e
   puts "Error converting VM to ASM: #{e}"

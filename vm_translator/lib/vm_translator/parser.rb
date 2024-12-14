@@ -50,14 +50,16 @@ module VMTranslator
       @static_ram = VMTranslator::Static.new
     end
 
-    def parse
-      start_vm_lines = put_start_program
-      start_vm_lines.size.times
-        .each do |index|
-          line = start_vm_lines[index]
+    def parse(init: false)
+      if init
+        start_vm_lines = put_start_program
+        start_vm_lines.size.times
+          .each do |index|
+            line = start_vm_lines[index]
 
-          parse_line(index, line)
-        end
+            parse_line(index, line)
+          end
+      end
 
       lines.size.times
         .each do |index|
