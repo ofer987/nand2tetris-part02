@@ -6,16 +6,19 @@ test_file = ARGV[0].to_s
 begin
   puts "Testing\t#{test_file}"
 
-  test_extension = File.extname test_file
+  directory = File.dirname test_file
+  vm_files_glob = File.join(directory, '*.vm')
+  given_vm_files = Dir.glob(vm_files_glob)
 
-  given_vm_file = test_file.gsub(test_extension, '.vm')
-  actual_asm_file = test_file.gsub(test_extension, '.asm')
+  given_vm_files.each do |vm_file|
+    actual_asm_file = test_file.gsub(vm_file, '.asm')
 
-  result = system("./exe/compiler #{given_vm_file} > #{actual_asm_file}")
-  raise "Failed to compile #{given_vm_file}" unless result
+    result = system("./exe/compiler #{vm_file} > #{actual_asm_file}")
+    raise "Failed to compile #{vm_file}" unless result
 
-  result = system("../nand2tetris/tools/CPUEmulator.sh #{test_file}")
-  raise "Test failed: #{given_vm_file}" unless result
+    result = system("../nand2tetris/tools/CPUEmulator.sh #{test_file}")
+    raise "Test failed: #{vm_file}" unless result
+  end
 rescue StandardError => e
   puts e
 
