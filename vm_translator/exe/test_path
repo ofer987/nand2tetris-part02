@@ -8,12 +8,13 @@ begin
 
   directory = File.dirname test_file
   vm_files_glob = File.join(directory, '*.vm')
+  actual_asm_file = test_file.gsub(test_file, '.asm')
   given_vm_files = Dir.glob(vm_files_glob)
 
-  given_vm_files.each do |vm_file|
-    actual_asm_file = test_file.gsub(vm_file, '.asm')
+  File.delete actual_asm_file if File.exist? actual_asm_file
 
-    result = system("./exe/compiler #{vm_file} > #{actual_asm_file}")
+  given_vm_files.each do |vm_file|
+    result = system("./exe/compiler #{vm_file} >> #{actual_asm_file}")
     raise "Failed to compile #{vm_file}" unless result
 
     result = system("../nand2tetris/tools/CPUEmulator.sh #{test_file}")
