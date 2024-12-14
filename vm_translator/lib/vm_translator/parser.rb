@@ -367,6 +367,9 @@ module VMTranslator
           statements.concat ram_memory.set_value_to_d_register
         end
 
+        stack.pop(0)
+        stack.go_to_now(stack.value)
+
         # statements.concat temp_ram.pop(0)
         # statements.concat stack.set_value_to_d_register
 
