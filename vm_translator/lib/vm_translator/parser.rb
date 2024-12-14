@@ -277,6 +277,7 @@ module VMTranslator
         is_empty = false
         is_empty = true if statement.empty?
         is_empty = true if statement.start_with? '//'
+        is_empty = true if statement.match?(/^\(.*\)$/)
 
         puts "// PC: #{program_counter}" unless is_empty
         puts statement
