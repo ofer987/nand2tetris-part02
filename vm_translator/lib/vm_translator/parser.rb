@@ -6,20 +6,15 @@ module VMTranslator
     attr_reader :program_counter
 
     def put_start_program
-      statements = []
+      vm_statements = []
       output = <<~PROGRAM_START
-        (PROGRAM_START)
-        // @#{VMTranslator::RAM::STACK_RAM_INDEX}
-        // D=A
-
-        // @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
-        // M=D
+        call Sys.init 0
       PROGRAM_START
 
-      statements.concat output.split("\n")
-      statements.concat << "\n"
+      vm_statements.concat output.split("\n")
+      vm_statements.concat << "\n"
 
-      print(statements)
+      vm_statements
     end
 
     def put_end_program
@@ -56,6 +51,14 @@ module VMTranslator
     end
 
     def parse
+      start_vm_lines = put_start_program
+      start_vm_lines.size.times
+        .each do |index|
+          line = start_vm_lines[index]
+
+          parse_line(index, line)
+        end
+
       lines.size.times
         .each do |index|
           line = lines[index]
