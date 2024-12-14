@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 test_file = ARGV[0].to_s
+initialize = ARGV[1] == 'true'
 
 begin
   puts "Testing\t#{test_file}"
@@ -15,7 +16,7 @@ begin
   File.delete actual_asm_file if File.exist? actual_asm_file
 
   given_vm_files.each do |vm_file|
-    result = system("./exe/compiler #{vm_file} >> #{actual_asm_file}")
+    result = system("./exe/compiler #{vm_file} #{initialize} >> #{actual_asm_file}")
     raise "Failed to compile #{vm_file}" unless result
   end
 
