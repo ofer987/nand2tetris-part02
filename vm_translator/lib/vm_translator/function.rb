@@ -49,15 +49,13 @@ module VMTranslator
     #   end
     # end
 
-    def initialize_local_ram(local_ram, temp_ram)
+    # TODO: do not use TEMP RAM
+    # TODO: use constant
+    def initialize_local_ram(local_ram, total)
       statements = []
 
       local_ram_loop_init_label = "INIT_LOCAL_RAM_LOOP_FOR_FUNCTION_#{name}_LABEL"
       exit_local_ram_loop_init_label = "EXIT_INIT_LOCAL_RAM_LOOP_FOR_FUNCTION_#{name}_LABEL"
-
-      statements.concat local_ram.value
-      statements.concat temp_ram.push(0)
-      statements << "\n"
 
       asm_loop = <<~ASM_LOOP
         (#{local_ram_loop_init_label})
@@ -67,14 +65,17 @@ module VMTranslator
           @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
           D=M-D
 
+          @#{total}
+          D=D-A
+
           @#{exit_local_ram_loop_init_label}
           D;JEQ
 
-          @#{VMTranslator::RAM::LOCAL_ADDRESS_LOCATION}
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
           A=M
           M=0
 
-          @#{VMTranslator::RAM::LOCAL_ADDRESS_LOCATION}
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
           M=M+1
 
           @#{local_ram_loop_init_label}
@@ -83,10 +84,6 @@ module VMTranslator
       ASM_LOOP
 
       statements.concat asm_loop.split("\n")
-      statements << "\n"
-
-      statements.concat temp_ram.pop(0)
-      statements.concat local_ram.set_value_to_d_register
       statements << "\n"
 
       statements

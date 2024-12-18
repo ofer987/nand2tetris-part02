@@ -187,15 +187,15 @@ module VMTranslator
         statements << "// Preparing Local variables for Function #{function.name}"
 
         # Add Local variables on to the Stack
-        statements << "// Add #{function.local_total} to LOCAL RAM"
-        statements.concat stack.value
-        statements.concat stack.push(0)
-
-        statements.concat constant_ram.pop(function.local_total)
-        statements.concat stack.push(0)
-        statements.concat stack.add
-        statements.concat stack.set_value_to_d_register
-        statements.concat function.initialize_local_ram(local_ram, temp_ram)
+        # statements << "// Add #{function.local_total} to LOCAL RAM"
+        # statements.concat stack.value
+        # statements.concat stack.push(0)
+        #
+        # statements.concat constant_ram.pop(function.local_total)
+        # statements.concat stack.push(0)
+        # statements.concat stack.add
+        # statements.concat stack.set_value_to_d_register
+        statements.concat function.initialize_local_ram(local_ram, function.local_total)
 
         # binding.pry
         @function_stack << function
