@@ -306,11 +306,38 @@ module VMTranslator
         function = @function_stack.pop
         statements << "// Returning from #{function.name}"
 
-        statements << '// Store the current return value into ARGUMENT_RAM'
+        # statements << '// Store the (address of the return pointer) + 1 to TEMP_RAM'
+        # statements.concat local_ram.value
+        # statements.concat stack.push(0)
+        #
+        # statements.concat constant_ram.pop(1)
+        # statements.concat stack.push(0)
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.sub_operation
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.sub_operation
+        # statements.concat temp_ram.push(0)
+
+        statements << '// Store the current (return value) into TEMP_RAM 0'
         statements.concat stack.pop(0)
         statements.concat stack.dereferenced_value
-        statements.concat argument_ram.push(0)
-        statements << "\n"
+        statements.concat temp_ram.push(0)
+
+        # statements << '// Store the (address of the return pointer) + 1 to TEMP_RAM'
+        # statements.concat local_ram.value
+        # statements.concat stack.push(0)
+        #
+        # statements.concat constant_ram.pop(1)
+        # statements.concat stack.push(0)
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.sub_operation
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.sub_operation
+        # statements.concat temp_ram.push(0)
 
         # statements << '// Increment the value of the stack'
         # # statements << '// after decrementing it by 1'
@@ -337,15 +364,30 @@ module VMTranslator
         ]
 
         # Restore the RAMs and the Stack
+        statements << '// Restore the Memories'
         restore_rams.each do |ram_memory|
+          statements << "// Restore #{ram_memory.class}"
           statements.concat stack.pop(0)
           statements.concat stack.dereferenced_value
 
           statements.concat ram_memory.set_value_to_d_register
         end
 
+        # ARGUMENT_RAM
+        # statements << "// Restore #{argument_ram.class}"
+        # statements.concat stack.pop(0)
+        # statements.concat stack.dereferenced_value
+        #
+        # statements.concat ram_memory.set_value_to_d_register
+
         statements << '// Reset the Stack to (LOCAL_RAM address - 1) of caller'
+        statements << '// Store it in TEMP_RAM 1'
         statements.concat stack.pop(0)
+        statements.concat stack.dereferenced_value
+        statements.concat temp_ram.push(1)
+
+        statements.concat temp_ram.pop(0)
+        statements.concat stack.push(0)
 
         # statements.concat stack.set_value_to_d_register
 
@@ -356,7 +398,17 @@ module VMTranslator
         # statements.concat temp_ram.pop(0)
         # statements.concat stack.set_value_to_d_register
 
-        statements.concat stack.return
+        statements.concat temp_ram.pop(1)
+        go_to_statement = <<~COMMAND
+          // Return to caller
+          A=D
+          0;JMP
+        COMMAND
+
+        statements.concat go_to_statement.split("\n")
+        statements << "\n"
+
+        # statements.concat stack.return
         # statements.concat stack.pop(0)
         # statements.concat argument_ram.set_value_to_d_register
         # statements.concat argument_ram.reference
