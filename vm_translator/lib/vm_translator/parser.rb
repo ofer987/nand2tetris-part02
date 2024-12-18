@@ -37,7 +37,6 @@ module VMTranslator
       @lines = Array(lines).map(&:strip)
 
       @functions = {}
-      @function_stack = []
       @last_function_end_address_space_index = nil
       @program_counter = 0
       @stack = VMTranslator::Stack.new
@@ -62,15 +61,25 @@ module VMTranslator
           end
       end
 
+      parse_functions
+
+      @function_stack = []
       lines.size.times
         .each do |index|
           line = lines[index]
 
           parse_line(index, line)
         end
+      @function_stack = []
     end
 
     private
+
+    def parse_functions
+      lines.each do |line|
+        parse_function(line)
+      end
+    end
 
     def parse_line(index, line)
       statements = []
@@ -170,26 +179,15 @@ module VMTranslator
         statements.concat stack.go_to_if(label_name, argument_ram)
       elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
         name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
-        local_ram_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i
 
-        # Assumptions:
-        # 1. Function is only defined once
-        # 2. Function _always_ accepts the same amount of arguments
-        function =
-          if @functions.key? name
-            @functions[name]
-          else
-            VMTranslator::Function.new(name)
-          end
-
-        puts "// Preparing Local variables for Function #{function.name}"
-
-        function.local_total = local_ram_total
+        function = @functions[name]
+        raise "Could not find Function (#{name})" if function.nil?
 
         statements << function.label
+        statements << "// Preparing Local variables for Function #{function.name}"
 
         # Add Local variables on to the Stack
-        puts "// Add #{function.local_total} to LOCAL RAM"
+        statements << "// Add #{function.local_total} to LOCAL RAM"
         statements.concat stack.value
         statements.concat stack.push(0)
 
@@ -199,30 +197,18 @@ module VMTranslator
         statements.concat stack.set_value_to_d_register
         statements.concat function.initialize_local_ram(local_ram, temp_ram)
 
+        # binding.pry
         @function_stack << function
       elsif line.match? VMTranslator::Commands::CALL_REGEX
         name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
 
-        # Assumptions:
-        # 1. Function is only defined once
-        # 2. Function _always_ accepts the same amount of arguments
-        function =
-          if @functions.key? name
-            @functions[name]
-          else
-            VMTranslator::Function.new(name)
-          end
-
-        # NOTE: This might be a bug!
-        function.argument_total = argument_total
+        function = @functions[name]
+        raise "Could not find Function (#{name})" if function.nil?
 
         # Increment the local_ram value by current function local ram total
-        current_function = @function_stack[-1]
-        current_function_local_ram_total = current_function.local_total
-
         # Debug
-        puts "// Preparing Function #{current_function.name} before calling it"
+        statements << "// Preparing Function #{function.name} before calling it"
 
         # Reserve RAM for the Function's return value
         statements.concat stack.value
@@ -268,8 +254,14 @@ module VMTranslator
 
         # Push the current stack address (i.e., the Program Counter)
         # Into the Stack
+        statements.concat << "// Add the Program Counter to ARGUMENT_RAM @ #{@program_counter + 102}"
         statements.concat constant_ram.pop(@program_counter)
         statements.concat stack.push(0)
+
+        # TODO: change this if assembly language statements change!
+        statements.concat constant_ram.pop(102)
+        statements.concat stack.push(0)
+        statements.concat stack.add
 
         ram_objects = [
           local_ram,
@@ -306,18 +298,36 @@ module VMTranslator
         statements.concat stack.value
         statements.concat local_ram.set_value_to_d_register
 
-        @function_stack << function
-
-        puts "// Finished Preparing Function #{current_function.name}: Now calling it"
+        statements << "// Finished Preparing Function #{function.name}: Now calling it"
         statements.concat function.execute
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
-        raise "#{VMTranslator::Commands::RETURN_REGEX} should be placed within a function" if @function_stack.empty?
+        raise 'Cannot return because we are not in a Function' if @function_stack.empty?
 
-        current_function = @function_stack.pop
+        function = @function_stack.pop
+        statements << "// Returning from #{function.name}"
+
+        statements << '// Store the current return value into ARGUMENT_RAM'
         statements.concat stack.pop(0)
+        statements.concat stack.dereferenced_value
         statements.concat argument_ram.push(0)
-        statements.concat argument_ram.value
-        statements.concat temp_ram.push(0)
+        statements << "\n"
+
+        # statements << '// Increment the value of the stack'
+        # # statements << '// after decrementing it by 1'
+        # statements.concat stack.value
+        # statements.concat stack.push(0)
+        #
+        # statements.concat constant_ram.pop(1)
+        # statements.concat stack.push(0)
+        # statements.concat stack.add
+        # # statements.concat argument_ram.push(0)
+        # statements << "\n"
+
+        statements << '// Reset the Stack to current value - LOCAL_RAM count of caller'
+
+        statements << '// Restore SP to address of LOCAL_RAM'
+        statements.concat local_ram.value
+        statements.concat stack.set_value_to_d_register
 
         restore_rams = [
           that_ram,
@@ -334,27 +344,77 @@ module VMTranslator
           statements.concat ram_memory.set_value_to_d_register
         end
 
-        statements.concat argument_ram.reference
+        statements << '// Reset the Stack to (LOCAL_RAM address - 1) of caller'
+        statements.concat stack.pop(0)
+
+        # statements.concat stack.set_value_to_d_register
+
+        # Add argument_total to argument_ram.value
+        # And then put it in the Stack, and set the SP to point to it
+        # statements << '// Find the return address stored at'
+        # statements << '// @ (dereferenced_value of temp_ram) + function.argument_total}'
+        # statements.concat temp_ram.pop(0)
+        # statements.concat stack.set_value_to_d_register
+
         statements.concat stack.return
+        # statements.concat stack.pop(0)
+        # statements.concat argument_ram.set_value_to_d_register
+        # statements.concat argument_ram.reference
 
         # Add +1 to ARG and store in Stack value
-        statements.concat temp_ram.pop(0)
-        statements.concat stack.push(0)
-
-        statements.concat constant_ram.pop(1)
-        statements.concat stack.push(0)
-
-        statements.concat stack.asm_reset_to_zero
-        statements.concat stack.pop(0)
-        statements.concat stack.add_operation
-
-        statements.concat stack.pop(0)
-        statements.concat stack.add_operation
-
-        statements.concat stack.set_value_to_d_register
+        # statements.concat temp_ram.pop(0)
+        # statements.concat stack.push(0)
+        #
+        # statements.concat constant_ram.pop(1)
+        # statements.concat stack.push(0)
+        #
+        # statements.concat stack.asm_reset_to_zero
+        # statements.concat stack.pop(0)
+        # statements.concat stack.add_operation
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.add_operation
+        #
+        # statements.concat stack.set_value_to_d_register
       end
     ensure
       print(statements)
+    end
+
+    def parse_function(line)
+      if line.match? VMTranslator::Commands::FUNCTION_REGEX
+        name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
+        local_ram_total = line.match(VMTranslator::Commands::FUNCTION_REGEX)[2].to_i
+
+        # Assumptions:
+        # 1. Function is only defined once
+        # 2. Function _always_ accepts the same amount of arguments
+        function = nil
+        if @functions.key? name
+          function = @functions[name]
+        else
+          function = VMTranslator::Function.new(name)
+          @functions[name] = function
+        end
+
+        function.local_total = local_ram_total
+      elsif line.match? VMTranslator::Commands::CALL_REGEX
+        name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
+        argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
+
+        # Assumptions:
+        # 1. Function is only defined once
+        # 2. Function _always_ accepts the same amount of arguments
+        function = nil
+        if @functions.key? name
+          function = @functions[name]
+        else
+          function = VMTranslator::Function.new(name)
+          @functions[name] = function
+        end
+
+        function.argument_total = argument_total
+      end
     end
 
     def print(statements)

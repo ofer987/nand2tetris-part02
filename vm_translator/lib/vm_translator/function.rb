@@ -16,7 +16,7 @@ module VMTranslator
 
     # Reserve at at least one argument for the return value
     def argument_total=(value)
-      @argument_total = value + 1
+      @argument_total = value
     end
 
     def ram_initialized?

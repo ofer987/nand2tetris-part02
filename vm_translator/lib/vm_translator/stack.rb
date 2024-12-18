@@ -270,6 +270,9 @@ module VMTranslator
 
       go_to_statement = <<~COMMAND
         // Return
+        @#{address}
+        A=M
+        A=M
         0;JMP
       COMMAND
 
