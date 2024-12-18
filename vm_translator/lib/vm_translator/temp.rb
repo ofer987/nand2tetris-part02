@@ -13,6 +13,7 @@ module VMTranslator
 
       statements = []
       command = <<~COMMAND
+        // Set the D Register the value of the #{self.class} Memory Segment indexed at #{indexed_address}
         @#{address + indexed_address}
         D=M
       COMMAND
@@ -28,6 +29,7 @@ module VMTranslator
 
       statements = []
       command = <<~COMMAND
+        // Set the M Register the value of the #{self.class} Memory Segment indexed at #{indexed_address}
         @#{address + indexed_address}
         M=D
       COMMAND

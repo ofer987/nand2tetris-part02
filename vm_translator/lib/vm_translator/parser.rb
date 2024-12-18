@@ -37,6 +37,7 @@ module VMTranslator
       @lines = Array(lines).map(&:strip)
 
       @functions = {}
+      @function_stack = []
       @last_function_end_address_space_index = nil
       @program_counter = 0
       @stack = VMTranslator::Stack.new
@@ -181,9 +182,24 @@ module VMTranslator
             VMTranslator::Function.new(name)
           end
 
+        puts "// Preparing Local variables for Function #{function.name}"
+
         function.local_total = local_ram_total
 
         statements << function.label
+
+        # Add Local variables on to the Stack
+        puts "// Add #{function.local_total} to LOCAL RAM"
+        statements.concat stack.value
+        statements.concat stack.push(0)
+
+        statements.concat constant_ram.pop(function.local_total)
+        statements.concat stack.push(0)
+        statements.concat stack.add
+        statements.concat stack.set_value_to_d_register
+        statements.concat function.initialize_local_ram(local_ram, temp_ram)
+
+        @function_stack << function
       elsif line.match? VMTranslator::Commands::CALL_REGEX
         name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
@@ -198,13 +214,57 @@ module VMTranslator
             VMTranslator::Function.new(name)
           end
 
+        # NOTE: This might be a bug!
         function.argument_total = argument_total
 
+        # Increment the local_ram value by current function local ram total
+        current_function = @function_stack[-1]
+        current_function_local_ram_total = current_function.local_total
+
+        # Debug
+        puts "// Preparing Function #{current_function.name} before calling it"
+
         # Reserve RAM for the Function's return value
-        if argument_total.zero?
-          statements.concat constant_ram.pop(0)
-          statements.concat stack.push(0)
-        end
+        statements.concat stack.value
+        statements.concat temp_ram.push(0)
+
+        # statements.concat stack.push(0)
+        # statements.concat constant_ram.pop(current_function_local_ram_total)
+        # statements.concat stack.push(0)
+        #
+        # statements.concat stack.add
+        # statements.concat stack.set_value_to_d_register
+
+        # statements.concat stack.pop(0)
+        # statements.concat stack.add_operation
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.add_operation
+
+        # Stack is now local_ram + current_function's local ram total
+        # Argument RAM is now local_ram + current_function's local ram total
+
+        # Add the number of (arguments - 1) to the Stack
+        # statements.concat stack.value
+        # statements.concat stack.push(0)
+        #
+        # statements.concat constant_ram.pop(function.argument_total - 1)
+        # statements.concat stack.push(0)
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.add_operation
+        #
+        # statements.concat stack.pop(0)
+        # statements.concat stack.add_operation
+        #
+        # statements.concat stack.set_value_to_d_register
+
+        # Space for the function's return argument
+        # statements.concat stack.pop(0)
+        # if argument_total.zero?
+        #   statements.concat constant_ram.pop(1)
+        #   statements.concat stack.push(0)
+        # end
 
         # Push the current stack address (i.e., the Program Counter)
         # Into the Stack
@@ -225,8 +285,35 @@ module VMTranslator
           statements.concat stack.push(0)
         end
 
+        # Argument will be current argument + 4  + function argument - 1 + function local
+        # NOTE
+        # statements.concat temp_ram.pop(0)
+        # statements.concat argument_ram.set_value_to_d_register
+
+        # Remove argument_total from argument_ram.value
+        statements.concat temp_ram.pop(0)
+        statements.concat stack.push(0)
+
+        statements.concat constant_ram.pop(argument_total)
+        statements.concat stack.push(0)
+        statements.concat stack.sub
+
+        statements.concat stack.pop(0)
+        statements.concat argument_ram.set_value_to_d_register
+        # statements.concat local_ram.set_value_to_d_register
+
+        # Set new LOCAL RAM Address
+        statements.concat stack.value
+        statements.concat local_ram.set_value_to_d_register
+
+        @function_stack << function
+
+        puts "// Finished Preparing Function #{current_function.name}: Now calling it"
         statements.concat function.execute
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
+        raise "#{VMTranslator::Commands::RETURN_REGEX} should be placed within a function" if @function_stack.empty?
+
+        current_function = @function_stack.pop
         statements.concat stack.pop(0)
         statements.concat argument_ram.push(0)
         statements.concat argument_ram.value
@@ -247,8 +334,8 @@ module VMTranslator
           statements.concat ram_memory.set_value_to_d_register
         end
 
-        stack.pop(0)
-        stack.go_to_now(stack.value)
+        statements.concat argument_ram.reference
+        statements.concat stack.return
 
         # Add +1 to ARG and store in Stack value
         statements.concat temp_ram.pop(0)

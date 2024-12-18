@@ -126,11 +126,27 @@ module VMTranslator
       statements
     end
 
+    # TODO: Should it be a different name?
+    def reference
+      statements = []
+
+      result = <<~VALUE
+        // Read the address of RAM #{self.class}
+        @#{address}
+        A=M
+      VALUE
+
+      statements.concat result.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
     def value
       statements = []
 
       result = <<~VALUE
-        // Read the address of the Stack
+        // Read the address of RAM #{self.class}
         @#{address}
         D=M
       VALUE
@@ -174,6 +190,7 @@ module VMTranslator
       statements
     end
 
+    # TODO: rename to reset_value_by_offset
     def reset_pointer_by_offset(offset)
       statements = []
 

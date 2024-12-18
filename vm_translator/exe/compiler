@@ -14,7 +14,6 @@ begin
 
   parser = VMTranslator::Parser.new(lines)
 
-  parser.parse
   parser.parse(init: initialize)
   parser.put_end_program
 rescue StandardError => e

@@ -16,9 +16,7 @@ module VMTranslator
 
     # Reserve at at least one argument for the return value
     def argument_total=(value)
-      @argument_total = value
-
-      @argument_total = 1 if value.zero?
+      @argument_total = value + 1
     end
 
     def ram_initialized?
@@ -51,6 +49,49 @@ module VMTranslator
     #   end
     # end
 
+    def initialize_local_ram(local_ram, temp_ram)
+      statements = []
+
+      local_ram_loop_init_label = "INIT_LOCAL_RAM_LOOP_FOR_FUNCTION_#{name}_LABEL"
+      exit_local_ram_loop_init_label = "EXIT_INIT_LOCAL_RAM_LOOP_FOR_FUNCTION_#{name}_LABEL"
+
+      statements.concat local_ram.value
+      statements.concat temp_ram.push(0)
+      statements << "\n"
+
+      asm_loop = <<~ASM_LOOP
+        (#{local_ram_loop_init_label})
+          @#{VMTranslator::RAM::LOCAL_ADDRESS_LOCATION}
+          D=M
+
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+          D=M-D
+
+          @#{exit_local_ram_loop_init_label}
+          D;JEQ
+
+          @#{VMTranslator::RAM::LOCAL_ADDRESS_LOCATION}
+          A=M
+          M=0
+
+          @#{VMTranslator::RAM::LOCAL_ADDRESS_LOCATION}
+          M=M+1
+
+          @#{local_ram_loop_init_label}
+          0;JMP
+        (#{exit_local_ram_loop_init_label})
+      ASM_LOOP
+
+      statements.concat asm_loop.split("\n")
+      statements << "\n"
+
+      statements.concat temp_ram.pop(0)
+      statements.concat local_ram.set_value_to_d_register
+      statements << "\n"
+
+      statements
+    end
+
     def initialize(name)
       @name = name
     end
@@ -78,26 +119,6 @@ module VMTranslator
     #
     #   exit 1
     # end
-
-    def initialize_local_ram(stack, ram)
-      statements = []
-
-      statements.concat stack.pointer
-      # TODO: use reset_pointer_by_new_address
-      statements.concat VMTranslator::Local.push
-
-      local_total.times.each do |_index|
-        statements.concat ram.push(0)
-      end
-
-      @is_local_ram_initialized = true
-      statements
-    rescue StandardError => e
-      puts "Error: Program crashed: #{e}"
-      puts e.backtrace
-
-      exit 1
-    end
 
     def initialize_argument_ram(stack, ram, argument_total)
       @argument_total = argument_total

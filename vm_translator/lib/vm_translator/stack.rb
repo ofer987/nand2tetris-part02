@@ -265,6 +265,20 @@ module VMTranslator
       statements
     end
 
+    def return
+      statements = []
+
+      go_to_statement = <<~COMMAND
+        // Return
+        0;JMP
+      COMMAND
+
+      statements.concat go_to_statement.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
     def go_to_now(name)
       statements = []
 
