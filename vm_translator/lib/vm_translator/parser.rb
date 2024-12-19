@@ -211,8 +211,8 @@ module VMTranslator
         statements << "// Preparing Function #{function.name} before calling it"
 
         # Reserve RAM for the Function's return value
-        statements.concat stack.value
-        statements.concat temp_ram.push(0)
+        # statements.concat stack.value
+        # statements.concat temp_ram.push(0)
 
         # statements.concat stack.push(0)
         # statements.concat constant_ram.pop(current_function_local_ram_total)
@@ -283,10 +283,11 @@ module VMTranslator
         # statements.concat argument_ram.set_value_to_d_register
 
         # Remove argument_total from argument_ram.value
-        statements.concat temp_ram.pop(0)
+        statements << '// Setting ARGUMENT_RAM'
+        statements.concat stack.value
         statements.concat stack.push(0)
 
-        statements.concat constant_ram.pop(argument_total)
+        statements.concat constant_ram.pop(argument_total + 4)
         statements.concat stack.push(0)
         statements.concat stack.sub
 
