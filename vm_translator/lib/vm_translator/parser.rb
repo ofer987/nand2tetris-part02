@@ -313,7 +313,8 @@ module VMTranslator
           D=M
 
           @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
-          M=M-1
+          // TODO: remove this later
+          // M=M-1
           M=M-1
 
           // Place the Return Value on the Stack Pointer
@@ -377,7 +378,8 @@ module VMTranslator
         # # statements.concat argument_ram.push(0)
         # statements << "\n"
 
-        statements << '// Reset the Stack to current value - LOCAL_RAM count of caller'
+        # statements << '// Reset the Stack to current value - LOCAL_RAM count of caller'
+        statements.concat function.reset_stack_pointer_to_argument_second_approach
 
         statements << '// Restore SP to address of LOCAL_RAM'
         statements.concat local_ram.value
@@ -409,11 +411,25 @@ module VMTranslator
         # statements.concat stack.dereferenced_value
         # statements.concat stack.push(0)
 
-        statements << "// Retrieve the Return Value @ (4 + #{function.local_total})"
+        statements << "// Retrieve the Return Value @ (4 + #{function.local_total} + #{function.argument_total})"
+        # statements.concat stack.pop(0)
+        statements << "// But first decrement the stack by #{function.argument_total}"
         statements.concat stack.value
         statements.concat stack.push(0)
 
-        statements.concat constant_ram.pop(4 + function.local_total)
+        statements.concat constant_ram.pop(function.argument_total)
+        statements.concat stack.push(0)
+        statements.concat stack.sub
+        statements.concat stack.set_value_to_d_register
+
+        # statements << "// Subtract #{function.argument_total}"
+        # statements.concat constant_ram.pop(function.argument_total)
+        # statements.concat stack.push(0)
+        # statements.concat stack.sub
+
+        statements.concat stack.value
+        statements.concat stack.push(0)
+        statements.concat constant_ram.pop(4 + function.local_total + function.argument_total)
         statements.concat stack.push(0)
         statements.concat stack.asm_reset_to_zero
         statements.concat stack.pop(0)

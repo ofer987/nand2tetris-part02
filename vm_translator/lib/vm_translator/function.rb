@@ -49,6 +49,62 @@ module VMTranslator
     #   end
     # end
 
+    def reset_stack_pointer_to_argument_second_approach
+      statements = []
+
+      command_loop = <<~COMMAND
+        // Place the Return Pointer into the address of ARGUMENT_RAM
+        @#{VMTranslator::RAM::ARGUMENT_ADDRESS_LOCATION}
+        A=M
+        D=A
+
+        @#{argument_total}
+        D=D+A
+        A=D
+        D=M
+
+        @#{VMTranslator::RAM::ARGUMENT_ADDRESS_LOCATION}
+        A=M
+        M=D
+      COMMAND
+
+      statements.concat command_loop.split("\n")
+      statements << "\n"
+    end
+
+    def reset_stack_pointer_to_argument
+      statements = []
+
+      reset_stack_pointer_loop_label = "INIT_RESET_STACK_POINTER_LOOP_FOR_FUNCTION_#{name}_LABEL"
+      exit_reset_stack_pointer_loop_label = "EXIT_RESET_STACK_POINTER_LOOP_FOR_FUNCTION_#{name}_LABEL"
+
+      total = argument_total
+      command_loop = <<~COMMAND
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+          D=M
+
+          // Start from #{total} number of arguments
+          // And decrement one (1) by one (1)
+          @#{total}
+        (#{reset_stack_pointer_loop_label})
+          // Exit if A is 0
+          @#{exit_reset_stack_pointer_loop_label}
+          A;JEQ
+
+          // Reset the SP to previous ARGUMENT_RAM
+          A=A-1
+          M=D
+
+          // Restart the loop till A is 0
+          @#{reset_stack_pointer_loop_label}
+          0;JMP
+        (#{exit_reset_stack_pointer_loop_label})
+      COMMAND
+
+      statements.concat command_loop.split("\n")
+      statements << "\n"
+    end
+
     # TODO: do not use TEMP RAM
     # TODO: use constant
     def initialize_local_ram(total)
