@@ -3,6 +3,8 @@
 
 module VMTranslator
   class Parser
+    PROGRAM_COUNTER_SHIFT = 98
+
     attr_reader :program_counter
 
     def put_start_program
@@ -254,12 +256,12 @@ module VMTranslator
 
         # Push the current stack address (i.e., the Program Counter)
         # Into the Stack
-        statements.concat << "// Add the Program Counter to ARGUMENT_RAM @ #{@program_counter + 98}"
+        statements.concat << "// Add Program Counter to ARGUMENT_RAM @ #{@program_counter} + #{PROGRAM_COUNTER_SHIFT}"
         statements.concat constant_ram.pop(@program_counter)
         statements.concat stack.push(0)
 
         # TODO: change this if assembly language statements change!
-        statements.concat constant_ram.pop(98)
+        statements.concat constant_ram.pop(PROGRAM_COUNTER_SHIFT)
         statements.concat stack.push(0)
         statements.concat stack.add
 
@@ -301,6 +303,29 @@ module VMTranslator
 
         statements << "// Finished Preparing Function #{function.name}: Now calling it"
         statements.concat function.execute
+
+        increment_stack = <<~COMMAND
+          // Retrieve the Return Address
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+          M=M+1
+
+          A=M
+          D=M
+
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+          M=M-1
+          M=M-1
+
+          // Place the Return Value on the Stack Pointer
+          A=M
+          M=D
+
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+          M=M+1
+        COMMAND
+
+        statements.concat increment_stack.split("\n")
+        statements << "\n"
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
         raise 'Cannot return because we are not in a Function' if @function_stack.empty?
 
@@ -407,9 +432,9 @@ module VMTranslator
         # statements.concat stack.push(0)
         # statements.concat stack.pop(0)
 
-        statements << '// And store it at SP - 1'
-        statements.concat stack.pop(0)
-        statements.concat stack.push(0)
+        # statements << '// And store it at SP - 1'
+        # statements.concat stack.pop(0)
+        # statements.concat stack.push(0)
 
         # statements.concat stack.value
         go_to_statement = <<~COMMAND
@@ -424,16 +449,16 @@ module VMTranslator
         statements << "\n"
 
         # Place the return value @ ARGUMENT_RAM
-        statements.concat stack.value
-        statements.concat stack.push(0)
-
-        statements << "// Search for Return value by adding #{function.local_total + 4 + 2}"
-        statements.concat constant_ram.pop(4 + 2 + function.local_total)
-        statements.concat stack.push(0)
-        statements.concat stack.add
-        statements.concat stack.dereferenced_value
-        statements.concat argument_ram.push(0)
-        statements.concat stack.pop(0)
+        # statements.concat stack.value
+        # statements.concat stack.push(0)
+        #
+        # statements << "// Search for Return value by adding #{function.local_total + 4 + 2}"
+        # statements.concat constant_ram.pop(4 + 2 + function.local_total)
+        # statements.concat stack.push(0)
+        # statements.concat stack.add
+        # statements.concat stack.dereferenced_value
+        # statements.concat argument_ram.push(0)
+        # statements.concat stack.pop(0)
         # statements.concat stack.pop(0)
         # statements.concat stack.push(0)
 
