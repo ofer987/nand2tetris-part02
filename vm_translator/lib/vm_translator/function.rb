@@ -51,7 +51,7 @@ module VMTranslator
 
     # TODO: do not use TEMP RAM
     # TODO: use constant
-    def initialize_local_ram(local_ram, total)
+    def initialize_local_ram(total)
       statements = []
 
       local_ram_loop_init_label = "INIT_LOCAL_RAM_LOOP_FOR_FUNCTION_#{name}_LABEL"

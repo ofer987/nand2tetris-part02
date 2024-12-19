@@ -195,7 +195,7 @@ module VMTranslator
         # statements.concat stack.push(0)
         # statements.concat stack.add
         # statements.concat stack.set_value_to_d_register
-        statements.concat function.initialize_local_ram(local_ram, function.local_total)
+        statements.concat function.initialize_local_ram(function.local_total)
 
         # binding.pry
         @function_stack << function
@@ -254,12 +254,12 @@ module VMTranslator
 
         # Push the current stack address (i.e., the Program Counter)
         # Into the Stack
-        statements.concat << "// Add the Program Counter to ARGUMENT_RAM @ #{@program_counter + 102}"
+        statements.concat << "// Add the Program Counter to ARGUMENT_RAM @ #{@program_counter + 98}"
         statements.concat constant_ram.pop(@program_counter)
         statements.concat stack.push(0)
 
         # TODO: change this if assembly language statements change!
-        statements.concat constant_ram.pop(102)
+        statements.concat constant_ram.pop(98)
         statements.concat stack.push(0)
         statements.concat stack.add
 
@@ -287,7 +287,7 @@ module VMTranslator
         statements.concat stack.value
         statements.concat stack.push(0)
 
-        statements.concat constant_ram.pop(argument_total + 4)
+        statements.concat constant_ram.pop(argument_total + 4 + 1)
         statements.concat stack.push(0)
         statements.concat stack.sub
 
@@ -321,10 +321,11 @@ module VMTranslator
         # statements.concat stack.sub_operation
         # statements.concat temp_ram.push(0)
 
-        statements << '// Store the current (return value) into TEMP_RAM 0'
-        statements.concat stack.pop(0)
-        statements.concat stack.dereferenced_value
-        statements.concat temp_ram.push(0)
+        # statements << '// Store the current (return value) into TEMP_RAM 0'
+        # statements << "// Pop the Stack Pointer to point to the Return Value of #{function.name}"
+        # statements.concat stack.pop(0)
+        # statements.concat stack.dereferenced_value
+        # statements.concat temp_ram.push(0)
 
         # statements << '// Store the (address of the return pointer) + 1 to TEMP_RAM'
         # statements.concat local_ram.value
@@ -374,40 +375,67 @@ module VMTranslator
           statements.concat ram_memory.set_value_to_d_register
         end
 
-        # ARGUMENT_RAM
-        # statements << "// Restore #{argument_ram.class}"
+        # Now the Stack points to the the Return IP (i.e., ROM)
+        # NOTE: should this be removed?
+        # statements << "// Now the SP points to the Return IP of #{function.name}"
         # statements.concat stack.pop(0)
+
+        # statements << "// Place the Return IP of #{function.name} at (SP + 1)"
         # statements.concat stack.dereferenced_value
-        #
-        # statements.concat ram_memory.set_value_to_d_register
+        # statements.concat stack.push(0)
 
-        statements << '// Reset the Stack to (LOCAL_RAM address - 1) of caller'
-        statements << '// Store it in TEMP_RAM 1'
-        statements.concat stack.pop(0)
-        statements.concat stack.dereferenced_value
-        statements.concat temp_ram.push(1)
-
-        statements.concat temp_ram.pop(0)
+        statements << "// Retrieve the Return Value @ (4 + #{function.local_total})"
+        statements.concat stack.value
         statements.concat stack.push(0)
 
-        # statements.concat stack.set_value_to_d_register
+        statements.concat constant_ram.pop(4 + function.local_total)
+        statements.concat stack.push(0)
+        statements.concat stack.asm_reset_to_zero
+        statements.concat stack.pop(0)
+        statements.concat stack.add_operation
 
-        # Add argument_total to argument_ram.value
-        # And then put it in the Stack, and set the SP to point to it
-        # statements << '// Find the return address stored at'
-        # statements << '// @ (dereferenced_value of temp_ram) + function.argument_total}'
-        # statements.concat temp_ram.pop(0)
-        # statements.concat stack.set_value_to_d_register
+        statements.concat stack.pop(0)
+        statements.concat stack.add_operation
+        statements.concat stack.push(0)
+        statements.concat stack.pop(0)
+        statements.concat stack.de_dereferenced_value
+        statements.concat stack.push(0)
+        statements.concat stack.pop(0)
+        statements.concat stack.pop(0)
+        # statements.concat stack.dereferenced_value
+        # statements.concat stack.pop(0)
+        # statements.concat stack.push(0)
+        # statements.concat stack.pop(0)
 
-        statements.concat temp_ram.pop(1)
+        statements << '// And store it at SP - 1'
+        statements.concat stack.pop(0)
+        statements.concat stack.push(0)
+
+        # statements.concat stack.value
         go_to_statement = <<~COMMAND
-          // Return to caller
-          A=D
+          // Return to the caller, i.e., #{function.name}
+          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+          A=M
+          A=M
           0;JMP
         COMMAND
 
         statements.concat go_to_statement.split("\n")
         statements << "\n"
+
+        # Place the return value @ ARGUMENT_RAM
+        statements.concat stack.value
+        statements.concat stack.push(0)
+
+        statements << "// Search for Return value by adding #{function.local_total + 4 + 2}"
+        statements.concat constant_ram.pop(4 + 2 + function.local_total)
+        statements.concat stack.push(0)
+        statements.concat stack.add
+        statements.concat stack.dereferenced_value
+        statements.concat argument_ram.push(0)
+        statements.concat stack.pop(0)
+        # statements.concat stack.pop(0)
+        # statements.concat stack.push(0)
 
         # statements.concat stack.return
         # statements.concat stack.pop(0)

@@ -157,6 +157,25 @@ module VMTranslator
       statements
     end
 
+    def de_dereferenced_value
+      statements = []
+
+      result = <<~VALUE
+        // De-dereference the value of the RAM
+        // i.e., Treat the value of the RAM as an address,
+        // and the return the value at that address
+        @#{address}
+        A=M
+        A=M
+        D=M
+      VALUE
+
+      statements.concat result.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
     def dereferenced_value
       statements = []
 
