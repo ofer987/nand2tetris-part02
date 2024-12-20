@@ -65,14 +65,12 @@ module VMTranslator
 
       parse_functions
 
-      @function_stack = []
       lines.size.times
         .each do |index|
           line = lines[index]
 
           parse_line(index, line)
         end
-      @function_stack = []
     end
 
     private
@@ -200,7 +198,6 @@ module VMTranslator
         statements.concat function.initialize_local_ram(function.local_total)
 
         # binding.pry
-        @function_stack << function
       elsif line.match? VMTranslator::Commands::CALL_REGEX
         name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
@@ -328,9 +325,9 @@ module VMTranslator
         statements.concat increment_stack.split("\n")
         statements << "\n"
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
-        raise 'Cannot return because we are not in a Function' if @function_stack.empty?
+        function = find_function(name, index)
+        raise 'Cannot return because we are not in a Function' if function.nil?
 
-        function = @function_stack.pop
         statements << "// Returning from #{function.name}"
 
         # statements << '// Store the (address of the return pointer) + 1 to TEMP_RAM'
@@ -501,6 +498,18 @@ module VMTranslator
       end
     ensure
       print(statements)
+    end
+
+    def find_function(name, current_vm_line_index)
+      (current_vm_line_index + 1).times.each do |index|
+        line_index = current_vm_line_index - index
+        line = lines[line_index]
+
+        next unless line.match? VMTranslator::Commands::FUNCTION_REGEX
+
+        name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
+        return @functions[name]
+      end
     end
 
     def parse_function(line)
