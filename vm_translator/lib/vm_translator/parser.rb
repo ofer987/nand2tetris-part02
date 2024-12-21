@@ -201,55 +201,11 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::CALL_REGEX
         name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
-
         function = @functions[name]
         raise "Could not find Function (#{name})" if function.nil?
 
-        # Increment the local_ram value by current function local ram total
         # Debug
         statements << "// Preparing Function #{function.name} before calling it"
-
-        # Reserve RAM for the Function's return value
-        # statements.concat stack.value
-        # statements.concat temp_ram.push(0)
-
-        # statements.concat stack.push(0)
-        # statements.concat constant_ram.pop(current_function_local_ram_total)
-        # statements.concat stack.push(0)
-        #
-        # statements.concat stack.add
-        # statements.concat stack.set_value_to_d_register
-
-        # statements.concat stack.pop(0)
-        # statements.concat stack.add_operation
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.add_operation
-
-        # Stack is now local_ram + current_function's local ram total
-        # Argument RAM is now local_ram + current_function's local ram total
-
-        # Add the number of (arguments - 1) to the Stack
-        # statements.concat stack.value
-        # statements.concat stack.push(0)
-        #
-        # statements.concat constant_ram.pop(function.argument_total - 1)
-        # statements.concat stack.push(0)
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.add_operation
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.add_operation
-        #
-        # statements.concat stack.set_value_to_d_register
-
-        # Space for the function's return argument
-        # statements.concat stack.pop(0)
-        # if argument_total.zero?
-        #   statements.concat constant_ram.pop(1)
-        #   statements.concat stack.push(0)
-        # end
 
         # Push the current stack address (i.e., the Program Counter)
         # Into the Stack
@@ -257,7 +213,6 @@ module VMTranslator
         statements.concat constant_ram.pop(@program_counter)
         statements.concat stack.push(0)
 
-        # TODO: change this if assembly language statements change!
         statements.concat constant_ram.pop(PROGRAM_COUNTER_SHIFT)
         statements.concat stack.push(0)
         statements.concat stack.add
@@ -276,11 +231,6 @@ module VMTranslator
           statements.concat stack.push(0)
         end
 
-        # Argument will be current argument + 4  + function argument - 1 + function local
-        # NOTE
-        # statements.concat temp_ram.pop(0)
-        # statements.concat argument_ram.set_value_to_d_register
-
         # Remove argument_total from argument_ram.value
         statements << '// Setting ARGUMENT_RAM'
         statements.concat stack.value
@@ -292,7 +242,6 @@ module VMTranslator
 
         statements.concat stack.pop(0)
         statements.concat argument_ram.set_value_to_d_register
-        # statements.concat local_ram.set_value_to_d_register
 
         # Set new LOCAL RAM Address
         statements.concat stack.value
@@ -330,51 +279,6 @@ module VMTranslator
 
         statements << "// Returning from #{function.name}"
 
-        # statements << '// Store the (address of the return pointer) + 1 to TEMP_RAM'
-        # statements.concat local_ram.value
-        # statements.concat stack.push(0)
-        #
-        # statements.concat constant_ram.pop(1)
-        # statements.concat stack.push(0)
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.sub_operation
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.sub_operation
-        # statements.concat temp_ram.push(0)
-
-        # statements << '// Store the current (return value) into TEMP_RAM 0'
-        # statements << "// Pop the Stack Pointer to point to the Return Value of #{function.name}"
-        # statements.concat stack.pop(0)
-        # statements.concat stack.dereferenced_value
-        # statements.concat temp_ram.push(0)
-
-        # statements << '// Store the (address of the return pointer) + 1 to TEMP_RAM'
-        # statements.concat local_ram.value
-        # statements.concat stack.push(0)
-        #
-        # statements.concat constant_ram.pop(1)
-        # statements.concat stack.push(0)
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.sub_operation
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.sub_operation
-        # statements.concat temp_ram.push(0)
-
-        # statements << '// Increment the value of the stack'
-        # # statements << '// after decrementing it by 1'
-        # statements.concat stack.value
-        # statements.concat stack.push(0)
-        #
-        # statements.concat constant_ram.pop(1)
-        # statements.concat stack.push(0)
-        # statements.concat stack.add
-        # # statements.concat argument_ram.push(0)
-        # statements << "\n"
-
         # statements << '// Reset the Stack to current value - LOCAL_RAM count of caller'
         statements.concat function.reset_stack_pointer_to_argument_second_approach
 
@@ -399,17 +303,7 @@ module VMTranslator
           statements.concat ram_memory.set_value_to_d_register
         end
 
-        # Now the Stack points to the the Return IP (i.e., ROM)
-        # NOTE: should this be removed?
-        # statements << "// Now the SP points to the Return IP of #{function.name}"
-        # statements.concat stack.pop(0)
-
-        # statements << "// Place the Return IP of #{function.name} at (SP + 1)"
-        # statements.concat stack.dereferenced_value
-        # statements.concat stack.push(0)
-
         statements << "// Retrieve the Return Value @ (4 + #{function.local_total} + #{function.argument_total})"
-        # statements.concat stack.pop(0)
         statements << "// But first decrement the stack by #{function.argument_total}"
         statements.concat stack.value
         statements.concat stack.push(0)
@@ -418,11 +312,6 @@ module VMTranslator
         statements.concat stack.push(0)
         statements.concat stack.sub
         statements.concat stack.set_value_to_d_register
-
-        # statements << "// Subtract #{function.argument_total}"
-        # statements.concat constant_ram.pop(function.argument_total)
-        # statements.concat stack.push(0)
-        # statements.concat stack.sub
 
         statements.concat stack.value
         statements.concat stack.push(0)
@@ -440,16 +329,7 @@ module VMTranslator
         statements.concat stack.push(0)
         statements.concat stack.pop(0)
         statements.concat stack.pop(0)
-        # statements.concat stack.dereferenced_value
-        # statements.concat stack.pop(0)
-        # statements.concat stack.push(0)
-        # statements.concat stack.pop(0)
 
-        # statements << '// And store it at SP - 1'
-        # statements.concat stack.pop(0)
-        # statements.concat stack.push(0)
-
-        # statements.concat stack.value
         go_to_statement = <<~COMMAND
           // Return to the caller, i.e., #{function.name}
           @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
@@ -460,41 +340,6 @@ module VMTranslator
 
         statements.concat go_to_statement.split("\n")
         statements << "\n"
-
-        # Place the return value @ ARGUMENT_RAM
-        # statements.concat stack.value
-        # statements.concat stack.push(0)
-        #
-        # statements << "// Search for Return value by adding #{function.local_total + 4 + 2}"
-        # statements.concat constant_ram.pop(4 + 2 + function.local_total)
-        # statements.concat stack.push(0)
-        # statements.concat stack.add
-        # statements.concat stack.dereferenced_value
-        # statements.concat argument_ram.push(0)
-        # statements.concat stack.pop(0)
-        # statements.concat stack.pop(0)
-        # statements.concat stack.push(0)
-
-        # statements.concat stack.return
-        # statements.concat stack.pop(0)
-        # statements.concat argument_ram.set_value_to_d_register
-        # statements.concat argument_ram.reference
-
-        # Add +1 to ARG and store in Stack value
-        # statements.concat temp_ram.pop(0)
-        # statements.concat stack.push(0)
-        #
-        # statements.concat constant_ram.pop(1)
-        # statements.concat stack.push(0)
-        #
-        # statements.concat stack.asm_reset_to_zero
-        # statements.concat stack.pop(0)
-        # statements.concat stack.add_operation
-        #
-        # statements.concat stack.pop(0)
-        # statements.concat stack.add_operation
-        #
-        # statements.concat stack.set_value_to_d_register
       end
     ensure
       print(statements)
