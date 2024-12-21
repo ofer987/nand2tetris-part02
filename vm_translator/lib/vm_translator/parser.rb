@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'pry-byebug'
+
 module VMTranslator
   class Parser
     PROGRAM_COUNTER_SHIFT = 98
@@ -38,6 +40,7 @@ module VMTranslator
       # Remove leading and trailing whitespace
       @lines = Array(lines).map(&:strip)
 
+      @branch_condition = VMTranslator::Stack::DEFAULT_CONDITION
       @functions = {}
       @function_return_stack = []
       @last_function_end_address_space_index = nil
@@ -53,15 +56,43 @@ module VMTranslator
       @static_ram = VMTranslator::Static.new
     end
 
+    def initialize_stack_machine
+      statements = []
+
+      initialize = <<~COMMAND
+        set RAM[0] 256
+        set RAM[1] -1
+        set RAM[2] -2
+        set RAM[3] -3
+        set RAM[4] -4
+        set RAM[5] -1     // test results
+        set RAM[6] -1
+        set RAM[256] -1 // fake stack frame from call Sys.init
+        set RAM[257] -1
+        set RAM[258] -2
+        set RAM[259] -3
+        set RAM[260] -4
+      COMMAND
+
+      statements.concat initialize.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
     def parse(init: false)
       if init
-        start_vm_lines = put_start_program
-        start_vm_lines.size.times
-          .each do |index|
-            line = start_vm_lines[index]
-
-            parse_line(index, line)
-          end
+        start_vm_lines = initialize_stack_machine.concat put_start_program
+        all_lines = start_vm_lines.concat lines
+        @lines = all_lines
+        # start_vm_lines = initialize_stack_machine.concat put_start_program
+        # start_vm_lines.size.times
+        #   .each do |index|
+        #     line = start_vm_lines[index]
+        #
+        #     binding.pry if line.include? 'call'
+        #     parse_line(index, line)
+        #   end
       end
 
       parse_functions
@@ -99,9 +130,22 @@ module VMTranslator
 
         statements.concat stack.pop(value)
         statements.concat ram.push(value)
+      elsif line.match? VMTranslator::Commands::NEGATIVE_SET_REGEX
+        ram_address = line.match(VMTranslator::Commands::NEGATIVE_SET_REGEX)[1].to_i
+        value = line.match(VMTranslator::Commands::NEGATIVE_SET_REGEX)[2].to_i
+
+        # binding.pry
+        statements.concat stack.negative_set(ram_address, value)
+      elsif line.match? VMTranslator::Commands::SET_REGEX
+        ram_address = line.match(VMTranslator::Commands::SET_REGEX)[1].to_i
+        value = line.match(VMTranslator::Commands::SET_REGEX)[2].to_i
+
+        # binding.pry
+        statements.concat stack.set(ram_address, value)
       elsif line.match? VMTranslator::Commands::CONSTANT_REGEX
         value = line.match(VMTranslator::Commands::CONSTANT_REGEX)[1].to_i
 
+        # binding.pry
         [constant_ram, value]
       elsif line.match? VMTranslator::Commands::LOCAL_REGEX
         value = line.match(VMTranslator::Commands::LOCAL_REGEX)[1].to_i
@@ -136,11 +180,17 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::SUB_REGEX
         statements.concat stack.sub
       elsif line.match? VMTranslator::Commands::EQ_REGEX
-        statements.concat stack.eq
+        @branch_condition = VMTranslator::Stack::EQUAL_CONDITION
+
+        statements << "// Branching Condition: #{@branch_condition}"
       elsif line.match? VMTranslator::Commands::LT_REGEX
-        statements.concat stack.lt
+        @branch_condition = VMTranslator::Stack::LESS_THAN_CONDITION
+
+        statements << "// Branching Condition: #{@branch_condition}"
       elsif line.match? VMTranslator::Commands::GT_REGEX
-        statements.concat stack.gt
+        @branch_condition = VMTranslator::Stack::GREATER_THAN_CONDITION
+
+        statements << "// Branching Condition: #{@branch_condition}"
       elsif line.match? VMTranslator::Commands::NEG_REGEX
         statements.concat stack.neg
       elsif line.match? VMTranslator::Commands::AND_REGEX
@@ -176,8 +226,19 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::GO_TO_IF_REGEX
         label_name = line.match(VMTranslator::Commands::GO_TO_IF_REGEX)[1].to_s
 
-        statements.concat stack.pop(0)
-        statements.concat stack.go_to_if(label_name, argument_ram)
+        if @branch_condition == VMTranslator::Stack::DEFAULT_CONDITION
+          # binding.pry
+          statements.concat stack.pop(0)
+          statements.concat stack.default_go_to_if(label_name, argument_ram)
+        else
+          statements << "// Go To IF #{@branch_condition}"
+          statements.concat stack.sub
+          statements.concat stack.pop(0)
+          statements.concat stack.go_to_if(label_name, @branch_condition)
+        end
+
+        # Reset the branch condition
+        @branch_condition = VMTranslator::Stack::DEFAULT_CONDITION
       elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
         name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
 
@@ -202,6 +263,9 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::CALL_REGEX
         name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
+        # binding.pry
+        # raise 'Not in function context' if current_function.nil?
+
         function = @functions[name]
         raise "Could not find Function (#{name})" if function.nil?
 
@@ -251,35 +315,49 @@ module VMTranslator
         statements << "// Finished Preparing Function #{function.name}: Now calling it"
         statements.concat function.execute
 
-        function.increment_return_counter
-        return_label = function.return_label
-        statements << "(#{return_label})"
+        # function.increment_return_counter
+        # We are in the VM Bootstrap if current_function is nil
+        current_function = find_function(index)
+        if current_function.nil?
+          message = <<~MESSAGE
+            // Just start the application
+            // NOTE: We assume that Sys.init will end the application
+          MESSAGE
 
-        increment_stack = <<~COMMAND
-          // Retrieve the Return Value
-          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
-          M=M+1
+          statements.concat message.split("\n")
+        else
+          current_function.increment_return_counter
+          return_label = current_function.return_label
+          statements << "(#{return_label})"
+          # @function_return_stack << return_label
 
-          A=M
-          D=M
+          increment_stack = <<~COMMAND
+            // Retrieve the Return Value
+            @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+            M=M+1
 
-          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
-          // TODO: remove this later
-          // M=M-1
-          M=M-1
+            A=M
+            D=M
 
-          // Place the Return Value on the Stack Pointer
-          A=M
-          M=D
+            @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+            // TODO: remove this later
+            // M=M-1
+            M=M-1
 
-          @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
-          M=M+1
-        COMMAND
+            // Place the Return Value on the Stack Pointer
+            A=M
+            M=D
 
-        statements.concat increment_stack.split("\n")
+            @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
+            M=M+1
+          COMMAND
+
+          statements.concat increment_stack.split("\n")
+        end
+
         statements << "\n"
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
-        function = find_function(name, index)
+        function = find_function(index)
         raise 'Cannot return because we are not in a Function' if function.nil?
 
         statements << "// Returning from #{function.name}"
@@ -320,6 +398,7 @@ module VMTranslator
 
         statements.concat stack.value
         statements.concat stack.push(0)
+        # binding.pry
         statements.concat constant_ram.pop(4 + function.local_total + function.argument_total)
         statements.concat stack.push(0)
         statements.concat stack.asm_reset_to_zero
@@ -335,7 +414,12 @@ module VMTranslator
         statements.concat stack.pop(0)
         statements.concat stack.pop(0)
 
+        # return_label = @function_return_stack.pop
+
         go_to_statement = <<~COMMAND
+          // @#{return_label}
+          // 0;JMP
+
           // Return to the caller, i.e., #{function.name}
           @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
           A=M
@@ -350,7 +434,7 @@ module VMTranslator
       print(statements)
     end
 
-    def find_function(name, current_vm_line_index)
+    def find_function(current_vm_line_index)
       (current_vm_line_index + 1).times.each do |index|
         line_index = current_vm_line_index - index
         line = lines[line_index]
@@ -360,6 +444,8 @@ module VMTranslator
         name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
         return @functions[name]
       end
+
+      nil
     end
 
     def parse_function(line)
