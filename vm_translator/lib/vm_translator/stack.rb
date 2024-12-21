@@ -2,6 +2,11 @@
 
 module VMTranslator
   class Stack < RAM
+    DEFAULT_CONDITION = 'JGT'
+    EQUAL_CONDITION = 'JEQ'
+    GREATER_THAN_CONDITION = 'JGT'
+    LESS_THAN_CONDITION = 'JLT'
+
     def address
       STACK_ADDRESS_LOCATION
     end
@@ -95,7 +100,7 @@ module VMTranslator
     end
 
     def lt
-      asm_binary_operation('JLT')
+      'JLT'
     end
 
     def gt
@@ -334,7 +339,7 @@ module VMTranslator
       statements
     end
 
-    def go_to_if(name, ram)
+    def default_go_to_if(name, ram)
       statements = []
 
       go_to_statement = <<~COMMAND
@@ -345,6 +350,20 @@ module VMTranslator
 
         @#{name}
         D;JGT
+      COMMAND
+
+      statements.concat go_to_statement.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
+    def go_to_if(name, branch_condition)
+      statements = []
+
+      go_to_statement = <<~COMMAND
+        @#{name}
+        D;#{branch_condition}
       COMMAND
 
       statements.concat go_to_statement.split("\n")
