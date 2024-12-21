@@ -9,7 +9,7 @@ module VMTranslator
     GO_TO_NOW_REGEX = /^goto (\S+)/
 
     # RAM
-    CONSTANT_REGEX = /constant (\d+)/
+    CONSTANT_REGEX = /constant (-?\d+)/
     LOCAL_REGEX = /local (\d+)/
     ARGUMENT_REGEX = /argument (\d+)/
     THIS_REGEX = /this (\d+)/
@@ -21,6 +21,8 @@ module VMTranslator
     # Stack commands
     PUSH_REGEX = /^push (.+)/
     POP_REGEX = /^pop (.+)/
+    SET_REGEX = /^set RAM\[(\d+)\] (\d+)/
+    NEGATIVE_SET_REGEX = /^set RAM\[(\d+)\] -(\d+)/
 
     # Logical commands
     ADD_REGEX = /^add/
@@ -34,8 +36,8 @@ module VMTranslator
     NOT_REGEX = /^not/
 
     # Functions
-    FUNCTION_REGEX = /^function (.+) (\d+)/
-    CALL_REGEX = /^call (.+) (\d+)/
+    FUNCTION_REGEX = /^function (\S+) (\d+)/
+    CALL_REGEX = /^call (\S+) (\d+)/
     RETURN_REGEX = /return/
 
     STATEMENTS = [
@@ -44,6 +46,8 @@ module VMTranslator
       GO_TO_NOW_REGEX,
       PUSH_REGEX,
       POP_REGEX,
+      SET_REGEX,
+      NEGATIVE_SET_REGEX,
       ADD_REGEX,
       SUB_REGEX,
       EQ_REGEX,

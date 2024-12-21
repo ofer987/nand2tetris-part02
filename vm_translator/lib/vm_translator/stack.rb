@@ -52,6 +52,44 @@ module VMTranslator
       statements
     end
 
+    def set(ram_address, value)
+      statements = []
+
+      command = <<~COMMAND
+        // Set RAM address @ #{ram_address} to #{value}
+        @#{value}
+        D=A
+        @#{ram_address}
+        M=D
+      COMMAND
+
+      statements.concat command.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
+    def negative_set(ram_address, value)
+      statements = []
+
+      command = <<~COMMAND
+        // Set RAM address @ #{ram_address} to #{value}
+        @#{value}
+        D=A
+
+        @0
+        D=A-D
+
+        @#{ram_address}
+        M=D
+      COMMAND
+
+      statements.concat command.split("\n")
+      statements << "\n"
+
+      statements
+    end
+
     def eq
       asm_binary_operation('JEQ')
     end
