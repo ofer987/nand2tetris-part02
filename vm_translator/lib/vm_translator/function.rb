@@ -82,6 +82,7 @@ module VMTranslator
 
     def initialize(name)
       @name = name
+      @return_counter = 0
     end
 
     def label
@@ -89,7 +90,7 @@ module VMTranslator
     end
 
     def return_label
-      "#{name}$#{@return_counter}"
+      "#{name}$ret.#{@return_counter}"
     end
 
     def increment_return_counter

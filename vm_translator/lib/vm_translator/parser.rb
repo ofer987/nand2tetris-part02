@@ -39,6 +39,7 @@ module VMTranslator
       @lines = Array(lines).map(&:strip)
 
       @functions = {}
+      @function_return_stack = []
       @last_function_end_address_space_index = nil
       @program_counter = 0
       @stack = VMTranslator::Stack.new
@@ -250,8 +251,12 @@ module VMTranslator
         statements << "// Finished Preparing Function #{function.name}: Now calling it"
         statements.concat function.execute
 
+        function.increment_return_counter
+        return_label = function.return_label
+        statements << "(#{return_label})"
+
         increment_stack = <<~COMMAND
-          // Retrieve the Return Address
+          // Retrieve the Return Value
           @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
           M=M+1
 
