@@ -15,11 +15,8 @@ def read_lines(path)
   paths = Dir.glob path
 
   # binding.pry
-  paths.flat_map do |item|
-    File.readlines(item)
-      .map(&:strip)
-      .reject { |line| line.start_with? '//' }
-      .reject(&:empty?)
+  paths.map do |item|
+    VMTranslator::Klazz.new(item)
   end
 end
 

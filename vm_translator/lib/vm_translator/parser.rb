@@ -36,11 +36,12 @@ module VMTranslator
       print(statements)
     end
 
-    def initialize(lines)
+    def initialize(klazzes)
       # Remove leading and trailing whitespace
-      @lines = Array(lines).map(&:strip)
+      @klazzes = Array(klazzes)
 
       @branch_condition = VMTranslator::Stack::DEFAULT_CONDITION
+      @static_variables = {}
       @functions = {}
       @function_return_stack = []
       @last_function_end_address_space_index = nil
@@ -83,8 +84,9 @@ module VMTranslator
     def parse(init: false)
       if init
         start_vm_lines = initialize_stack_machine.concat put_start_program
-        all_lines = start_vm_lines.concat lines
-        @lines = all_lines
+        klazz_lines = @klazzes.flat_map(&:body)
+
+        lines = start_vm_lines.concat klazz_lines
         # start_vm_lines = initialize_stack_machine.concat put_start_program
         # start_vm_lines.size.times
         #   .each do |index|
@@ -95,38 +97,47 @@ module VMTranslator
         #   end
       end
 
-      parse_functions
+      # parse_static_variables
+      parse_functions(lines)
 
       lines.size.times
         .each do |index|
           line = lines[index]
 
-          parse_line(index, line)
+          parse_line(lines, index, line)
         end
     end
 
     private
 
-    def parse_functions
+    def parse_functions(lines)
       lines.each do |line|
         parse_function(line)
       end
     end
 
-    def parse_line(index, line)
+    def parse_static_variables
+      @klazzes.each do |klazz|
+        klazz.body.each do |line|
+          parse_static_variable(klazz, line)
+        end
+      end
+    end
+
+    def parse_line(lines, index, line)
       statements = []
 
       if line.match? VMTranslator::Commands::PUSH_REGEX
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
-        ram, value = parse_line(index, inner_match)
+        ram, value = parse_line(lines, index, inner_match)
 
         statements.concat ram.pop(value)
         statements.concat stack.push(value)
       elsif line.match? VMTranslator::Commands::POP_REGEX
         inner_match = line.match(VMTranslator::Commands::POP_REGEX)[1].to_s
 
-        ram, value = parse_line(index, inner_match)
+        ram, value = parse_line(lines, index, inner_match)
 
         statements.concat stack.pop(value)
         statements.concat ram.push(value)
@@ -317,7 +328,7 @@ module VMTranslator
 
         # function.increment_return_counter
         # We are in the VM Bootstrap if current_function is nil
-        current_function = find_function(index)
+        current_function = find_function(lines, index)
         if current_function.nil?
           message = <<~MESSAGE
             // Just start the application
@@ -357,7 +368,7 @@ module VMTranslator
 
         statements << "\n"
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
-        function = find_function(index)
+        function = find_function(lines, index)
         raise 'Cannot return because we are not in a Function' if function.nil?
 
         statements << "// Returning from #{function.name}"
@@ -434,7 +445,7 @@ module VMTranslator
       print(statements)
     end
 
-    def find_function(current_vm_line_index)
+    def find_function(lines, current_vm_line_index)
       (current_vm_line_index + 1).times.each do |index|
         line_index = current_vm_line_index - index
         line = lines[line_index]
@@ -481,6 +492,11 @@ module VMTranslator
         end
 
         function.argument_total = argument_total
+      end
+    end
+
+    def parse_static_variable(klazz, line)
+      if line.match? VMTranslator::Commands::STATIC_REGEX
       end
     end
 
