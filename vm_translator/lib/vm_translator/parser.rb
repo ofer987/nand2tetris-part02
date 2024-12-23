@@ -60,14 +60,14 @@ module VMTranslator
       statements = []
 
       initialize = <<~COMMAND
-        set RAM[0] 261
-        set RAM[1] 261
-        set RAM[2] 256
+        set RAM[0] 256
+        set RAM[1] -1
+        set RAM[2] -2
         set RAM[3] -3
         set RAM[4] -4
         set RAM[5] -1     // test results
         set RAM[6] -1
-        set RAM[256] 1234 // fake stack frame from call Sys.init
+        set RAM[256] -1 // fake stack frame from call Sys.init
         set RAM[257] -1
         set RAM[258] -2
         set RAM[259] -3
@@ -181,10 +181,16 @@ module VMTranslator
         statements.concat stack.sub
       elsif line.match? VMTranslator::Commands::EQ_REGEX
         @branch_condition = VMTranslator::Stack::EQUAL_CONDITION
+
+        statements << "// Branching Condition: #{@branch_condition}"
       elsif line.match? VMTranslator::Commands::LT_REGEX
         @branch_condition = VMTranslator::Stack::LESS_THAN_CONDITION
+
+        statements << "// Branching Condition: #{@branch_condition}"
       elsif line.match? VMTranslator::Commands::GT_REGEX
         @branch_condition = VMTranslator::Stack::GREATER_THAN_CONDITION
+
+        statements << "// Branching Condition: #{@branch_condition}"
       elsif line.match? VMTranslator::Commands::NEG_REGEX
         statements.concat stack.neg
       elsif line.match? VMTranslator::Commands::AND_REGEX
@@ -225,7 +231,9 @@ module VMTranslator
           statements.concat stack.pop(0)
           statements.concat stack.default_go_to_if(label_name, argument_ram)
         else
+          statements << "// Go To IF #{@branch_condition}"
           statements.concat stack.sub
+          statements.concat stack.pop(0)
           statements.concat stack.go_to_if(label_name, @branch_condition)
         end
 
