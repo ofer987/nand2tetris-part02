@@ -82,11 +82,37 @@ module VMTranslator
     end
 
     def parse(init: false)
-      if init
-        start_vm_lines = initialize_stack_machine.concat put_start_program
-        klazz_lines = @klazzes.flat_map(&:body)
+      all_klazzes = @klazzes
+      # klazz_lines = @klazzes.map { |klazz| [klazz.name, klazz.body] }
 
-        lines = start_vm_lines.concat klazz_lines
+      if init
+        # start_vm_lines = initialize_stack_machine.concat put_start_program
+        #
+        # binding.pry
+        body = initialize_stack_machine.concat(put_start_program)
+          .join("\n")
+        start_program_klazz = VMTranslator::Klazz.new('StartProgram', body)
+
+        all_klazzes = []
+        all_klazzes << start_program_klazz
+        all_klazzes.concat @klazzes
+      end
+        # start_lines = ['start_program', initialize_stack_machine.concat(put_start_program)]
+        # all_lines = start_lines
+        # all_lines.concat klazz_lines
+        # klazz_lines['start_program'] = initialize_stack_machine.concat(put_start_program)
+        # start_program_lines = {
+        #   'start_program' => initialize_stack_machine.concat(put_start_program)
+        # }
+        #
+        # all_klazz_lines = {}
+        #
+        # binding.pry
+        #
+        #
+        # # klazz_lines = @klazzes.flat_map(&:body)
+        #
+        # lines = start_vm_lines.concat(klazz_lines)
         # start_vm_lines = initialize_stack_machine.concat put_start_program
         # start_vm_lines.size.times
         #   .each do |index|
@@ -94,18 +120,25 @@ module VMTranslator
         #
         #     binding.pry if line.include? 'call'
         #     parse_line(index, line)
-        #   end
+      # end
+
+      # binding.pry
+      parse_static_variables(all_klazzes)
+      # binding.pry
+      all_lines = all_klazzes.flat_map { |klazz| klazz.body.split("\n") }
+      parse_functions(all_lines)
+
+      all_klazzes.each do |klazz|
+        lines = klazz.body.split("\n")
+
+        lines.size.times
+          .each do |index|
+            line = lines[index]
+
+            # binding.pry
+            parse_line(klazz.name, lines, index, line)
+          end
       end
-
-      # parse_static_variables
-      parse_functions(lines)
-
-      lines.size.times
-        .each do |index|
-          line = lines[index]
-
-          parse_line(lines, index, line)
-        end
     end
 
     private
@@ -116,28 +149,28 @@ module VMTranslator
       end
     end
 
-    def parse_static_variables
-      @klazzes.each do |klazz|
-        klazz.body.each do |line|
-          parse_static_variable(klazz, line)
+    def parse_static_variables(all_klazzes)
+      all_klazzes.each do |klazz|
+        klazz.body.split("\n").each do |line|
+          parse_static_variable(klazz.name, line)
         end
       end
     end
 
-    def parse_line(lines, index, line)
+    def parse_line(klazz_name, lines, index, line)
       statements = []
 
       if line.match? VMTranslator::Commands::PUSH_REGEX
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
-        ram, value = parse_line(lines, index, inner_match)
+        ram, value = parse_line(klazz_name, lines, index, inner_match)
 
         statements.concat ram.pop(value)
         statements.concat stack.push(value)
       elsif line.match? VMTranslator::Commands::POP_REGEX
         inner_match = line.match(VMTranslator::Commands::POP_REGEX)[1].to_s
 
-        ram, value = parse_line(lines, index, inner_match)
+        ram, value = parse_line(klazz_name, lines, index, inner_match)
 
         statements.concat stack.pop(value)
         statements.concat ram.push(value)
@@ -185,7 +218,8 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::STATIC_REGEX
         value = line.match(VMTranslator::Commands::STATIC_REGEX)[1].to_i
 
-        [static_ram, value]
+        label = static_ram.get_reserved_label(klazz_name, value)
+        [static_ram, label]
       elsif line.match? VMTranslator::Commands::ADD_REGEX
         statements.concat stack.add
       elsif line.match? VMTranslator::Commands::SUB_REGEX
@@ -495,9 +529,14 @@ module VMTranslator
       end
     end
 
-    def parse_static_variable(klazz, line)
+    def parse_static_variable(klazz_name, line)
+      # rubocop:disable Style/GuardClause
       if line.match? VMTranslator::Commands::STATIC_REGEX
+        value = line.match(VMTranslator::Commands::STATIC_REGEX)[1].to_i
+
+        static_ram.set_label(klazz_name, value)
       end
+      # rubocop:enable Style/GuardClause
     end
 
     def print(statements)
