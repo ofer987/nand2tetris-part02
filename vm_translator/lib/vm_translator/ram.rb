@@ -16,28 +16,6 @@ module VMTranslator
 
     TEMP_ADDRESS_LOCATION = 5
 
-    # def self.pop_value(address)
-    #   pop = <<~COMMAND
-    #     // Pop the value of the RAM's address into the D Register
-    #     @#{address}
-    #     D=M
-    #   COMMAND
-    #
-    #   puts pop.chomp
-    #   statements << "\n"
-    # end
-    #
-    # def self.push_value(address)
-    #   pop = <<~COMMAND
-    #     // Push the value of the D Register into
-    #     @#{address}
-    #     M=D
-    #   COMMAND
-    #
-    #   puts pop.chomp
-    #   statements << "\n"
-    # end
-
     attr_reader :vm_stack
 
     def address
@@ -55,7 +33,6 @@ module VMTranslator
       @address_space_size = address_space_size unless address_space_size.nil?
     end
 
-    # TODO: Rename
     def set_first_memory_register_to_d_register
       statements = []
       command = <<~COMMAND
@@ -126,7 +103,6 @@ module VMTranslator
       statements
     end
 
-    # TODO: Should it be a different name?
     def reference
       statements = []
 
@@ -209,7 +185,6 @@ module VMTranslator
       statements
     end
 
-    # TODO: rename to reset_value_by_offset
     def reset_pointer_by_offset(offset)
       statements = []
 

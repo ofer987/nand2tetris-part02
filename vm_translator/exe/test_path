@@ -9,16 +9,12 @@ begin
 
   directory = File.dirname test_file
   vm_files_glob = File.join(directory, '*.vm')
-  # require 'pry-byebug'
-  # binding.pry
   test_extension = File.extname test_file
   actual_asm_file = test_file.gsub(test_extension, '.asm')
-  # given_vm_files = Dir.glob(vm_files_glob)
 
   File.delete actual_asm_file if File.exist? actual_asm_file
 
   result = system("./exe/compiler '#{vm_files_glob}' #{initialize} >> #{actual_asm_file}")
-
   raise "Failed to compile #{vm_files_glob}" unless result
 
   result = system("../nand2tetris/tools/CPUEmulator.sh #{test_file}")

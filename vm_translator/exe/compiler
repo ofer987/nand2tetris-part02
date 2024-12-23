@@ -3,7 +3,6 @@
 
 require_relative '../lib/vm_translator'
 
-require 'pry-byebug'
 path = ARGV[0].to_s
 initialize = ARGV[1] == 'true'
 
@@ -11,27 +10,20 @@ def glob?(path)
   path.include? '*'
 end
 
-def read_lines(path)
+def read_klazzes(path)
   paths = Dir.glob path
 
-  # binding.pry
-  paths.flat_map do |item|
-    File.readlines(item)
-      .map(&:strip)
-      .reject { |line| line.start_with? '//' }
-      .reject(&:empty?)
+  paths.map do |item|
+    VMTranslator::Klazz.initialize_from_file(item)
   end
 end
 
 begin
-  lines = read_lines(path)
+  klazzes = read_klazzes(path)
 
-  # require 'pry-byebug'
-  # binding.pry
-  parser = VMTranslator::Parser.new(lines)
+  parser = VMTranslator::Parser.new(klazzes)
 
   parser.initialize_stack_machine
-  # binding.pry
 
   parser.parse(init: initialize)
   parser.put_end_program

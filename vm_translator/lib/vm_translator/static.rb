@@ -2,19 +2,28 @@
 
 module VMTranslator
   class Static < RAM
-    attr_reader :vm_stack
+    attr_reader :vm_stack, :available_address
+
+    FIRST_ADDRESS = 16
+    LAST_ADDRESS = 255
+
+    def self.variable_name(klazz_name, address)
+      unless (address + 16) >= FIRST_ADDRESS && (address + 16) <= LAST_ADDRESS
+        raise "Address (#{address}) should should be between #{FIRST_ADDRESS - 16} and #{LAST_ADDRESS - 16}"
+      end
+
+      "#{klazz_name}.#{address}"
+    end
 
     def address
       THIS_ADDRESS_LOCATION
     end
 
-    def pop(indexed_address)
-      validate_memory_address(indexed_address)
-
+    def pop(label)
       statements = []
       command = <<~COMMAND
         // Set the D Register the value of the Memory Segment
-        @#{label(indexed_address)}
+        @#{label}
         D=M
       COMMAND
       statements.concat command.split("\n")
@@ -25,9 +34,7 @@ module VMTranslator
       statements
     end
 
-    def push(indexed_address)
-      validate_memory_address(indexed_address)
-
+    def push(label)
       statements = []
       command = <<~COMMAND
         // Set the D Register to the value of the Stack
@@ -35,8 +42,8 @@ module VMTranslator
         A=M
         D=M
 
-        // Set the M Pointer of #{label(indexed_address)} Memory Segment to the value of the D Register
-        @#{label(indexed_address)}
+        // Set the M Pointer of #{label} Memory Segment to the value of the D Register
+        @#{label}
         M=D
       COMMAND
       statements.concat command.split("\n")
@@ -47,10 +54,42 @@ module VMTranslator
       statements
     end
 
+    def label(klazz_name, address_index)
+      "#{klazz_name}.$#{address_index}"
+    end
+
+    def get_reserved_label(klazz_name, address_index)
+      name = label(klazz_name, address_index)
+      raise "Static address #{name} has not been reserved" unless @reserved_labels.key? name
+
+      name
+    end
+
+    def set_label(klazz_name, address_index)
+      new_label = label(klazz_name, address_index)
+      return if @reserved_labels.key? new_label
+
+      unless @available_address >= FIRST_ADDRESS && @available_address <= LAST_ADDRESS
+        raise 'No more static memory available!'
+      end
+
+      @reserved_labels[new_label] = @available_address
+      increment_available_address
+
+      new_label
+    end
+
+    def initialize
+      super
+
+      @reserved_labels = {}
+      @available_address = 16
+    end
+
     private
 
-    def label(indexed_address)
-      "Foo.$#{indexed_address}"
+    def increment_available_address
+      @available_address += 1
     end
   end
 end
