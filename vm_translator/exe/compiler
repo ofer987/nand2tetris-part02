@@ -3,16 +3,35 @@
 
 require_relative '../lib/vm_translator'
 
+require 'pry-byebug'
 path = ARGV[0].to_s
 initialize = ARGV[1] == 'true'
 
-begin
-  lines = File.readlines(path)
-    .map(&:strip)
-    .reject { |line| line.start_with? '//' }
-    .reject(&:empty?)
+def glob?(path)
+  path.include? '*'
+end
 
+def read_lines(path)
+  paths = Dir.glob path
+
+  # binding.pry
+  paths.flat_map do |item|
+    File.readlines(item)
+      .map(&:strip)
+      .reject { |line| line.start_with? '//' }
+      .reject(&:empty?)
+  end
+end
+
+begin
+  lines = read_lines(path)
+
+  # require 'pry-byebug'
+  # binding.pry
   parser = VMTranslator::Parser.new(lines)
+
+  parser.initialize_stack_machine
+  # binding.pry
 
   parser.parse(init: initialize)
   parser.put_end_program
