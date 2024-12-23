@@ -69,9 +69,9 @@ module VMTranslator
         set RAM[6] -1
         set RAM[256] -1 // fake stack frame from call Sys.init
         set RAM[257] -1
-        set RAM[258] -2
-        set RAM[259] -3
-        set RAM[260] -4
+        set RAM[258] -1
+        set RAM[259] -1
+        set RAM[260] -1
       COMMAND
 
       statements.concat initialize.split("\n")
