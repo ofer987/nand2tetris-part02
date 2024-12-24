@@ -15,6 +15,7 @@ require_relative './vm_translator/static'
 require_relative './vm_translator/commands'
 require_relative './vm_translator/parser'
 require_relative './vm_translator/function'
+require_relative './vm_translator/klazz'
 
 module VMTranslator
   class Error < StandardError; end

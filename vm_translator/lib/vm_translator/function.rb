@@ -83,6 +83,9 @@ module VMTranslator
     def initialize(name)
       @name = name
       @return_counter = 0
+
+      @local_total = 0
+      @argument_total = 0
     end
 
     def label

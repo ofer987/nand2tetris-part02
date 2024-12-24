@@ -36,11 +36,11 @@ module VMTranslator
       print(statements)
     end
 
-    def initialize(lines)
-      # Remove leading and trailing whitespace
-      @lines = Array(lines).map(&:strip)
+    def initialize(klazzes)
+      @klazzes = Array(klazzes)
 
       @branch_condition = VMTranslator::Stack::DEFAULT_CONDITION
+      @static_variables = {}
       @functions = {}
       @function_return_stack = []
       @last_function_end_address_space_index = nil
@@ -69,9 +69,9 @@ module VMTranslator
         set RAM[6] -1
         set RAM[256] -1 // fake stack frame from call Sys.init
         set RAM[257] -1
-        set RAM[258] -2
-        set RAM[259] -3
-        set RAM[260] -4
+        set RAM[258] -1
+        set RAM[259] -1
+        set RAM[260] -1
       COMMAND
 
       statements.concat initialize.split("\n")
@@ -81,52 +81,65 @@ module VMTranslator
     end
 
     def parse(init: false)
+      all_klazzes = @klazzes
+
       if init
-        start_vm_lines = initialize_stack_machine.concat put_start_program
-        all_lines = start_vm_lines.concat lines
-        @lines = all_lines
-        # start_vm_lines = initialize_stack_machine.concat put_start_program
-        # start_vm_lines.size.times
-        #   .each do |index|
-        #     line = start_vm_lines[index]
-        #
-        #     binding.pry if line.include? 'call'
-        #     parse_line(index, line)
-        #   end
+        body = initialize_stack_machine.concat(put_start_program)
+          .join("\n")
+        start_program_klazz = VMTranslator::Klazz.new('StartProgram', body)
+
+        all_klazzes = []
+        all_klazzes << start_program_klazz
+        all_klazzes.concat @klazzes
       end
 
-      parse_functions
+      parse_static_variables(all_klazzes)
 
-      lines.size.times
-        .each do |index|
-          line = lines[index]
+      all_lines = all_klazzes.flat_map { |klazz| klazz.body.split("\n") }
+      parse_functions(all_lines)
 
-          parse_line(index, line)
-        end
+      all_klazzes.each do |klazz|
+        lines = klazz.body.split("\n")
+
+        lines.size.times
+          .each do |index|
+            line = lines[index]
+
+            parse_line(klazz.name, lines, index, line)
+          end
+      end
     end
 
     private
 
-    def parse_functions
+    def parse_functions(lines)
       lines.each do |line|
         parse_function(line)
       end
     end
 
-    def parse_line(index, line)
+    def parse_static_variables(all_klazzes)
+      all_klazzes.each do |klazz|
+        klazz.body.split("\n").each do |line|
+          parse_static_variable(klazz.name, line)
+        end
+      end
+    end
+
+    def parse_line(klazz_name, lines, index, line)
       statements = []
 
       if line.match? VMTranslator::Commands::PUSH_REGEX
         inner_match = line.match(VMTranslator::Commands::PUSH_REGEX)[1].to_s
 
-        ram, value = parse_line(index, inner_match)
+        ram, value = parse_line(klazz_name, lines, index, inner_match)
 
         statements.concat ram.pop(value)
         statements.concat stack.push(value)
       elsif line.match? VMTranslator::Commands::POP_REGEX
         inner_match = line.match(VMTranslator::Commands::POP_REGEX)[1].to_s
 
-        ram, value = parse_line(index, inner_match)
+        ram, value = parse_line(klazz_name, lines, index, inner_match)
 
         statements.concat stack.pop(value)
         statements.concat ram.push(value)
@@ -134,18 +147,15 @@ module VMTranslator
         ram_address = line.match(VMTranslator::Commands::NEGATIVE_SET_REGEX)[1].to_i
         value = line.match(VMTranslator::Commands::NEGATIVE_SET_REGEX)[2].to_i
 
-        # binding.pry
         statements.concat stack.negative_set(ram_address, value)
       elsif line.match? VMTranslator::Commands::SET_REGEX
         ram_address = line.match(VMTranslator::Commands::SET_REGEX)[1].to_i
         value = line.match(VMTranslator::Commands::SET_REGEX)[2].to_i
 
-        # binding.pry
         statements.concat stack.set(ram_address, value)
       elsif line.match? VMTranslator::Commands::CONSTANT_REGEX
         value = line.match(VMTranslator::Commands::CONSTANT_REGEX)[1].to_i
 
-        # binding.pry
         [constant_ram, value]
       elsif line.match? VMTranslator::Commands::LOCAL_REGEX
         value = line.match(VMTranslator::Commands::LOCAL_REGEX)[1].to_i
@@ -174,7 +184,8 @@ module VMTranslator
       elsif line.match? VMTranslator::Commands::STATIC_REGEX
         value = line.match(VMTranslator::Commands::STATIC_REGEX)[1].to_i
 
-        [static_ram, value]
+        label = static_ram.get_reserved_label(klazz_name, value)
+        [static_ram, label]
       elsif line.match? VMTranslator::Commands::ADD_REGEX
         statements.concat stack.add
       elsif line.match? VMTranslator::Commands::SUB_REGEX
@@ -227,7 +238,6 @@ module VMTranslator
         label_name = line.match(VMTranslator::Commands::GO_TO_IF_REGEX)[1].to_s
 
         if @branch_condition == VMTranslator::Stack::DEFAULT_CONDITION
-          # binding.pry
           statements.concat stack.pop(0)
           statements.concat stack.default_go_to_if(label_name, argument_ram)
         else
@@ -237,7 +247,7 @@ module VMTranslator
           statements.concat stack.go_to_if(label_name, @branch_condition)
         end
 
-        # Reset the branch condition
+        statements << "// Reset the Branch Condition to #{VMTranslator::Stack::DEFAULT_CONDITION}"
         @branch_condition = VMTranslator::Stack::DEFAULT_CONDITION
       elsif line.match? VMTranslator::Commands::FUNCTION_REGEX
         name = line.match(VMTranslator::Commands::FUNCTION_REGEX)[1].to_s
@@ -248,28 +258,14 @@ module VMTranslator
         statements << function.label
         statements << "// Preparing Local variables for Function #{function.name}"
 
-        # Add Local variables on to the Stack
-        # statements << "// Add #{function.local_total} to LOCAL RAM"
-        # statements.concat stack.value
-        # statements.concat stack.push(0)
-        #
-        # statements.concat constant_ram.pop(function.local_total)
-        # statements.concat stack.push(0)
-        # statements.concat stack.add
-        # statements.concat stack.set_value_to_d_register
         statements.concat function.initialize_local_ram(function.local_total)
-
-        # binding.pry
       elsif line.match? VMTranslator::Commands::CALL_REGEX
         name = line.match(VMTranslator::Commands::CALL_REGEX)[1].to_s
         argument_total = line.match(VMTranslator::Commands::CALL_REGEX)[2].to_i
-        # binding.pry
-        # raise 'Not in function context' if current_function.nil?
 
         function = @functions[name]
         raise "Could not find Function (#{name})" if function.nil?
 
-        # Debug
         statements << "// Preparing Function #{function.name} before calling it"
 
         # Push the current stack address (i.e., the Program Counter)
@@ -317,7 +313,7 @@ module VMTranslator
 
         # function.increment_return_counter
         # We are in the VM Bootstrap if current_function is nil
-        current_function = find_function(index)
+        current_function = find_function(lines, index)
         if current_function.nil?
           message = <<~MESSAGE
             // Just start the application
@@ -329,7 +325,6 @@ module VMTranslator
           current_function.increment_return_counter
           return_label = current_function.return_label
           statements << "(#{return_label})"
-          # @function_return_stack << return_label
 
           increment_stack = <<~COMMAND
             // Retrieve the Return Value
@@ -357,12 +352,11 @@ module VMTranslator
 
         statements << "\n"
       elsif line.match? VMTranslator::Commands::RETURN_REGEX
-        function = find_function(index)
+        function = find_function(lines, index)
         raise 'Cannot return because we are not in a Function' if function.nil?
 
         statements << "// Returning from #{function.name}"
 
-        # statements << '// Reset the Stack to current value - LOCAL_RAM count of caller'
         statements.concat function.reset_stack_pointer_to_argument_second_approach
 
         statements << '// Restore SP to address of LOCAL_RAM'
@@ -398,7 +392,6 @@ module VMTranslator
 
         statements.concat stack.value
         statements.concat stack.push(0)
-        # binding.pry
         statements.concat constant_ram.pop(4 + function.local_total + function.argument_total)
         statements.concat stack.push(0)
         statements.concat stack.asm_reset_to_zero
@@ -414,12 +407,7 @@ module VMTranslator
         statements.concat stack.pop(0)
         statements.concat stack.pop(0)
 
-        # return_label = @function_return_stack.pop
-
         go_to_statement = <<~COMMAND
-          // @#{return_label}
-          // 0;JMP
-
           // Return to the caller, i.e., #{function.name}
           @#{VMTranslator::RAM::STACK_ADDRESS_LOCATION}
           A=M
@@ -434,7 +422,7 @@ module VMTranslator
       print(statements)
     end
 
-    def find_function(current_vm_line_index)
+    def find_function(lines, current_vm_line_index)
       (current_vm_line_index + 1).times.each do |index|
         line_index = current_vm_line_index - index
         line = lines[line_index]
@@ -482,6 +470,16 @@ module VMTranslator
 
         function.argument_total = argument_total
       end
+    end
+
+    def parse_static_variable(klazz_name, line)
+      # rubocop:disable Style/GuardClause
+      if line.match? VMTranslator::Commands::STATIC_REGEX
+        value = line.match(VMTranslator::Commands::STATIC_REGEX)[1].to_i
+
+        static_ram.set_label(klazz_name, value)
+      end
+      # rubocop:enable Style/GuardClause
     end
 
     def print(statements)
