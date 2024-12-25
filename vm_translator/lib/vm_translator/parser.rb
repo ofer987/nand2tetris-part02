@@ -357,7 +357,7 @@ module VMTranslator
 
         statements << "// Returning from #{function.name}"
 
-        statements.concat function.reset_stack_pointer_to_argument_second_approach
+        statements.concat function.reset_stack_pointer_to_argument
 
         statements << '// Restore SP to address of LOCAL_RAM'
         statements.concat local_ram.value

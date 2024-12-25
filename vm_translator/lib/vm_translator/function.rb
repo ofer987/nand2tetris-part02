@@ -19,7 +19,7 @@ module VMTranslator
       statements
     end
 
-    def reset_stack_pointer_to_argument_second_approach
+    def reset_stack_pointer_to_argument
       statements = []
 
       command_loop = <<~COMMAND
