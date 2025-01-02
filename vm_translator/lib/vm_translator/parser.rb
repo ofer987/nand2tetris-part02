@@ -6,6 +6,7 @@ require 'pry-byebug'
 module VMTranslator
   class Parser
     PROGRAM_COUNTER_SHIFT = 98
+    ASM_LABEL = /^\(.*\)$/
 
     attr_reader :program_counter
 
@@ -491,7 +492,7 @@ module VMTranslator
         is_empty = false
         is_empty = true if statement.empty?
         is_empty = true if statement.start_with? '//'
-        is_empty = true if statement.match?(/^\(.*\)$/)
+        is_empty = true if statement.match?(ASM_LABEL)
 
         puts "// PC: #{program_counter}" unless is_empty
         puts statement
