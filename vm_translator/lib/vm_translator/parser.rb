@@ -474,13 +474,10 @@ module VMTranslator
     end
 
     def parse_static_variable(klazz_name, line)
-      # rubocop:disable Style/GuardClause
-      if line.match? VMTranslator::Commands::STATIC_REGEX
-        value = line.match(VMTranslator::Commands::STATIC_REGEX)[1].to_i
+      return unless line.match? VMTranslator::Commands::STATIC_REGEX
 
-        static_ram.set_label(klazz_name, value)
-      end
-      # rubocop:enable Style/GuardClause
+      value = line.match(VMTranslator::Commands::STATIC_REGEX)[1].to_i
+      static_ram.set_label(klazz_name, value)
     end
 
     def print(statements)
