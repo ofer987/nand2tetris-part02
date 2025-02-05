@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pry-byebug'
+
+require_relative '../lib/jack_compiler'
+
+path = ARGV[0].to_s
+
+state_machine = JackCompiler::StateMachine.new(path)
+
+state_machine.parse
+
+document = state_machine.document.root
+puts document.to_xml
