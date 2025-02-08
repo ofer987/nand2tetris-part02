@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class Node
+  class Statement
     attr_reader :document
 
     def initialize(document)

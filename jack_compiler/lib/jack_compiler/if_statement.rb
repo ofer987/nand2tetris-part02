@@ -1,13 +1,9 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class IfNode < Node
-    REGEX = JackCompiler::RegularExpressions::IF
-    EXPRESSION_REGEX = JackCompiler::RegularExpressions::EXPRESSION
-
-    def initialize(document)
-      super(document)
-    end
+  class IfStatement < Statement
+    REGEX = RegularExpressions::IF
+    EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_element)
       result = statements.match(IF_REGEX)
