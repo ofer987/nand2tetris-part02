@@ -1,43 +1,37 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class ClassStatement < Statement
-    REGEX = RegularExpressions::CLASS
+  class CloseBraceStatement < Statement
+    REGEX = RegularExpressions::CLOSE_BRACE
     EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
-      result = lines.match(REGEX)
-      class_node = document.create_element(CLASS)
-      binding.pry
+      result = lines[0].match(REGEX)
+      class_node = document.create_element('class')
 
-      parent_node << class_node
+      document << class_node
 
-      keyword_node = document.create_element(KEYWORD, CLASS)
+      keyword_node = document.create_element('keyword', 'class')
       class_node << keyword_node
 
-      class_name_node = document.create_element(IDENTIFIER, result[1])
+      class_name_node = document.create_element('identifier', result[1])
       class_node << class_name_node
 
-      next_lines = lines.sub(result[0], '')
-      next_statements(class_node, next_lines)
+      next_statements(lines[1..])
     end
 
-    def next_statements(parent_node, next_lines)
-      binding.pry
+    def next_statements(next_lines)
       return if next_lines.empty?
 
-      next_klass = next_classes.first { |klass| klass::REGEX.match? next_lines }
+      first_line = next_lines[0]
 
-      next_klass
-        .new(document)
-        .create_elements(parent_node, next_lines)
+      first_line
     end
 
     protected
 
     def next_classes
-      [OpenBraceStatement]
-      # [FieldStatement, ConstructorStatement, FunctionStatement, MethodStatement]
+      [BeginClassStatement]
     end
 
     private

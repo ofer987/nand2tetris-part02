@@ -2,6 +2,12 @@
 
 module JackCompiler
   class StateMachine
+    LINE_COMMENT = %r{//.+$}
+    BEGIN_COMMENT_BLOCK = %r{/\*}
+    END_COMMENT_BLOCK = %r{\*/}
+
+    attr_reader :statements
+
     def document
       return @document if defined? @document
 
@@ -9,41 +15,47 @@ module JackCompiler
     end
 
     def initialize(path)
-      @statements = File.readlines(path)
+      lines = File.readlines(path)
         .map(&:chomp)
         .map(&:strip)
-        .join
+        .map { |line| line.gsub(LINE_COMMENT, '') }
+        .reject(&:blank?)
+
+      self.statements = lines
     end
 
     def parse
-      parsed_statements = @statements
-
-      until parsed_statements.blank?
-        if parsed_statements.match? JackCompiler::RegularExpressions::IF
-          if_statement(document, JackCompiler::RegularExpressions::IF, parsed_statements)
-        elsif parsed_statements.match? JackCompiler::RegularExpressions::CLASS
-          class_statement(document, JackCompiler::RegularExpressions::CLASS,  parsed_statements)
-      end
+      class_statement = ClassStatement.new(document)
+      class_statement.create_elements(document, statements)
+      # parsed_statements = @statements
+      #
+      # statements.each do |statement|
+      #   if parsed_statements.match? JackCompiler::RegularExpressions::IF
+      #     if_statement(document, parsed_statements)
+      #   elsif parsed_statements.match? JackCompiler::RegularExpressions::CLASS
+      #     class_statement(document, JackCompiler::RegularExpressions::CLASS,  parsed_statements)
+      #   end
     end
 
     private
 
-    def class_statement(document, regex, parsed_statements)
-      result = parsed_statements.match(regex)
-      class_node = document.create_element('class')
+    def statements=(lines)
+      results = []
 
-      document << class_node
+      is_comment_block = false
+      lines.each do |line|
+        is_comment_block = true if line.match? BEGIN_COMMENT_BLOCK
 
-      keyword_node = document.create_element('keyword', 'class')
-      class_node << keyword_node
+        if line.match?(END_COMMENT_BLOCK)
+          is_comment_block = false
 
-      class_name_node = document.create_element('identifier', result[1])
-      class_node << class_name_node
+          next
+        end
+
+        results << line unless is_comment_block
+      end
+
+      @statements = results.join
     end
-
-    def if_statement(document, parsed_statements)
-    end
-
-    attr_writer :statements
   end
 end

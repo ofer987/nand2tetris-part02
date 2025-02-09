@@ -7,7 +7,7 @@ module JackCompiler
     LET = /let\s+([A-Za-z\-_]+)\s*(=)\s*"(.+)"\s*(;)/
     CLASS = /class\s+(\S+)\s+/
     ENDING_STATEMENT = /;/
-    OPENING_BRACE = /{/
-    CLOSING_BRACE = /}/
+    OPEN_BRACE = /{/
+    CLOSE_BRACE = /}/
   end
 end
