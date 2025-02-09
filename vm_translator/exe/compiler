@@ -7,7 +7,7 @@ path = ARGV[0].to_s
 initialize = ARGV[1] == 'true'
 
 def glob?(path)
-  path.include? '*'
+  path.include? '*.vm'
 end
 
 def read_klazzes(path)
