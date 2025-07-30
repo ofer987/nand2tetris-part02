@@ -6,7 +6,7 @@ module JackCompiler
     EXPRESSION = /\(\s*(\S+)\s*(\S+)\s*(\S+)/
     LET = /let\s+([A-Za-z\-_]+)\s*(=)\s*"(.+)"\s*(;)/
     CLASS = /class\s+(\S+)\s+{/
-    FUNCTION = /function\s+(\S+)\s+(\S+)\(\)/
+    FUNCTION = /function\s+(\S+)\s+(\S+)\((.*)\).+{/
     ENDING_STATEMENT = /;/
     OPEN_BRACE = /{/
     CLOSE_BRACE = /}/

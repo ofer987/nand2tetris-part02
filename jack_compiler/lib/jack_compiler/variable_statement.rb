@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class ClassSubroutineStatement < Statement
+  class VariableStatement < Statement
     REGEX = RegularExpressions::FUNCTION
     # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
