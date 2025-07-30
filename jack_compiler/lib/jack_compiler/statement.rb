@@ -18,7 +18,9 @@ module JackCompiler
     SEMI_COLON = ';'
     EQUAL_SIGN = '='
     LET_STATEMENT = 'letStatement'
-    DO_STATEMENT = 'do'
+    LET_KEYWORD = 'let'
+    DO_STATEMENT = 'doStatement'
+    DO_KEYWORD = 'do'
 
     attr_reader :document
 
