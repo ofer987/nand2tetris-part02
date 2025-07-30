@@ -12,6 +12,7 @@ module JackCompiler
     CLOSE_BRACE = /}/
     CLASS_VAR_STATEMENT = /(static)\s+(\S+)\s+(\S+)\s*;/
     VAR_STATEMENT = /(var)\s+(\S+)\s+(\S+)\s*(;)/
+    DO_STATEMENT = /(do)\s+(\S+)\s*(;)/
     EXPRESSION_STATEMENT = //
   end
 end

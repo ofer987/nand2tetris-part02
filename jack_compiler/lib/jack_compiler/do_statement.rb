@@ -2,12 +2,12 @@
 
 module JackCompiler
   class LetStatement < Statement
-    REGEX = RegularExpressions::LET_STATEMENT
+    REGEX = RegularExpressions::DO_STATEMENT
     # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
-      result_node = document.create_element(LET_STATEMENT)
+      result_node = document.create_element(DO_STATEMENT)
       # binding.pry
 
       parent_node << result_node
@@ -15,13 +15,8 @@ module JackCompiler
       keyword_node = document.create_element(KEYWORD, result[1])
       result_node << keyword_node
 
-      identifier_node = document.create_element(IDENTIFIER, result[2])
-      result_node << identifier_node
+      # TODO: Implement the expression
 
-      symbol_node = document.create_element(SYMBOL, EQUAL_SIGN)
-      result_node << symbol_node
-
-      # binding.pry
       next_lines = lines.sub(REGEX, '')
       next_statements(result_node, next_lines)
     end
@@ -29,7 +24,7 @@ module JackCompiler
     protected
 
     def next_classes
-      [ExpressionStatement]
+      []
     end
   end
 end
