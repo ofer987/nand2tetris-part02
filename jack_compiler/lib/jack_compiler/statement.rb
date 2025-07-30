@@ -16,6 +16,8 @@ module JackCompiler
     SUBROUTINE_BODY = 'subroutineBody'
     VAR_DESCRIPTION = 'varDec'
     SEMI_COLON = ';'
+    EQUAL_SIGN = '='
+    LET_STATEMENT = 'letStatement'
 
     attr_reader :document
 
