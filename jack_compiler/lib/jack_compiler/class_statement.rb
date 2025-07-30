@@ -7,23 +7,27 @@ module JackCompiler
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
-      class_node = document.create_element(CLASS)
-      binding.pry
+      result_node = document.create_element(CLASS)
+      # binding.pry
 
-      parent_node << class_node
+      parent_node << result_node
 
       keyword_node = document.create_element(KEYWORD, CLASS)
-      class_node << keyword_node
+      result_node << keyword_node
 
       class_name_node = document.create_element(IDENTIFIER, result[1])
-      class_node << class_name_node
+      result_node << class_name_node
 
-      next_lines = lines.sub(result[0], '')
-      next_statements(class_node, next_lines)
+      symbol_node = document.create_element(SYMBOL, OPEN_BRACE)
+      result_node << keyword_node
+
+      binding.pry
+      next_lines = lines.sub(REGEX, '')
+      next_statements(result_node, next_lines)
     end
 
     def next_statements(parent_node, next_lines)
-      binding.pry
+      # binding.pry
       return if next_lines.empty?
 
       next_klass = next_classes.first { |klass| klass::REGEX.match? next_lines }
@@ -36,7 +40,7 @@ module JackCompiler
     protected
 
     def next_classes
-      [OpenBraceStatement]
+      [ClassVariableStatement, ClassSubroutineStatement]
       # [FieldStatement, ConstructorStatement, FunctionStatement, MethodStatement]
     end
 

@@ -5,14 +5,17 @@ module JackCompiler
     CLASS = 'class'
     KEYWORD = 'keyword'
     IDENTIFIER = 'identifier'
+    PARAMETER_LIST = 'parameterList'
+    OPEN_PARENTHESIS = '('
+    CLOSE_PARENTHESIS = ')'
     OPEN_BRACE = '{'
     CLOSE_BRACE = '}'
     SYMBOL = 'symbol'
     CLASS_VAR_DESCRIPTION = 'classVarDec'
     SUBROUTINE_DESCRIPTION = 'subroutineDec'
-    PARAMETER_LIST = 'parameterList'
     SUBROUTINE_BODY = 'subroutineBody'
     VAR_DESCRIPTION = 'varDec'
+    SEMI_COLON = ';'
 
     attr_reader :document
 
@@ -24,8 +27,23 @@ module JackCompiler
       raise NotImplementedError
     end
 
-    def next_statements
-      raise NotImplementedError
+    protected
+
+    def next_classes
+      []
+    end
+
+    private
+
+    def next_statements(parent_node, next_lines)
+      # binding.pry
+      return if next_lines.empty?
+
+      next_klass = next_classes.first { |klass| klass::REGEX.match? next_lines }
+
+      next_klass
+        .new(document)
+        .create_elements(parent_node, next_lines)
     end
   end
 end

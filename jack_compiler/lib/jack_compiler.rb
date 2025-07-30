@@ -12,6 +12,7 @@ require_relative 'jack_compiler/close_brace_statement'
 require_relative 'jack_compiler/class_statement'
 require_relative 'jack_compiler/let_statement'
 require_relative 'jack_compiler/if_statement'
+require_relative 'jack_compiler/class_variable_statement'
 
 require_relative 'jack_compiler/version'
 require_relative 'jack_compiler/state_machine'

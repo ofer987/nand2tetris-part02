@@ -5,13 +5,16 @@ module JackCompiler
     REGEX = RegularExpressions::OPEN_BRACE
 
     def create_elements(parent_node, lines)
-      binding.pry
-      lines = lines.match(REGEX)
+      # binding.pry unless lines.match?(REGEX)
+
+      # binding.pry
+      result = lines.match(REGEX)
       symbol_node = document.create_element(SYMBOL, OPEN_BRACE)
 
       parent_node << symbol_node
 
-      next_lines = lines.sub(lines[0], '')
+      binding.pry
+      next_lines = lines.sub(REGEX, '')
       next_statements(next_lines)
     end
 
@@ -24,7 +27,8 @@ module JackCompiler
     protected
 
     def next_classes
-      [BeginClassStatement]
+      # [BeginClassStatement]
+      []
     end
 
     private

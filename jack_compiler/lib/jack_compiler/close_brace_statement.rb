@@ -7,15 +7,15 @@ module JackCompiler
 
     def create_elements(parent_node, lines)
       result = lines[0].match(REGEX)
-      class_node = document.create_element('class')
+      variable_node = document.create_element('class')
 
-      document << class_node
+      document << variable_node
 
       keyword_node = document.create_element('keyword', 'class')
-      class_node << keyword_node
+      variable_node << keyword_node
 
-      class_name_node = document.create_element('identifier', result[1])
-      class_node << class_name_node
+      identifier_node = document.create_element('identifier', result[1])
+      variable_node << identifier_node
 
       next_statements(lines[1..])
     end

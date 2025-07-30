@@ -11,6 +11,6 @@ state_machine = JackCompiler::StateMachine.new(path)
 
 puts state_machine.statements
 state_machine.parse
-binding.pry
+# binding.pry
 
 puts document.to_xml

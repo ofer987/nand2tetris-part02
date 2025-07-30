@@ -54,7 +54,7 @@ tokenizer = document.create_element('tokenizer')
 # end
 #
 def match_token(document, element, statements)
-  binding.pry
+  # binding.pry
 
   until statements.blank?
     statements = statements.to_s.strip
@@ -84,7 +84,7 @@ def match_token(document, element, statements)
       symbol = document.create_element('symbol', ')')
       element << symbol
 
-      binding.pry
+      # binding.pry
       statements = result[-1]
     elsif statements.match? LET_REGEX
       result = statements.match(LET_REGEX)
