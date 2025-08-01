@@ -3,7 +3,7 @@
 module JackCompiler
   class ClassStatement < Statement
     REGEX = RegularExpressions::CLASS
-    EXPRESSION_REGEX = RegularExpressions::EXPRESSION
+    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)

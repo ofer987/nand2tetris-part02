@@ -3,7 +3,7 @@
 module JackCompiler
   class IfStatement < Statement
     REGEX = RegularExpressions::IF
-    EXPRESSION_REGEX = RegularExpressions::EXPRESSION
+    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node)
       result = statements.match(IF_REGEX)

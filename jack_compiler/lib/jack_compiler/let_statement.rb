@@ -18,7 +18,7 @@ module JackCompiler
       identifier_node = document.create_element(IDENTIFIER, result[2])
       result_node << identifier_node
 
-      symbol_node = document.create_element(SYMBOL, EQUAL_SIGN)
+      symbol_node = document.create_element(SYMBOL, result[3])
       result_node << symbol_node
 
       # binding.pry

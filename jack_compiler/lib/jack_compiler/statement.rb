@@ -42,10 +42,13 @@ module JackCompiler
 
     def next_statements(parent_node, next_lines)
       # binding.pry
-      return if next_lines.empty?
+      return if next_lines.blank?
+      return if next_classes.blank?
 
       next_klass = next_classes.first { |klass| klass::REGEX.match? next_lines }
+      return if next_klass.blank?
 
+      binding.pry
       next_klass
         .new(document)
         .create_elements(parent_node, next_lines)

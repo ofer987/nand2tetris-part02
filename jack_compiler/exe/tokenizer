@@ -13,4 +13,5 @@ puts state_machine.statements
 state_machine.parse
 # binding.pry
 
+document = state_machine.document
 puts document.to_xml
