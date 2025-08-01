@@ -19,22 +19,12 @@ module JackCompiler
       result_node << class_name_node
 
       symbol_node = document.create_element(SYMBOL, OPEN_BRACE)
-      result_node << keyword_node
+      result_node << symbol_node
 
-      binding.pry
       next_lines = lines.sub(REGEX, '')
       next_statements(result_node, next_lines)
-    end
 
-    def next_statements(parent_node, next_lines)
-      # binding.pry
-      return if next_lines.empty?
-
-      next_klass = next_classes.first { |klass| klass::REGEX.match? next_lines }
-
-      next_klass
-        .new(document)
-        .create_elements(parent_node, next_lines)
+      next_lines
     end
 
     protected

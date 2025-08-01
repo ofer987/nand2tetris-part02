@@ -23,7 +23,9 @@ module JackCompiler
 
       # binding.pry
       next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines)
+      next_statements(result_node, result[4])
+
+      next_lines
     end
 
     protected

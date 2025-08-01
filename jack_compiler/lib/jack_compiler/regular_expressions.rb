@@ -4,7 +4,7 @@ module JackCompiler
   class RegularExpressions
     IF = /(if)\s*(\(.+)/
     # EXPRESSION = /\(\s*(\S+)\s*(\S+)\s*(\S+)/
-    LET_STATEMENT = /let\s+(\S+)\s*(=)\s*(\S+)\s*(;)/
+    LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*(\S+)\s*(;)/
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /function\s+(\S+)\s+(\S+)\((.*)\)\s*{/
     ENDING_STATEMENT = /;/

@@ -6,6 +6,7 @@ module JackCompiler
     # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
+      binding.pry
       result = lines.match(REGEX)
       result_node = document.create_element(SUBROUTINE_DESCRIPTION)
       # binding.pry

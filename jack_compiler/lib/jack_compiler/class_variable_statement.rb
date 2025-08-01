@@ -6,7 +6,6 @@ module JackCompiler
     # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
-      binding.pry
       result = lines.match(REGEX)
       result_node = document.create_element(CLASS_VAR_DESCRIPTION)
       # binding.pry
@@ -28,6 +27,8 @@ module JackCompiler
       # binding.pry
       next_lines = lines.sub(REGEX, '')
       next_statements(result_node, next_lines)
+
+      next_lines
     end
   end
 end
