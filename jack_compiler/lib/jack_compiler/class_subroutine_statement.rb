@@ -27,6 +27,8 @@ module JackCompiler
 
       parameter_list_node = document.create_element(PARAMETER_LIST)
       result_node << parameter_list_node
+
+      next_statements(parameter_list_node, result[4], next_argument_classes)
       # TODO: implement **parameterList**
       # unless result[4].to_s.blank?
 
@@ -43,6 +45,10 @@ module JackCompiler
     end
 
     private
+
+    def next_argument_classes
+      []
+    end
 
     def next_classes
       [SubroutineBodyStatement]
