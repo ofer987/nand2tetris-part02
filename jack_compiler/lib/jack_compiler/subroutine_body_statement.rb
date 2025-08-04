@@ -34,9 +34,8 @@ module JackCompiler
       statements_node = document.create_element(STATEMENTS)
       result_node << statements_node
 
-      next_lines = next_statements(statements_node, next_lines, statement_classes)
-
-      next_statements(result_node, next_lines, close_brace_classes)
+      # binding.pry
+      next_statements(statements_node, next_lines, statement_classes)
     end
 
     protected
@@ -46,11 +45,7 @@ module JackCompiler
     end
 
     def statement_classes
-      [LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement, CloseBraceStatement]
-    end
-
-    def close_brace_classes
-      [CloseBraceStatement]
+      [LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement]
     end
   end
 end

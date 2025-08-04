@@ -5,7 +5,7 @@ module JackCompiler
     REGEX = RegularExpressions::CLOSE_BRACE
 
     def create_elements(parent_node, lines)
-      result_node = document.create_element(CLOSE_BRACE)
+      result_node = document.create_element(SYMBOL, CLOSE_BRACE)
       parent_node << result_node
 
       lines.sub(REGEX, '')
