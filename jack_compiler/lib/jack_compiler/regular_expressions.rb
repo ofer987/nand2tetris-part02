@@ -17,5 +17,7 @@ module JackCompiler
     EXPRESSION_STATEMENT_EXECUTION = /(\S+)(\.)(\S)\((.*)\)\s*(;)/
     EXPRESSION_STATEMENT_INTEGER = /(\S+)\s*(;)/
     EXPRESSION_STATEMENT_NUL = /(null)\s*(;)/
+    RETURN_STATEMENT = /(return)\s*(\S+)(;)/
+    EMPTY_RETURN_STATEMENT = /(return)\s*(;)/
   end
 end

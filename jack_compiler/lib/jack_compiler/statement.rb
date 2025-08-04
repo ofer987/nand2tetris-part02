@@ -21,6 +21,7 @@ module JackCompiler
     LET_KEYWORD = 'let'
     DO_STATEMENT = 'doStatement'
     DO_KEYWORD = 'do'
+    RETURN_STATEMENT = 'returnStatement'
 
     attr_reader :document
 
