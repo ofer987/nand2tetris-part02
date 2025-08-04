@@ -17,7 +17,7 @@ module JackCompiler
       # binding.pry
 
       next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines, variable_classes)
+      next_lines = next_statements(result_node, next_lines, variable_classes)
 
       # keyword_node = document.create_element(KEYWORD, result[2])
       # result_node << keyword_node
@@ -31,16 +31,12 @@ module JackCompiler
       # TODO: implement **parameterList**
       # unless result[4].to_s.blank?
 
-      symbol_node = document.create_element(SYMBOL, CLOSE_BRACE)
-      result_node << symbol_node
+      statements_node = document.create_element(STATEMENTS)
+      result_node << statements_node
 
-      # TODO: implement **subroutineBody**
+      next_lines = next_statements(statements_node, next_lines, statement_classes)
 
-      # binding.pry
-      next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines, statement_classes)
-
-      next_lines
+      next_statements(result_node, next_lines, close_brace_classes)
     end
 
     protected
@@ -51,6 +47,10 @@ module JackCompiler
 
     def statement_classes
       [LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement, CloseBraceStatement]
+    end
+
+    def close_brace_classes
+      [CloseBraceStatement]
     end
   end
 end
