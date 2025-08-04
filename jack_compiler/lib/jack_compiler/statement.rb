@@ -37,25 +37,17 @@ module JackCompiler
       raise NotImplementedError
     end
 
-    protected
-
-    def next_classes
-      []
-    end
-
     private
 
-    def next_statements(parent_node, next_lines)
+    def next_statements(parent_node, next_lines, next_classes)
       # binding.pry
       loop do
         return if next_lines.blank?
         return if next_classes.blank?
 
-        binding.pry
         next_klass = next_classes
           .select { |klass| klass::REGEX.match? next_lines }
           .first
-        binding.pry
         return if next_klass.blank?
 
         next_lines = next_klass

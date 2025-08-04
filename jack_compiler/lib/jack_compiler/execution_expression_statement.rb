@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class Execution_ExpressionStatement < ExpressionStatement
+  class ExecutionExpressionStatement < ExpressionStatement
     REGEX = RegularExpressions::EXECUTION_EXPRESSION_STATEMENT
     # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
-      result = lines.match(REGEX)
-      result_node = document.create_element(LET_STATEMENT)
+      result = lines.match?(REGEX)
+      result_node = document.create_element(EXPRESSION_STATEMENT)
       # binding.pry
 
       parent_node << result_node
@@ -24,8 +24,7 @@ module JackCompiler
       # result_node << symbol_node
 
       # binding.pry
-      next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines)
+      lines.sub(REGEX, '')
     end
   end
 end

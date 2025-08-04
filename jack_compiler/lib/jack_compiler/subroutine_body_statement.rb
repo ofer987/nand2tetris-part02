@@ -16,6 +16,9 @@ module JackCompiler
       result_node << symbol_node
       # binding.pry
 
+      next_lines = lines.sub(REGEX, '')
+      next_statements(result_node, next_lines, variable_classes)
+
       # keyword_node = document.create_element(KEYWORD, result[2])
       # result_node << keyword_node
       #
@@ -35,13 +38,19 @@ module JackCompiler
 
       # binding.pry
       next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines)
+      next_statements(result_node, next_lines, statement_classes)
+
+      next_lines
     end
 
     protected
 
-    def next_classes
-      [VariableStatement, LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement, CloseBraceStatement]
+    def variable_classes
+      [VariableStatement]
+    end
+
+    def statement_classes
+      [LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement, CloseBraceStatement]
     end
   end
 end

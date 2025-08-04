@@ -25,21 +25,19 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[4])
       term_node << symbol_node
 
-      # TODO: Expression List for arguments
       expression_list_node = document.create_element(EXPRESSION_LIST)
+      next_statements(expression_list_node, result[5], next_classes)
+
       term_node << expression_list_node
 
       symbol_node = document.create_element(SYMBOL, result[6])
       term_node << symbol_node
 
       # binding.pry
-      next_lines = lines.sub(REGEX, '')
-      next_statements(expression_list_node, result[5])
-
-      next_lines
+      lines.sub(REGEX, '')
     end
 
-    protected
+    private
 
     def next_classes
       [ArgumentStatement]

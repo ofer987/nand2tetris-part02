@@ -25,10 +25,7 @@ module JackCompiler
       result_node << symbol_node
 
       # binding.pry
-      next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines)
-
-      next_lines
+      lines.sub(REGEX, '')
     end
   end
 end

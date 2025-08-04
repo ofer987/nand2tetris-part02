@@ -13,7 +13,7 @@ module JackCompiler
       lines.sub(REGEX, '')
     end
 
-    protected
+    private
 
     def next_classes
       []

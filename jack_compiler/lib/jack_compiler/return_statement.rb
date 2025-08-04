@@ -23,14 +23,7 @@ module JackCompiler
 
       # TODO: Implement the expression
 
-      next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines)
-    end
-
-    protected
-
-    def next_classes
-      []
+      lines.sub(REGEX, '')
     end
   end
 end

@@ -6,7 +6,7 @@ module JackCompiler
     # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
-      binding.pry
+      # binding.pry
       result = lines.match(REGEX)
       result_node = document.create_element(SUBROUTINE_DESCRIPTION)
       # binding.pry
@@ -25,6 +25,8 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, OPEN_PARENTHESIS)
       result_node << symbol_node
 
+      parameter_list_node = document.create_element(PARAMETER_LIST)
+      result_node << parameter_list_node
       # TODO: implement **parameterList**
       # unless result[4].to_s.blank?
 
@@ -35,10 +37,12 @@ module JackCompiler
 
       # binding.pry
       next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines)
+      next_statements(result_node, next_lines, next_classes)
+
+      next_lines
     end
 
-    protected
+    private
 
     def next_classes
       [SubroutineBodyStatement]

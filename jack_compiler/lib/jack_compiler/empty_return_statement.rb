@@ -18,16 +18,7 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[2])
       result_node << symbol_node
 
-      # TODO: Implement the expression
-
-      next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines)
-    end
-
-    protected
-
-    def next_classes
-      []
+      lines.sub(REGEX, '')
     end
   end
 end

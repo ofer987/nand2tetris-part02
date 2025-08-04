@@ -23,15 +23,15 @@ module JackCompiler
 
       # binding.pry
       next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, result[4])
+      next_statements(result_node, result[4], next_classes)
 
       next_lines
     end
 
-    protected
+    private
 
     def next_classes
-      [Execution_ExpressionStatement, AssignmentExpressionStatement]
+      [AssignmentExpressionStatement]
     end
   end
 end
