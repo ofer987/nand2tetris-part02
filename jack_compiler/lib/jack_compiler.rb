@@ -22,6 +22,7 @@ require_relative 'jack_compiler/empty_return_statement'
 require_relative 'jack_compiler/expression_statement'
 require_relative 'jack_compiler/execution_expression_statement'
 require_relative 'jack_compiler/assignment_expression_statement'
+require_relative 'jack_compiler/argument_statement'
 
 require_relative 'jack_compiler/version'
 require_relative 'jack_compiler/state_machine'

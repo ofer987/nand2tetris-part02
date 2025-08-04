@@ -22,15 +22,14 @@ module JackCompiler
       result_node << symbol_node
 
       # binding.pry
-      next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, result[4], next_classes)
+      next_statements(result_node, result[4], next_expression_classes)
 
-      next_lines
+      lines.sub(REGEX, '')
     end
 
     private
 
-    def next_classes
+    def next_expression_classes
       [AssignmentExpressionStatement]
     end
   end
