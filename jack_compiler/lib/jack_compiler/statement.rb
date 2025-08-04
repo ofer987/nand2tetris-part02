@@ -41,20 +41,26 @@ module JackCompiler
     private
 
     def next_statements(parent_node, next_lines, next_classes)
+      next_lines = next_lines.strip
+
       # binding.pry
       loop do
-        return if next_lines.blank?
-        return if next_classes.blank?
+        break if next_lines.blank?
+        break if next_classes.blank?
 
+        # Interpret code, line by line in descending order
         next_klass = next_classes
-          .select { |klass| klass::REGEX.match? next_lines }
+          .select { |klass| next_lines.match?(/^#{klass::REGEX}/) }
           .first
-        return if next_klass.blank?
+        break if next_klass.blank?
 
         next_lines = next_klass
           .new(document)
           .create_elements(parent_node, next_lines)
+          .strip
       end
+
+      next_lines
     end
   end
 end
