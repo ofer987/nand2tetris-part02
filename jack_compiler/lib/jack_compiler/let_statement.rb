@@ -31,7 +31,7 @@ module JackCompiler
     protected
 
     def next_classes
-      [ExpressionStatement]
+      [Execution_ExpressionStatement, AssignmentExpressionStatement]
     end
   end
 end
