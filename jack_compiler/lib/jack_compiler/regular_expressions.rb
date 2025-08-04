@@ -14,10 +14,12 @@ module JackCompiler
     CLASS_VAR_STATEMENT = /(static)\s+(\S+)\s+(\S+)\s*;/
     VAR_STATEMENT = /(var)\s+(\S+)\s+(\S+)\s*(;)/
     DO_STATEMENT = /(do)\s+(\S+)(\.)(S+)(\()(\S+)(\))\s*(;)/
-    EXPRESSION_STATEMENT_EXECUTION = /(\S+)(\.)(\S)\((.*)\)\s*(;)/
-    EXPRESSION_STATEMENT_INTEGER = /(\S+)\s*(;)/
-    EXPRESSION_STATEMENT_NUL = /(null)\s*(;)/
+    ASSIGNMENT_EXPRESSION_STATEMENT = /(\S+)(\.)(\S)(\()([^)]*)(\))\s*/
+    EXECUTION_EXPRESSION_STATEMENT = /(\S+)(\.)(\S)\((.*)\)\s*(;)/
+    INTEGER_EXPRESSION_STATEMENT = /(\S+)\s*(;)/
+    NULL_EXPRESSION_STATEMENT = /(null)\s*(;)/
     RETURN_STATEMENT = /(return)\s*(\S+)(;)/
     EMPTY_RETURN_STATEMENT = /(return)\s*(;)/
+    ARGUMENT_STATEMENT = /([^,]+),?/
   end
 end

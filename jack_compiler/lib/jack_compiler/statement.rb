@@ -22,6 +22,10 @@ module JackCompiler
     DO_STATEMENT = 'doStatement'
     DO_KEYWORD = 'do'
     RETURN_STATEMENT = 'returnStatement'
+    EXPRESSION_STATEMENT = 'expression'
+    TERM_STATEMENT = 'term'
+    EXPRESSION_LIST = 'expressionList'
+    ARGUMENT_STATEMENT = 'argument'
 
     attr_reader :document
 
