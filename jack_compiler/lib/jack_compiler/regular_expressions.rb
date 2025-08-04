@@ -6,9 +6,10 @@ module JackCompiler
     # EXPRESSION = /\(\s*(\S+)\s*(\S+)\s*(\S+)/
     LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*(\S+)\s*(;)/
     CLASS = /class\s+(\S+)\s+{/
-    FUNCTION = /function\s+(\S+)\s+(\S+)\((.*)\)\s*{/
+    FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
+    SUBROUTINE_BODY = //
     ENDING_STATEMENT = /;/
-    OPEN_BRACE = /{/
+    OPEN_BRACE = /({)/
     CLOSE_BRACE = /}/
     CLASS_VAR_STATEMENT = /(static)\s+(\S+)\s+(\S+)\s*;/
     VAR_STATEMENT = /(var)\s+(\S+)\s+(\S+)\s*(;)/
