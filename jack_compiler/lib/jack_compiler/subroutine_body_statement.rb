@@ -45,7 +45,7 @@ module JackCompiler
     end
 
     def statement_classes
-      [LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement]
+      [IfStatement, LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement]
     end
   end
 end

@@ -27,6 +27,7 @@ module JackCompiler
     EXPRESSION_LIST = 'expressionList'
     ARGUMENT_STATEMENT = 'argument'
     STATEMENTS = 'statements'
+    COMMA = ','
 
     attr_reader :document
 
