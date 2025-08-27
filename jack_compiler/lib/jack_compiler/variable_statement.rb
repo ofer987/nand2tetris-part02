@@ -23,10 +23,12 @@ module JackCompiler
         end
       result_node << node
 
-      multiple_variable_nodes(result[3]).each do |variable_node|
+      multiple_variable_nodes(result[3]).each do |key, value|
+        variable_node = document.create_element(key, value)
+
         result_node << variable_node
       end
-      binding.pry
+      # binding.pry
       # result_node << identifier_node
 
       symbol_node = document.create_element(SYMBOL, SEMI_COLON)
@@ -39,11 +41,24 @@ module JackCompiler
     private
 
     def multiple_variable_nodes(identifier)
-      identifier
+      identifiers = identifier
         .split(',')
         .map { |item| [IDENTIFIER, item] }
-        .join([SYMBOL, COMMA])
-        .map { |key, value| document.create_element(key, value) }
+
+      size = identifiers.size
+
+      results = []
+      identifiers[...(size - 1)].each do |key, value|
+        results << [key, value]
+        results << [SYMBOL, COMMA]
+      end
+
+      last_identifer = identifiers[-1][0]
+      last_value = identifiers[-1][1]
+
+      results << [last_identifer, last_value]
+
+      results
     end
   end
 end
