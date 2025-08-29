@@ -41,11 +41,11 @@ module JackCompiler
     end
 
     def next_expression_classes
-      # TODO
       [
         StringAssignmentStatement,
         NullAssignmentStatement,
         IntegerAssignmentStatement,
+        VariableAssignmentStatement,
         ArrayAssignmentStatement,
         AssignmentExpressionStatement
       ]

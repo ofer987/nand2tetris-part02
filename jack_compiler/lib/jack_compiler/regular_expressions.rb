@@ -10,6 +10,8 @@ module JackCompiler
     STRING_CONSTANT_ASSIGNMENT = /"(.*)"/
     INTEGER_CONSTANT_ASSIGNMENT = /(\d+)/
     NULL_CONSTANT_ASSIGNMENT = /(null)/
+    VARIABLE_ASSIGNMENT = /(.+)/
+    OPERATION_EXPRESSION_REGEX = %r{-/\*\|\+}
 
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/

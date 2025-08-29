@@ -20,7 +20,14 @@ module JackCompiler
     end
 
     def next_expression_classes
-      [IntegerAssignmentStatement]
+      [
+        StringAssignmentStatement,
+        NullAssignmentStatement,
+        IntegerAssignmentStatement,
+        VariableAssignmentStatement,
+        ArrayAssignmentStatement,
+        AssignmentExpressionStatement
+      ]
     end
   end
 end

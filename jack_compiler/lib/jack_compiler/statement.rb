@@ -33,6 +33,7 @@ module JackCompiler
 
     STRING_CONSTANT = 'stringConstant'
     INTEGER_CONSTANT = 'integerConstant'
+    VARIABLE_CONSTANT = 'identifier'
     NULL_CONSTANT = 'keyword'
 
     attr_reader :document
