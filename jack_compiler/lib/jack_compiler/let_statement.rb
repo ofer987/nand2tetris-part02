@@ -15,8 +15,8 @@ module JackCompiler
       keyword_node = document.create_element(KEYWORD, result[1])
       result_node << keyword_node
 
-      identifier_node = document.create_element(IDENTIFIER, result[2])
-      result_node << identifier_node
+      value_node = document.create_element(IDENTIFIER, result[2])
+      result_node << value_node
 
       symbol_node = document.create_element(SYMBOL, result[3])
       result_node << symbol_node
@@ -33,7 +33,7 @@ module JackCompiler
     private
 
     def next_expression_classes
-      [AssignmentExpressionStatement]
+      [StringAssignmentStatement, NullAssignmentStatement, IntegerAssignmentStatement, AssignmentExpressionStatement]
     end
   end
 end
