@@ -6,6 +6,7 @@ module JackCompiler
     # IF = /(if)\s*(\(.+)/
     # EXPRESSION = /\(\s*(\S+)\s*(\S+)\s*(\S+)/
     LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*([^;]+)(;)/
+    ARRAY_EXPRESSION = /([^\[]+)(\[)(\d+)(\])/
     STRING_CONSTANT_ASSIGNMENT = /"(.*)"/
     INTEGER_CONSTANT_ASSIGNMENT = /(\d+)/
     NULL_CONSTANT_ASSIGNMENT = /(null)/
