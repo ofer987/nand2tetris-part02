@@ -8,7 +8,7 @@ module JackCompiler
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
       result_node = document.create_element(DO_STATEMENT)
-      binding.pry
+      # binding.pry
 
       parent_node << result_node
 

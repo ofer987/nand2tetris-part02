@@ -31,7 +31,7 @@ module JackCompiler
       # TODO: implement **parameterList**
       # unless result[4].to_s.blank?
 
-      statements_node = document.create_element(STATEMENTS)
+      statements_node = document.create_element(STATEMENTS_STATEMENT)
       result_node << statements_node
 
       # binding.pry

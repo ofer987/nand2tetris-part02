@@ -17,6 +17,7 @@ module JackCompiler
     VAR_DESCRIPTION = 'varDec'
     SEMI_COLON = ';'
     EQUAL_SIGN = '='
+    IF_STATEMENT = 'ifStatement'
     LET_STATEMENT = 'letStatement'
     LET_KEYWORD = 'let'
     DO_STATEMENT = 'doStatement'
@@ -26,8 +27,12 @@ module JackCompiler
     TERM_STATEMENT = 'term'
     EXPRESSION_LIST = 'expressionList'
     ARGUMENT_STATEMENT = 'argument'
-    STATEMENTS = 'statements'
+    STATEMENTS_STATEMENT = 'statements'
     COMMA = ','
+
+    STRING_CONSTANT = 'stringConstant'
+    INTEGER_CONSTANT = 'integerConstant'
+    NULL_CONSTANT = 'keyword'
 
     attr_reader :document
 

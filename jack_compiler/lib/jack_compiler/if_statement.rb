@@ -2,25 +2,49 @@
 
 module JackCompiler
   class IfStatement < Statement
-    REGEX = RegularExpressions::IF
+    REGEX = RegularExpressions::IF_STATEMENT_REGEX
     # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
-    def create_elements(parent_node)
-      result = statements.match(IF_REGEX)
-      if_statement_node = document.create_element('ifStatement')
-      parent_node << if_statement_node
+    def create_elements(parent_node, lines)
+      # return ''
+      #
+      # binding.pry
+      result = lines.match(REGEX)
 
-      keyword_node = document.create_element('keyword', 'if')
-      if_statement << keyword_node
+      result_node = document.create_element(IF_STATEMENT)
 
-      symbol_node = document.create_element('symbol', '(')
-      if_statement << symbol_node
+      parent_node << result_node
 
-      expression_node = document.create_element('expression')
+      keyword_node = document.create_element(KEYWORD, result[1])
+      result_node << keyword_node
+
+      symbol_node = document.create_element(SYMBOL, result[2])
+      result_node << symbol_node
+
+      expression_node = document.create_element(EXPRESSION_STATEMENT)
       parent_node << expression_node
 
-      symbol_node = document.create_element('symbol', ')')
-      if_statement << symbol_node
+      term_node = document.create_element(TERM_STATEMENT)
+      expression_node << term_node
+
+      keyword_node = document.create_element(KEYWORD, result[3])
+      term_node << keyword_node
+
+      symbol_node = document.create_element(SYMBOL, result[4])
+      result_node << symbol_node
+
+      symbol_node = document.create_element(SYMBOL, result[4])
+      result_node << symbol_node
+
+      binding.pry
+      next_lines = lines.sub(REGEX, '')
+      next_statements(result_node, next_lines, next_classes)
+    end
+
+    protected
+
+    def next_classes
+      [VariableStatement, StatementsStatement]
     end
   end
 end

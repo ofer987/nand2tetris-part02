@@ -24,6 +24,9 @@ module JackCompiler
       # binding.pry
       next_statements(result_node, result[4], next_expression_classes)
 
+      symbol_node = document.create_element(SYMBOL, result[5])
+      result_node << symbol_node
+
       lines.sub(REGEX, '')
     end
 

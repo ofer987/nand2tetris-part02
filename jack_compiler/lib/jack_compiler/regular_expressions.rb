@@ -2,9 +2,14 @@
 
 module JackCompiler
   class RegularExpressions
-    IF = /(if)\s*(\(.+)/
+    # PARAMETER_LIST = /\S+,\s*(\S+)
+    # IF = /(if)\s*(\(.+)/
     # EXPRESSION = /\(\s*(\S+)\s*(\S+)\s*(\S+)/
-    LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*(\S+)\s*(;)/
+    LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*([^;]+)(;)/
+    STRING_CONSTANT_ASSIGNMENT = /"(.*)"(;)/
+    INTEGER_CONSTANT_ASSIGNMENT = /(\d+)(;)/
+    NULL_CONSTANT_ASSIGNMENT = /(null)(;)/
+
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
     SUBROUTINE_BODY = //
@@ -21,5 +26,7 @@ module JackCompiler
     RETURN_STATEMENT = /(return)\s*(\S+)(;)/
     EMPTY_RETURN_STATEMENT = /(return)\s*(;)/
     ARGUMENT_STATEMENT = /([^,]+),?/
+    IF_STATEMENT_REGEX = /(if)\s*(\()\s*(\S+)\s*(\))\s*({)/
+    STATEMENTS_REGEX = //
   end
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
+  # For executing methods of classes
   class AssignmentExpressionStatement < ExpressionStatement
     REGEX = RegularExpressions::ASSIGNMENT_EXPRESSION_STATEMENT
 
