@@ -6,9 +6,9 @@ module JackCompiler
     # IF = /(if)\s*(\(.+)/
     # EXPRESSION = /\(\s*(\S+)\s*(\S+)\s*(\S+)/
     LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*([^;]+)(;)/
-    STRING_CONSTANT_ASSIGNMENT = /"(.*)"(;)/
-    INTEGER_CONSTANT_ASSIGNMENT = /(\d+)(;)/
-    NULL_CONSTANT_ASSIGNMENT = /(null)(;)/
+    STRING_CONSTANT_ASSIGNMENT = /"(.*)"/
+    INTEGER_CONSTANT_ASSIGNMENT = /(\d+)/
+    NULL_CONSTANT_ASSIGNMENT = /(null)/
 
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
@@ -28,6 +28,6 @@ module JackCompiler
     ARGUMENT_STATEMENT = /([^,]+),?/
     IF_STATEMENT_REGEX = /(if)\s*(\()\s*(\S+)\s*(\))\s*({)/
     ELSE_STATEMENT_REGEX = /(else)\s*({)/
-    STATEMENTS_REGEX = //
+    STATEMENTS_REGEX = /if|let|do|return/
   end
 end

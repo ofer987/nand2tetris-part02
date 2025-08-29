@@ -17,10 +17,10 @@ module JackCompiler
       parent_node << keyword_node
 
       symbol_node = document.create_element(SYMBOL, result[2])
-      result_node << symbol_node
+      parent_node << symbol_node
 
       next_lines = lines.sub(REGEX, '')
-      next_lines = next_statements(result_node, next_lines, next_classes)
+      next_lines = next_statements(parent_node, next_lines, next_classes)
 
       next_statements(parent_node, next_lines, end_classes)
     end

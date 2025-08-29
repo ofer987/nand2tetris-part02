@@ -9,7 +9,6 @@ module JackCompiler
 
       parent_node << result_node
 
-      # next_lines = lines.sub(REGEX, '')
       next_lines = lines
       next_statements(result_node, next_lines, statement_classes)
     end
