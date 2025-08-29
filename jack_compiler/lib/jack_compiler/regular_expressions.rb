@@ -27,6 +27,7 @@ module JackCompiler
     EMPTY_RETURN_STATEMENT = /(return)\s*(;)/
     ARGUMENT_STATEMENT = /([^,]+),?/
     IF_STATEMENT_REGEX = /(if)\s*(\()\s*(\S+)\s*(\))\s*({)/
+    ELSE_STATEMENT_REGEX = /(else)\s*({)/
     STATEMENTS_REGEX = //
   end
 end

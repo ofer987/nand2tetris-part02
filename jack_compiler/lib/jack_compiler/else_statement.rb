@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+module JackCompiler
+  class ElseStatement < Statement
+    REGEX = RegularExpressions::ELSE_STATEMENT_REGEX
+    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
+
+    def create_elements(parent_node, lines)
+      # return ''
+      #
+      # binding.pry
+      result = lines.match(REGEX)
+
+      # result_node = document.create_element(ELSE_STATEMENT)
+
+      keyword_node = document.create_element(KEYWORD, result[1])
+      parent_node << keyword_node
+
+      symbol_node = document.create_element(SYMBOL, result[2])
+      result_node << symbol_node
+
+      next_lines = lines.sub(REGEX, '')
+      next_lines = next_statements(result_node, next_lines, next_classes)
+
+      next_statements(parent_node, next_lines, end_classes)
+    end
+
+    protected
+
+    def next_classes
+      [VariableStatement, StatementsStatement]
+    end
+
+    def end_classes
+      [CloseBraceStatement]
+    end
+  end
+end

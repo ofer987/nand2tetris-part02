@@ -33,18 +33,29 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[4])
       result_node << symbol_node
 
-      symbol_node = document.create_element(SYMBOL, result[4])
+      symbol_node = document.create_element(SYMBOL, result[5])
       result_node << symbol_node
 
       binding.pry
       next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines, next_classes)
+      next_lines = next_statements(result_node, next_lines, next_classes)
+
+      next_lines = next_statements(parent_node, next_lines, end_classes)
+      next_statements(parent_node, next_lines, else_classes)
     end
 
     protected
 
     def next_classes
       [VariableStatement, StatementsStatement]
+    end
+
+    def end_classes
+      [CloseBraceStatement]
+    end
+
+    def else_classes
+      [ElseStatement]
     end
   end
 end

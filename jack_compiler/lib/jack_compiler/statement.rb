@@ -18,6 +18,7 @@ module JackCompiler
     SEMI_COLON = ';'
     EQUAL_SIGN = '='
     IF_STATEMENT = 'ifStatement'
+    # ELSE_STATEMENT = 'ifStatement'
     LET_STATEMENT = 'letStatement'
     LET_KEYWORD = 'let'
     DO_STATEMENT = 'doStatement'
