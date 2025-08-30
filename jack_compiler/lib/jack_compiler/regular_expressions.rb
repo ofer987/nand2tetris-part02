@@ -14,13 +14,15 @@ module JackCompiler
     OPERATIONS = %r{[*\-+/]}
     UNARY_OPERATION_EXPRESSION_REGEX = /\((#{OPERATIONS})\s*([#{INTEGER_CONSTANT_ASSIGNMENT}#{VARIABLE_ASSIGNMENT}])\)/
 
-    # rubocop:disable Layout/LineLength
+    # FIXME: string does not allow spaces
+    # UNARY operation left & right
     BINARY_OPERATION_EXPRESSION_REGEX_01 = /(\(.+\))\s*(#{OPERATIONS})\s*(\(.+\))/
-    BINARY_OPERATION_EXPRESSION_REGEX_02 = /(\(.+\))\s*(#{OPERATIONS})\s*(.+)/
-    BINARY_OPERATION_EXPRESSION_REGEX_03 = /([^#{OPERATIONS}()\s]+)\s*(#{OPERATIONS})\s*(\(.+\))/
-    BINARY_OPERATION_EXPRESSION_REGEX_04 = /(.+)\s*(#{OPERATIONS})\s*(.+)/
-    # BINARY_OPERATION_EXPRESSION_REGEX_05 = /(#{STRING_CONSTANT_ASSIGNMENT})\s*(#{OPERATIONS})\s*([#{STRING_CONSTANT_ASSIGNMENT}#{INTEGER_CONSTANT_ASSIGNMENT}#{NULL_CONSTANT_ASSIGNMENT}#{VARIABLE_ASSIGNMENT}])/
-    # rubocop:enable Layout/LineLength
+    # UNARY operation left only
+    BINARY_OPERATION_EXPRESSION_REGEX_02 = /(\(.+\))\s*(#{OPERATIONS})\s*([^\s]+)/
+    # UNARY operation right only
+    BINARY_OPERATION_EXPRESSION_REGEX_03 = /([^\s]+)\s*(#{OPERATIONS})\s*(\(.+\))/
+    # No UNARY operations
+    BINARY_OPERATION_EXPRESSION_REGEX_04 = /([^\s]+)\s*(#{OPERATIONS})\s*([^\s]+)/
 
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
