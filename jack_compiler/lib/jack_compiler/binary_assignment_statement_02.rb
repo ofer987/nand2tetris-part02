@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class BinaryAssignmentStatement < ExpressionStatement
+  class BinaryAssignmentStatement02 < ExpressionStatement
     REGEX = RegularExpressions::BINARY_OPERATION_EXPRESSION_REGEX_02
 
     def create_elements(parent_node, lines)
@@ -29,7 +29,7 @@ module JackCompiler
       term_node = document.create_element(TERM_STATEMENT)
       result_node << term_node
 
-      next_statements(term_node, result[1], assignment_expression_classes)
+      next_statements(term_node, result[3], assignment_expression_classes)
       # result_node << term_node
 
       # value_node = document.create_element(VARIABLE_CONSTANT, result[2])

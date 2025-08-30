@@ -11,7 +11,7 @@ module JackCompiler
     INTEGER_CONSTANT_ASSIGNMENT = /(\d+)/
     NULL_CONSTANT_ASSIGNMENT = /(null)/
     VARIABLE_ASSIGNMENT = /(.+)/
-    OPERATIONS = %r{[*\-+/]}
+    OPERATIONS = %r{[*\-+/|]}
     UNARY_OPERATION_EXPRESSION_REGEX = /\((#{OPERATIONS})\s*([#{INTEGER_CONSTANT_ASSIGNMENT}#{VARIABLE_ASSIGNMENT}])\)/
 
     # FIXME: string does not allow spaces
