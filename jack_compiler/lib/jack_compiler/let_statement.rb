@@ -42,6 +42,8 @@ module JackCompiler
 
     def next_expression_classes
       [
+        BinaryAssignmentStatement,
+        UnaryAssignmentStatement,
         StringAssignmentStatement,
         NullAssignmentStatement,
         IntegerAssignmentStatement,

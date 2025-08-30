@@ -2,10 +2,11 @@
 
 module JackCompiler
   class OperationAssignmentStatement < ExpressionStatement
-    REGEX = RegularExpressions::OPERATION_EXPRESSION_REGEX
+    REGEX = RegularExpressions::UNARY_OPERATION_EXPRESSION_REGEX
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
+      binding.pry
       result_node = document.create_element(EXPRESSION_STATEMENT)
       parent_node << result_node
       # binding.pry
