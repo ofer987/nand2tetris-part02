@@ -22,7 +22,7 @@ module JackCompiler
       result_node << symbol_node
 
       expression_node = document.create_element(EXPRESSION_STATEMENT)
-      parent_node << expression_node
+      result_node << expression_node
 
       term_node = document.create_element(TERM_STATEMENT)
       expression_node << term_node

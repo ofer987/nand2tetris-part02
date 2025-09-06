@@ -13,7 +13,16 @@ module JackCompiler
       term_node = document.create_element(TERM_STATEMENT)
       result_node << term_node
 
+      identifier_node = document.create_element(IDENTIFIER, result[1])
+      term_node << identifier_node
+
+      symbol_node = document.create_element(SYMBOL, result[2])
+      term_node << symbol_node
+
       next_statements(term_node, result[3], next_expression_classes)
+
+      symbol_node = document.create_element(SYMBOL, result[4])
+      term_node << symbol_node
 
       # binding.pry
       lines.sub(REGEX, '')
