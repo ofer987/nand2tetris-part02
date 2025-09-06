@@ -15,6 +15,8 @@ module JackCompiler
       keyword_node = document.create_element(KEYWORD, result[1])
       result_node << keyword_node
 
+      parent_node << result_node
+
       if result[2].match? ArrrayExpressionStatement::REGEX
         next_statements(result_node, result[2], array_classes)
       else
@@ -25,8 +27,11 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[3])
       result_node << symbol_node
 
+      expression_node = document.create_element(EXPRESSION_STATEMENT)
+      result_node << expression_node
+
       # binding.pry
-      next_statements(result_node, result[4], next_expression_classes)
+      next_statements(expression_node, result[4], next_expression_classes)
 
       symbol_node = document.create_element(SYMBOL, result[5])
       result_node << symbol_node
@@ -47,12 +52,12 @@ module JackCompiler
         BinaryAssignmentStatement03,
         BinaryAssignmentStatement04,
         UnaryAssignmentStatement,
+        AssignmentExpressionStatement,
         StringAssignmentStatement,
         NullAssignmentStatement,
         IntegerAssignmentStatement,
         ArrayAssignmentStatement,
-        VariableAssignmentStatement,
-        AssignmentExpressionStatement
+        VariableAssignmentStatement
       ]
     end
   end
