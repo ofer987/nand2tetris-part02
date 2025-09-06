@@ -9,8 +9,7 @@ path = ARGV[0].to_s
 
 state_machine = JackCompiler::StateMachine.new(path)
 
-puts state_machine.statements
 state_machine.parse
 
-document = state_machine.document
+document = state_machine.document.root
 puts document.to_xml

@@ -20,15 +20,19 @@ module JackCompiler
       result_node << symbol_node
 
       next_lines = lines.sub(REGEX, '')
-      next_statements(result_node, next_lines, next_classes)
+      next_lines = next_statements(result_node, next_lines, next_classes)
 
-      next_lines
+      next_statement(result_node, next_lines, end_classes)
     end
 
     private
 
     def next_classes
       [ClassVariableStatement, ClassSubroutineStatement]
+    end
+
+    def end_classes
+      [CloseBraceStatement]
     end
   end
 end
