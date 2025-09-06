@@ -8,13 +8,13 @@ module JackCompiler
       result = lines.match(REGEX)
       result_node = parent_node
 
-      keyword_node = document.create_element(KEYWORD, result[1])
+      keyword_node = document.create_element(IDENTIFIER, result[1])
       result_node << keyword_node
 
       symbol_node = document.create_element(SYMBOL, result[2])
       result_node << symbol_node
 
-      keyword_node = document.create_element(KEYWORD, result[3])
+      keyword_node = document.create_element(IDENTIFIER, result[3])
       result_node << keyword_node
 
       symbol_node = document.create_element(SYMBOL, result[4])
