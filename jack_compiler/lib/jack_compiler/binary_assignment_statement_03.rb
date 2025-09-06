@@ -8,10 +8,7 @@ module JackCompiler
       result = lines.match(REGEX)
 
       # First operand
-      term_node = document.create_element(TERM_STATEMENT)
-      parent_node << term_node
-
-      next_statements(term_node, result[1], assignment_expression_classes)
+      next_statements(parent_node, result[1], assignment_expression_classes)
 
       # operator
       symbol_node = document.create_element(SYMBOL, result[2])
