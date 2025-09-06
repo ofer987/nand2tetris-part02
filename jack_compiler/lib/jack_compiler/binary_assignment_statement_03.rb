@@ -29,7 +29,7 @@ module JackCompiler
       term_node = document.create_element(TERM_STATEMENT)
       result_node << term_node
 
-      next_statements(term_node, result[3], assignment_expression_classes)
+      next_statements(term_node, result[3], unary_assignment_expression_classes)
       # result_node << term_node
 
       # value_node = document.create_element(VARIABLE_CONSTANT, result[2])
@@ -43,12 +43,17 @@ module JackCompiler
 
     def assignment_expression_classes
       [
-        UnaryAssignmentStatement,
         ArrayAssignmentStatement,
         StringAssignmentStatement,
         IntegerAssignmentStatement,
         NullAssignmentStatement,
         VariableAssignmentStatement
+      ]
+    end
+
+    def unary_assignment_expression_classes
+      [
+        UnaryAssignmentStatement
       ]
     end
   end

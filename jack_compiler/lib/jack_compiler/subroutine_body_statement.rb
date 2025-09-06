@@ -35,7 +35,9 @@ module JackCompiler
       result_node << statements_node
 
       # binding.pry
-      next_statements(statements_node, next_lines, statement_classes)
+      next_lines = next_statements(statements_node, next_lines, statement_classes)
+
+      next_statement(result_node, next_lines, end_classes)
     end
 
     protected
@@ -46,6 +48,10 @@ module JackCompiler
 
     def statement_classes
       [IfStatement, LetStatement, DoStatement, ReturnStatement, EmptyReturnStatement]
+    end
+
+    def end_classes
+      [CloseBraceStatement]
     end
   end
 end

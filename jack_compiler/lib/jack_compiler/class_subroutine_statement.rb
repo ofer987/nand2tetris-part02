@@ -41,7 +41,7 @@ module JackCompiler
       next_lines = lines.sub(REGEX, '')
       next_lines = next_statements(result_node, next_lines, next_classes)
 
-      next_statements(result_node, next_lines, next_close_brace_classes)
+      next_statement(result_node, next_lines, next_close_brace_classes)
     end
 
     private
