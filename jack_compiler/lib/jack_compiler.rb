@@ -1,0 +1,46 @@
+# frozen_string_literal: true
+
+require 'active_support'
+require 'active_support/core_ext'
+require 'nokogiri'
+
+require_relative 'jack_compiler/regular_expressions'
+
+require_relative 'jack_compiler/statement'
+require_relative 'jack_compiler/open_brace_statement'
+require_relative 'jack_compiler/close_brace_statement'
+require_relative 'jack_compiler/class_statement'
+require_relative 'jack_compiler/array_expression_statement'
+require_relative 'jack_compiler/let_statement'
+require_relative 'jack_compiler/expression_statement'
+require_relative 'jack_compiler/unary_assignment_statement'
+require_relative 'jack_compiler/binary_assignment_statement_01'
+require_relative 'jack_compiler/binary_assignment_statement_02'
+require_relative 'jack_compiler/binary_assignment_statement_03'
+require_relative 'jack_compiler/binary_assignment_statement_04'
+require_relative 'jack_compiler/array_assignment_statement'
+require_relative 'jack_compiler/string_assignment_statement'
+require_relative 'jack_compiler/integer_assignment_statement'
+require_relative 'jack_compiler/null_assignment_statement'
+require_relative 'jack_compiler/variable_assignment_statement'
+require_relative 'jack_compiler/execution_expression_statement'
+require_relative 'jack_compiler/operation_assignment_statement'
+require_relative 'jack_compiler/if_statement'
+require_relative 'jack_compiler/else_statement'
+require_relative 'jack_compiler/class_variable_statement'
+require_relative 'jack_compiler/class_subroutine_statement'
+require_relative 'jack_compiler/subroutine_body_statement'
+require_relative 'jack_compiler/variable_statement'
+require_relative 'jack_compiler/do_statement'
+require_relative 'jack_compiler/return_statement'
+require_relative 'jack_compiler/empty_return_statement'
+require_relative 'jack_compiler/assignment_expression_statement'
+require_relative 'jack_compiler/argument_statement'
+require_relative 'jack_compiler/statements_statement'
+
+require_relative 'jack_compiler/version'
+require_relative 'jack_compiler/state_machine'
+
+module JackCompiler
+  class Error < StandardError; end
+end
