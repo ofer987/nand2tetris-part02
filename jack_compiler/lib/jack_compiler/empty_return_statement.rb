@@ -3,12 +3,10 @@
 module JackCompiler
   class EmptyReturnStatement < Statement
     REGEX = RegularExpressions::EMPTY_RETURN_STATEMENT
-    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
       result_node = document.create_element(RETURN_STATEMENT)
-      # binding.pry
 
       parent_node << result_node
 

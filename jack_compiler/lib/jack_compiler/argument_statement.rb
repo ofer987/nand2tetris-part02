@@ -9,7 +9,6 @@ module JackCompiler
       result_node = document.create_element(ARGUMENT_STATEMENT, result[1])
       parent_node << result_node
 
-      # binding.pry
       lines.sub(REGEX, '')
     end
 

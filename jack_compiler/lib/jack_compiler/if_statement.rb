@@ -3,12 +3,8 @@
 module JackCompiler
   class IfStatement < Statement
     REGEX = RegularExpressions::IF_STATEMENT_REGEX
-    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
-      # return ''
-      #
-      # binding.pry
       result = lines.match(REGEX)
 
       result_node = document.create_element(IF_STATEMENT)
@@ -36,11 +32,12 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[5])
       result_node << symbol_node
 
-      binding.pry
       next_lines = lines.sub(REGEX, '')
+
       next_lines = next_statements(result_node, next_lines, next_classes)
 
       next_lines = next_statements(parent_node, next_lines, end_classes)
+
       next_statements(parent_node, next_lines, else_classes)
     end
 

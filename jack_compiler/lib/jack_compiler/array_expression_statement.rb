@@ -3,15 +3,9 @@
 module JackCompiler
   class ArrrayExpressionStatement < Statement
     REGEX = RegularExpressions::ARRAY_EXPRESSION
-    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
-      binding.pry
       result = lines.match(REGEX)
-      # result_node = document.create_element(LET_STATEMENT)
-      # binding.pry
-
-      # parent_node << result_node
 
       identifier_node = document.create_element(IDENTIFIER, result[1])
       parent_node << identifier_node

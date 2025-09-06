@@ -6,7 +6,6 @@ module JackCompiler
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
-      # binding.pry
 
       term_node = document.create_element(TERM_STATEMENT)
       parent_node << term_node
@@ -22,7 +21,6 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[4])
       term_node << symbol_node
 
-      # binding.pry
       lines.sub(REGEX, '')
     end
 

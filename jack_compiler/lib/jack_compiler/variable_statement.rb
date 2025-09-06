@@ -3,12 +3,10 @@
 module JackCompiler
   class VariableStatement < Statement
     REGEX = RegularExpressions::VAR_STATEMENT
-    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
       result_node = document.create_element(VAR_DESCRIPTION)
-      binding.pry
 
       parent_node << result_node
 
@@ -28,13 +26,10 @@ module JackCompiler
 
         result_node << variable_node
       end
-      # binding.pry
-      # result_node << identifier_node
 
       symbol_node = document.create_element(SYMBOL, SEMI_COLON)
       result_node << symbol_node
 
-      # binding.pry
       lines.sub(REGEX, '')
     end
 

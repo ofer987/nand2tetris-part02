@@ -43,5 +43,4 @@ require_relative 'jack_compiler/state_machine'
 
 module JackCompiler
   class Error < StandardError; end
-  # Your code goes here...
 end

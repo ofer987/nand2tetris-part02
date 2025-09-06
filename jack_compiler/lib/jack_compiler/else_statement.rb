@@ -3,15 +3,9 @@
 module JackCompiler
   class ElseStatement < Statement
     REGEX = RegularExpressions::ELSE_STATEMENT_REGEX
-    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
-      # return ''
-      #
-      # binding.pry
       result = lines.match(REGEX)
-
-      # result_node = document.create_element(ELSE_STATEMENT)
 
       keyword_node = document.create_element(KEYWORD, result[1])
       parent_node << keyword_node

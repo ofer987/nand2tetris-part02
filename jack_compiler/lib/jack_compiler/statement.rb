@@ -18,7 +18,6 @@ module JackCompiler
     SEMI_COLON = ';'
     EQUAL_SIGN = '='
     IF_STATEMENT = 'ifStatement'
-    # ELSE_STATEMENT = 'ifStatement'
     LET_STATEMENT = 'letStatement'
     LET_KEYWORD = 'let'
     DO_STATEMENT = 'doStatement'
@@ -69,7 +68,6 @@ module JackCompiler
     def next_statements(parent_node, next_lines, next_classes)
       next_lines = next_lines.strip
 
-      # binding.pry
       loop do
         break if next_lines.blank?
         break if next_classes.blank?

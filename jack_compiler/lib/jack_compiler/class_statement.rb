@@ -3,12 +3,10 @@
 module JackCompiler
   class ClassStatement < Statement
     REGEX = RegularExpressions::CLASS
-    # EXPRESSION_REGEX = RegularExpressions::EXPRESSION
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
       result_node = document.create_element(CLASS)
-      # binding.pry
 
       parent_node << result_node
 

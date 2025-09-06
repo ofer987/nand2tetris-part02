@@ -32,7 +32,6 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[6])
       term_node << symbol_node
 
-      # binding.pry
       lines.sub(REGEX, '')
     end
 

@@ -27,14 +27,6 @@ module JackCompiler
     def parse
       class_statement = ClassStatement.new(document)
       class_statement.create_elements(document, statements)
-      # parsed_statements = @statements
-      #
-      # statements.each do |statement|
-      #   if parsed_statements.match? JackCompiler::RegularExpressions::IF
-      #     if_statement(document, parsed_statements)
-      #   elsif parsed_statements.match? JackCompiler::RegularExpressions::CLASS
-      #     class_statement(document, JackCompiler::RegularExpressions::CLASS,  parsed_statements)
-      #   end
     end
 
     private
