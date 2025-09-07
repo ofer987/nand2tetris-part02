@@ -15,13 +15,16 @@ class Square {
       let x = ax;
       let y = ay;
       let size = asize;
+
       do draw();
+
       return this;
    }
 
    /** Disposes this square. */
    method void dispose() {
       do Memory.deAlloc(this);
+
       return;
    }
 
@@ -30,6 +33,7 @@ class Square {
       // Draws the square using the color black
       do Screen.setColor(true);
       do Screen.drawRectangle(x, y, x + size, y + size);
+
       return;
    }
 
@@ -38,6 +42,7 @@ class Square {
       // Draws the square using the color white (background color)
       do Screen.setColor(false);
       do Screen.drawRectangle(x, y, x + size, y + size);
+
       return;
    }
 
@@ -45,9 +50,11 @@ class Square {
    method void incSize() {
       if (((y + size) < 254) & ((x + size) < 510)) {
          do erase();
+
          let size = size + 2;
          do draw();
       }
+
       return;
    }
 
@@ -56,8 +63,10 @@ class Square {
       if (size > 2) {
          do erase();
          let size = size - 2;
+
          do draw();
       }
+
       return;
    }
 
@@ -72,6 +81,7 @@ class Square {
          do Screen.setColor(true);
          do Screen.drawRectangle(x, y, x + size, y + 1);
       }
+
       return;
    }
 
@@ -80,10 +90,12 @@ class Square {
       if ((y + size) < 254) {
          do Screen.setColor(false);
          do Screen.drawRectangle(x, y, x + size, y + 1);
+
          let y = y + 2;
          do Screen.setColor(true);
          do Screen.drawRectangle(x, (y + size) - 1, x + size, y + size);
       }
+
       return;
    }
 
@@ -92,10 +104,12 @@ class Square {
       if (x > 1) {
          do Screen.setColor(false);
          do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
+
          let x = x - 2;
          do Screen.setColor(true);
          do Screen.drawRectangle(x, y, x + 1, y + size);
       }
+
       return;
    }
 
@@ -104,10 +118,12 @@ class Square {
       if ((x + size) < 510) {
          do Screen.setColor(false);
          do Screen.drawRectangle(x, y, x + 1, y + size);
+
          let x = x + 2;
          do Screen.setColor(true);
          do Screen.drawRectangle((x + size) - 1, y, x + size, y + size);
       }
+
       return;
    }
 }
