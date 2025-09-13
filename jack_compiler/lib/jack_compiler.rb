@@ -38,6 +38,9 @@ require_relative 'jack_compiler/assignment_expression_statement'
 require_relative 'jack_compiler/argument_statement'
 require_relative 'jack_compiler/statements_statement'
 
+# Abstract Syntax Tree Parser
+require_relative 'jack_compiler/tree_parser'
+
 require_relative 'jack_compiler/version'
 require_relative 'jack_compiler/state_machine'
 

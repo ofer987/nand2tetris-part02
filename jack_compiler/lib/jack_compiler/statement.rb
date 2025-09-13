@@ -2,6 +2,9 @@
 
 module JackCompiler
   class Statement
+    # Default NODE_NAME is empty
+    NODE_NAME = ''
+
     CLASS = 'class'
     KEYWORD = 'keyword'
     IDENTIFIER = 'identifier'
