@@ -76,6 +76,7 @@ DEPENDENCIES
   pry (~> 0.15.2)
   rake (~> 13.2)
   rubocop (~> 1.71)
+  securerandom (~> 0.4.1)
 
 BUNDLED WITH
    2.4.22

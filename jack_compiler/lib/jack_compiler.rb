@@ -3,6 +3,7 @@
 require 'active_support'
 require 'active_support/core_ext'
 require 'nokogiri'
+require 'securerandom'
 
 require_relative 'jack_compiler/regular_expressions'
 
@@ -40,6 +41,8 @@ require_relative 'jack_compiler/statements_statement'
 
 # Abstract Syntax Tree Parser
 require_relative 'jack_compiler/tree_parser'
+require_relative 'jack_compiler/node'
+require_relative 'jack_compiler/if_node'
 
 require_relative 'jack_compiler/version'
 require_relative 'jack_compiler/state_machine'
