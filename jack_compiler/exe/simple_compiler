@@ -19,7 +19,9 @@ ast = Nokogiri::XML(File.read(path))
 ast_parser = JackCompiler::TreeParser.new
 
 root = ast.document.root
-ast_parser.put_vm_code(root)
+result = ast_parser.put_vm_code(root)
+
+puts result.join("\n")
 #
 # # statement_node = ast_parser.statement_node(root)
 # find_if_node(root)

@@ -9,17 +9,20 @@ module JackCompiler
     end
 
     def put_vm_code(xml_node)
+      result = []
       node_class = to_node_class(xml_node)
 
       unless node_class.nil?
         node = node_class.new(xml_node)
 
-        node.emit_vm_code
+        result << node.emit_vm_code
       end
 
       xml_node.children.each do |item|
-        put_vm_code(item)
+        result << put_vm_code(item)
       end
+
+      result.flatten
     end
 
     def to_node_class(xml_node)

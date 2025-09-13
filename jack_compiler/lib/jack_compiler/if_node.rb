@@ -13,16 +13,14 @@ module JackCompiler
     def emit_vm_code
       if statements.size > 1
         emit_if_else_code
-
-        return
+      else
+        emit_if_code
       end
-
-      emit_if_code
     end
 
     def emit_if_else_code
       # Store as lines in an array
-      puts <<~VM_CODE
+      result = <<~VM_CODE
         #{expression}
         not
         if-goto #{else_label}
@@ -32,17 +30,21 @@ module JackCompiler
         #{else_statements}
         #{continue_label}
       VM_CODE
+
+      result.split("\n")
     end
 
     def emit_if_code
       # Store as lines in an array
-      puts <<~VM_CODE
+      result = <<~VM_CODE
         #{expression}
         not
         if-goto #{continue_label}
         #{if_statements}
         #{continue_label}
       VM_CODE
+
+      result.split("\n")
     end
 
     protected
