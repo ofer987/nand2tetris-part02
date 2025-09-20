@@ -43,6 +43,7 @@ require_relative 'jack_compiler/statements_statement'
 require_relative 'jack_compiler/tree_parser'
 require_relative 'jack_compiler/node'
 require_relative 'jack_compiler/if_node'
+require_relative 'jack_compiler/class_node'
 
 require_relative 'jack_compiler/version'
 require_relative 'jack_compiler/state_machine'
