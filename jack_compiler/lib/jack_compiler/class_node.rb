@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class IfNode < Node
+  class ClassNode < Node
     REGEX = RegularExpressions::CLASS
     NODE_NAME = Statement::CLASS
 
