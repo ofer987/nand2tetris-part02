@@ -2,6 +2,7 @@
 
 module JackCompiler
   class IfNode < Node
+    REGEX = RegularExpressions::IF_STATEMENT_REGEX
     NODE_NAME = Statement::IF_STATEMENT
 
     def initialize(xml_node)

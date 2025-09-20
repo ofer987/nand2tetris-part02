@@ -2,7 +2,7 @@
 
 module JackCompiler
   class Node
-    REGEX = RegularExpressions::IF_STATEMENT_REGEX
+    REGEX = //
     NODE_NAME = ''
 
     attr_reader :xml_node
