@@ -8,7 +8,9 @@ module JackCompiler
     def initialize(xml_node)
       super(xml_node)
 
-      init_code
+      @statements = find_child_nodes(Statement::STATEMENTS_STATEMENT)
+      @if_statements = statements[0]
+      @else_statements = statements[1]
     end
 
     def emit_vm_code
@@ -18,6 +20,8 @@ module JackCompiler
         emit_if_code
       end
     end
+
+    private
 
     def emit_if_else_code
       # Store as lines in an array
@@ -47,17 +51,6 @@ module JackCompiler
 
       result.split("\n")
     end
-
-    protected
-
-    def init_code
-      @statements = find_child_nodes(Statement::STATEMENTS_STATEMENT)
-
-      @if_statements = statements[0]
-      @else_statements = statements[1]
-    end
-
-    private
 
     def expression
       ''

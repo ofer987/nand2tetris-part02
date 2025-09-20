@@ -22,17 +22,5 @@ module JackCompiler
         .select { |item| item.instance_of? Nokogiri::XML::Element }
         .select { |item| item.name == name }
     end
-
-    def next_classes
-      [VariableStatement, StatementsStatement]
-    end
-
-    def end_classes
-      [CloseBraceStatement]
-    end
-
-    def else_classes
-      [ElseStatement]
-    end
   end
 end
