@@ -17,6 +17,10 @@ module JackCompiler
 
     protected
 
+    def find_child_nodes_with_css_selector(selector)
+      xml_node.css(selector)
+    end
+
     def find_child_nodes(name)
       xml_node.children
         .select { |item| item.instance_of? Nokogiri::XML::Element }

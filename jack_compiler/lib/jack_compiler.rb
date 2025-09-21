@@ -44,6 +44,7 @@ require_relative 'jack_compiler/tree_parser'
 require_relative 'jack_compiler/node'
 require_relative 'jack_compiler/if_node'
 require_relative 'jack_compiler/class_node'
+require_relative 'jack_compiler/local_memory_node'
 require_relative 'jack_compiler/function_node'
 
 require_relative 'jack_compiler/version'

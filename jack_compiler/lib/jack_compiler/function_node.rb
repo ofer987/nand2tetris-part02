@@ -5,77 +5,79 @@ module JackCompiler
     REGEX = RegularExpressions::FUNCTION
     NODE_NAME = Statement::SUBROUTINE_DESCRIPTION
 
-    def initialize(xml_node)
+    attr_reader :class_name, :function_type, :function_name, :return_type
+
+    def initialize(xml_node, class_name)
       super(xml_node)
+
+      @class_name = class_name
 
       keywords = find_child_nodes(Statement::KEYWORD)
       @function_type = keywords[0]
       @return_type = keywords[1]
+      @function_name = find_child_nodes(Statement::IDENTIFIER).first
 
       @symbols = find_child_nodes(Statement::SYMBOL)
-      @parameters = find_child_nodes(Statement::PARAMETER_LIST).first
+      @parameters_node = find_child_nodes(Statement::PARAMETER_LIST).first
 
-      @subroutine_body
+      @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY).first
+      @local_memory_nodes = find_child_nodes_with_css_selector(
+        "> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}"
+      )
 
-      @if_statements = statements[0]
-      @else_statements = statements[1]
+      # rubocop:disable Layout/LineLength
+      @statement_nodes = find_child_nodes_with_css_selector(
+        "> #{Statement::SUBROUTINE_BODY} > #{STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}"
+      )
+      # rubocop:enable Layout/LineLength
+
+      @return_node = find_child_nodes_with_css_selector(
+        "> #{Statement::SUBROUTINE_BODY} > #{STATEMENTS_STATEMENT} > #{Statement::RETURN_STATEMENT}"
+      )
     end
 
     def emit_vm_code
-      if statements.size > 1
-        emit_if_else_code
-      else
-        emit_if_code
-      end
+      <<~VM_CODE
+        #{class_name}.#{function_name}.#{local_memory.size}
+
+        #{emit_statements_code}
+      VM_CODE
     end
 
     private
 
-    def emit_if_else_code
-      # Store as lines in an array
-      result = <<~VM_CODE
-        #{expression}
-        not
-        if-goto #{else_label}
-        #{if_statements}
-        GOTO #{continue_label}
-        (#{else_label})
-        #{else_statements}
-        #{continue_label}
-      VM_CODE
-
-      result.split("\n")
+    def emit_statements_code
+      @statement_nodes.map(&:emit_vm_code)
     end
 
-    def emit_if_code
-      # Store as lines in an array
-      result = <<~VM_CODE
-        #{expression}
-        not
-        if-goto #{continue_label}
-        #{if_statements}
-        #{continue_label}
-      VM_CODE
+    def local_memory
+      return @local_memory if defined? @local_memory
 
-      result.split("\n")
+      @local_memory = {}
+      return if local_memory_nodes.blank?
+
+      local_memory_nodes.each_with_index do |item, index|
+        memory << LocalMemoryNode.new(item, index)
+      end
+
+      memory.each do |item|
+        key = item.object_name
+
+        @local_memory[key] = item
+      end
+
+      # TODO, convert to a Hash where the key is the variable name
+      @local_memory
     end
 
-    def expression
-      ''
+    def statements
+      @statements ||= @statement_nodes.map { |item| StatementNode.new(item, local_memory) }
     end
 
-    def continue_label
-      @continue_label ||= "CONTINUE_LABEL_#{uuid}"
+    def return_statement
+      @return_statement ||= ReturnStatement.new(@return_node)
     end
 
-    def else_label
-      @else_label ||= "ELSE_LABEL_#{uuid}"
-    end
-
-    def uuid
-      @uuid ||= SecureRandom.uuid
-    end
-
-    attr_reader :statements, :if_statements, :else_statements
+    attr_reader :local_memory_nodes, :subroutine_body_node
   end
 end
