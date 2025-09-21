@@ -1,21 +1,19 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class LocalMemoryNode < Node
+  class LocalMemoryNode < MemoryNode
     REGEX = RegularExpressions::FUNCTION
     NODE_NAME = Statement::SUBROUTINE_DESCRIPTION
 
-    attr_reader :type, :object_name, :ram_index
+    attr_reader :object_type, :object_name
 
     def initialize(xml_node, ram_index)
-      super(xml_node)
+      super(xml_node, ram_index, 'local')
 
-      @ram_index = ram_index
-
-      @type = find_child_nodes(Statement::KEYWORD).first
+      @object_type = find_child_nodes(Statement::KEYWORD).first
 
       identifiers = find_child_nodes(Statement::IDENTIFIER)
-      @type = identifiers[0]
+      @object_type = identifiers[0]
       # TODO: What if there are multiple objects?
       @object_name = identifiers[1]
     end
