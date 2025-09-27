@@ -47,7 +47,7 @@ module JackCompiler
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
       @function_nodes = xml_nodes
-        .map { |node| Utils::XML.convert_to_jack_node(node) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, class_name: class_name) }
     end
   end
 end

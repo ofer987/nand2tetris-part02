@@ -8,6 +8,7 @@ require 'securerandom'
 require_relative 'jack_compiler/utils/xml'
 require_relative 'jack_compiler/regular_expressions'
 
+# Generate the Abstract Syntax Tree (AST)
 require_relative 'jack_compiler/statement'
 require_relative 'jack_compiler/open_brace_statement'
 require_relative 'jack_compiler/close_brace_statement'
@@ -40,14 +41,12 @@ require_relative 'jack_compiler/assignment_expression_statement'
 require_relative 'jack_compiler/argument_statement'
 require_relative 'jack_compiler/statements_statement'
 
-# Abstract Syntax Tree Parser
-require_relative 'jack_compiler/tree_parser'
+# Traverse the Abstract Syntax Tree (AST)
 require_relative 'jack_compiler/node'
 require_relative 'jack_compiler/if_node'
 require_relative 'jack_compiler/expression_list_node'
 require_relative 'jack_compiler/class_node'
 require_relative 'jack_compiler/memory_node'
-require_relative 'jack_compiler/local_memory_node'
 require_relative 'jack_compiler/statement_node'
 require_relative 'jack_compiler/function_node'
 require_relative 'jack_compiler/var_statement_node'

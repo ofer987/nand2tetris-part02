@@ -6,8 +6,8 @@ module JackCompiler
 
     attr_reader :action, :object_name, :method_name, :local_memory_index, :expression_node, :function_memory_index, :object_class
 
-    def initialize(xml_node, local_memory, function_memory, object_classes)
-      super(xml_node, local_memory)
+    def initialize(xml_node, options = {})
+      super(xml_node, options)
 
       @action = find_child_nodes(Statement::KEYWORD)
         .map(&:text)
@@ -17,11 +17,14 @@ module JackCompiler
         .map(&:text)
 
       self.expression_list_node = "> #{Statement::EXPRESSION_LIST}"
-        .first
 
+      local_memory = options[:local_memory]
       @local_memory_index = local_memory[@object_name]
-      # TODO: fix me
+
+      function_memory = options[:function_memory]
       @function_memory_index = function_memory[@object_name]
+
+      object_classes = options[:object_classes]
       @object_class = object_classes[@object_name]
 
       @symbol = find_child_nodes_with_css_selector("> #{Statement::SYMBOL}")
@@ -45,6 +48,7 @@ module JackCompiler
 
       @expression_list_node = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node) }
+        .first
     end
   end
 end

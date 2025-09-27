@@ -5,25 +5,11 @@ require 'pry-byebug'
 
 require_relative '../lib/jack_compiler'
 
-# def put_vm_code()
-#   binding.pry if node.name == JackCompiler::Statement::IF_STATEMENT
-#
-#   node.children.each do |item|
-#     find_if_node(item)
-#   end
-# end
-
 path = ARGV[0].to_s
 
 ast = Nokogiri::XML(File.read(path))
-ast_parser = JackCompiler::TreeParser.new
 
 root = ast.document.root
-result = ast_parser.put_vm_code(root)
+root_jack_node = Utils::XML.convert_to_jack_node(root)
 
-puts result.join("\n")
-#
-# # statement_node = ast_parser.statement_node(root)
-# find_if_node(root)
-#
-# puts root
+puts root_jack_node.emit_vm_code

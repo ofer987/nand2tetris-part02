@@ -4,41 +4,42 @@ module JackCompiler
   class FunctionNode < Node
     NODE_NAME = Statement::SUBROUTINE_DESCRIPTION
 
-    attr_reader :class_name, :function_type, :function_name, :return_type
+    attr_reader :class_name, :function_type, :function_name, :return_type, :local_memory_nodes
 
     def initialize(xml_node, options = {})
       super(xml_node, options)
 
       @class_name = options[:class_name]
 
-      keywords = find_child_nodes(Statement::KEYWORD)
-      @function_type = keywords[0]
-      @return_type = keywords[1]
-      @function_name = find_child_nodes(Statement::IDENTIFIER).first
+      @function_type, @return_type = find_child_nodes(Statement::KEYWORD)[0..1]
+        .map(&:text)
+
+      @function_name = find_child_nodes(Statement::IDENTIFIER)
+        .map(&:text)
+        .first
 
       @symbols = find_child_nodes(Statement::SYMBOL)
+        .map(&:text)
+
       @parameters_node = find_child_nodes(Statement::PARAMETER_LIST).first
 
       @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY)
         .first
-      @local_memory_nodes = find_child_nodes_with_css_selector(
-        "> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}"
-      )
+
+      self.local_memory_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}"
 
       # rubocop:disable Layout/LineLength
-      @statement_nodes = find_child_nodes_with_css_selector(
-        "> #{Statement::SUBROUTINE_BODY} > #{STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}"
-      )
+      self.statement_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}"
       # rubocop:enable Layout/LineLength
 
-      @return_node = find_child_nodes_with_css_selector(
-        "> #{Statement::SUBROUTINE_BODY} > #{STATEMENTS_STATEMENT} > #{Statement::RETURN_STATEMENT}"
-      )
+      # rubocop:disable Layout/LineLength
+      self.return_node = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::RETURN_STATEMENT}"
+      # rubocop:enable Layout/LineLength
     end
 
     def emit_vm_code
       <<~VM_CODE
-        #{class_name}.#{function_name}.#{local_memory.size}
+        #{class_name}.#{function_name}.#{local_memory_nodes.size}
 
         #{emit_statements_code}
       VM_CODE
@@ -46,38 +47,49 @@ module JackCompiler
 
     private
 
+    def local_memory_nodes=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+
+      @local_memory_nodes = []
+      xml_nodes.each_with_index do |node, index|
+        result = Utils::XML.convert_to_jack_node(node, memory_index: index)
+
+        @local_memory_nodes << result
+      end
+    end
+
     def emit_statements_code
-      @statement_nodes.map(&:emit_vm_code)
+      # @statement_nodes.map(&:emit_vm_code)
+      ''
     end
 
-    def local_memory
-      return @local_memory if defined? @local_memory
+    def statement_nodes=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
-      @local_memory = {}
-      return if local_memory_nodes.blank?
+      options = {
+        local_memory: local_memory_nodes
+          .map { |node| [node.object_name, node.memory_index] }
+          .to_h,
+        function_memory: {},
+        object_classes: local_memory_nodes
+          .map { |node| [node.object_name, node.object_class] }
+          .to_h
+      }
 
-      local_memory_nodes.each_with_index do |item, index|
-        memory << LocalMemoryNode.new(item, index)
-      end
-
-      memory.each do |item|
-        key = item.object_name
-
-        @local_memory[key] = item
-      end
-
-      # TODO, convert to a Hash where the key is the variable name
-      @local_memory
+      @statement_nodes = xml_nodes
+        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
     end
 
-    def statements
-      @statements ||= @statement_nodes.map { |item| StatementNode.new(item, local_memory) }
+    def return_node=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+
+      @return_node = xml_nodes
+        .map { |node| Utils::XML.convert_to_jack_node(node) }
+        .first
     end
 
     def return_statement
       @return_statement ||= ReturnStatement.new(@return_node)
     end
-
-    attr_reader :local_memory_nodes, :subroutine_body_node
   end
 end
