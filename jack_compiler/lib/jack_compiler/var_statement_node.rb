@@ -2,7 +2,6 @@
 
 module JackCompiler
   class VarStatementNode < StatementNode
-    REGEX = RegularExpressions::VAR_STATEMENT
     NODE_NAME = Statement::VAR_DESCRIPTION
 
     attr_reader :attr_names
@@ -10,8 +9,9 @@ module JackCompiler
     def initialize(xml_node, local_memory)
       super(xml_node, local_memory)
 
-      @keyword = find_child_nodes(Statement::KEYWORD)
+      @keyword = find_child_nodes(Statement::KEYWORD).map(&:text).first
       @type, @name = find_child_nodes(Statement::IDENTIFIER)[0..1]
+        .map(&:text)
     end
 
     def emit_vm_code

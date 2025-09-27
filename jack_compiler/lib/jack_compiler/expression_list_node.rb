@@ -6,7 +6,7 @@ module JackCompiler
     REGEX = //
     NODE_NAME = Statement::EXPRESSION_LIST
 
-    attr_reader :parameters
+    attr_reader :arguments
 
     def initialize(xml_node)
       super(xml_node)

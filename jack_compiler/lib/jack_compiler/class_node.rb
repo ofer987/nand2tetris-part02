@@ -18,13 +18,36 @@ module JackCompiler
         .map(&:text)
         .first
 
-      @class_variable_nodes = find_child_nodes_with_css_selector("> #{Statement::CLASS_VAR_DESCRIPTION}")
-
-      @function_nodes = find_child_nodes_with_css_selector("> #{Statement::SUBROUTINE_DESCRIPTION}")
+      self.class_variable_nodes = "> #{Statement::CLASS_VAR_DESCRIPTION}"
+      self.function_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
     end
 
     def emit_vm_code
-      ''
+      function_nodes.map do |function_node|
+        <<~VM_CODE
+          function #{class_name}.#{function_node.function_name} #{class_variable_nodes.size}
+        VM_CODE
+      end.join("\n")
+      #     # TODO: Do I need this?
+      #     #{class_variable_nodes.map(&:emit_vm_code).join("\n")}
+      #   VM_CODE
+      # end
+    end
+
+    private
+
+    def class_variable_nodes=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+
+      @class_variable_nodes = xml_nodes
+        .map { |node| Utils::XML.convert_to_jack_node(node) }
+    end
+
+    def function_nodes=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+
+      @function_nodes = xml_nodes
+        .map { |node| Utils::XML.convert_to_jack_node(node) }
     end
   end
 end

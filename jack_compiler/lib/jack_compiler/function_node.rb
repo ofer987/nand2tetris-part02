@@ -19,7 +19,8 @@ module JackCompiler
       @symbols = find_child_nodes(Statement::SYMBOL)
       @parameters_node = find_child_nodes(Statement::PARAMETER_LIST).first
 
-      @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY).first
+      @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY)
+        .first
       @local_memory_nodes = find_child_nodes_with_css_selector(
         "> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}"
       )

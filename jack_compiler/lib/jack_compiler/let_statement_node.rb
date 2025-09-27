@@ -5,37 +5,33 @@ module JackCompiler
     REGEX = ''
     NODE_NAME = ''
 
+    attr_reader :class_name, :object_name, :local_memory_index, :expression_node
+
     def initialize(xml_node, local_memory)
       super(xml_node, local_memory)
 
-      @keyword = find_child_nodes(Statement::KEYWORD)
+      @class_name = find_child_nodes(Statement::KEYWORD)
       @object_name = find_child_nodes(Statement::IDENTIFIER)
+      @local_memory_index = local_memory[@object_name]
 
-      
+      self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
+        .first
     end
 
     def emit_vm_code
       <<~VM_CODE
-        call #{memory.object_name}.
-
-        pop 
+        #{expression_node.emit_vm_code}
+        pop local #{local_memory_index}
       VM_CODE
     end
 
     private
 
-    def memory
-      return @memory if defined? @memory
+    def expression_node=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
-      return unless local_memory.include? @object_name
-
-      @memory = local_memory[@object_name]
+      @expression_list_node = xml_nodes
+        .map { |node| Utils::XML.convert_to_jack_node(node) }
     end
-
-    def memory_type
-      @memory_type ||= memory.type
-    end
-
-    attr_reader :memory
   end
 end
