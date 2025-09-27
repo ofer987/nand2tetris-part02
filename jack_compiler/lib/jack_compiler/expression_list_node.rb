@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class FunctionNode < Node
+  class ExpressionListNode < Node
     # TODO: fix me
     REGEX = //
     NODE_NAME = Statement::EXPRESSION_LIST

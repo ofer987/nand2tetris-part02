@@ -2,9 +2,7 @@
 
 module JackCompiler
   class Node
-    REGEX = //
     NODE_NAME = ''
-
     attr_reader :xml_node
 
     def initialize(xml_node)

@@ -2,7 +2,6 @@
 
 module JackCompiler
   class ExpressionNode < Node
-    REGEX = //
     NODE_NAME = Statement::EXPRESSION_STATEMENT
 
     def emit_vm_code

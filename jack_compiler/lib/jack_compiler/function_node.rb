@@ -2,7 +2,6 @@
 
 module JackCompiler
   class FunctionNode < Node
-    REGEX = RegularExpressions::FUNCTION
     NODE_NAME = Statement::SUBROUTINE_DESCRIPTION
 
     attr_reader :class_name, :function_type, :function_name, :return_type
