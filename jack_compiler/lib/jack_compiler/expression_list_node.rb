@@ -8,8 +8,8 @@ module JackCompiler
 
     attr_reader :arguments
 
-    def initialize(xml_node)
-      super(xml_node)
+    def initialize(xml_node, options = {})
+      super(xml_node, options)
 
       @parameters = []
     end

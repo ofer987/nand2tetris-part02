@@ -2,10 +2,13 @@
 
 module JackCompiler
   class MemoryNode < Node
-    REGEX = //
     NODE_NAME = ''
 
-    attr_reader :ram_index, :memory_type
+    attr_reader :ram_index
+
+    def memory_type
+      raise NotImplementedError
+    end
 
     def initialize(xml_node, ram_index, memory_type)
       super(xml_node)

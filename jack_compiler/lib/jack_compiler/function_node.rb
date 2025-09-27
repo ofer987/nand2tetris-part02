@@ -6,10 +6,10 @@ module JackCompiler
 
     attr_reader :class_name, :function_type, :function_name, :return_type
 
-    def initialize(xml_node, class_name)
-      super(xml_node)
+    def initialize(xml_node, options = {})
+      super(xml_node, options)
 
-      @class_name = class_name
+      @class_name = options[:class_name]
 
       keywords = find_child_nodes(Statement::KEYWORD)
       @function_type = keywords[0]

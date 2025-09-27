@@ -4,7 +4,7 @@ module JackCompiler
   class DoStatementNode < StatementNode
     NODE_NAME = Statement::DO_STATEMENT
 
-    attr_reader :action, :object_name, :method_name, :local_memory_index, :expression_node, :function_memory_index, @object_class
+    attr_reader :action, :object_name, :method_name, :local_memory_index, :expression_node, :function_memory_index, :object_class
 
     def initialize(xml_node, local_memory, function_memory, object_classes)
       super(xml_node, local_memory)

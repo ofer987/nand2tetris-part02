@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class VarStatementNode < StatementNode
+  class VarStatementNode < MemoryNode
     NODE_NAME = Statement::VAR_DESCRIPTION
 
     attr_reader :attr_names
+
+    def memory_type
+      'local'
+    end
 
     def initialize(xml_node, local_memory)
       super(xml_node, local_memory)

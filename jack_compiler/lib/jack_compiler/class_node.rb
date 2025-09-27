@@ -7,8 +7,8 @@ module JackCompiler
 
     attr_reader :file_name, :class_node, :class_name, :class_variable_nodes, :function_nodes
 
-    def initialize(xml_node)
-      super(xml_node)
+    def initialize(xml_node, options = {})
+      super(xml_node, options)
 
       @class_node = find_child_nodes_with_css_selector("> #{Statement::KEYWORD}")
         .map(&:text)
