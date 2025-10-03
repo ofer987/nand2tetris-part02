@@ -3,7 +3,7 @@
 module JackCompiler
   class LetStatementNode < StatementNode
     REGEX = ''
-    NODE_NAME = ''
+    NODE_NAME = Statement::LET_STATEMENT
 
     attr_reader :class_name, :object_name, :local_memory_index, :expression_node
 
@@ -15,7 +15,6 @@ module JackCompiler
       @local_memory_index = local_memory[@object_name]
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
-        .first
     end
 
     def emit_vm_code
@@ -30,8 +29,9 @@ module JackCompiler
     def expression_node=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
-      @expression_list_node = xml_nodes
+      @expression_node = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node) }
+        .first
     end
   end
 end

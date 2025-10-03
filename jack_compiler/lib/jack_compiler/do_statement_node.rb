@@ -4,7 +4,7 @@ module JackCompiler
   class DoStatementNode < StatementNode
     NODE_NAME = Statement::DO_STATEMENT
 
-    attr_reader :action, :object_name, :method_name, :local_memory_index, :expression_node, :function_memory_index, :object_class
+    attr_reader :action, :object_name, :method_name, :local_memory_index, :function_memory_index, :object_class
 
     def initialize(xml_node, options = {})
       super(xml_node, options)
@@ -36,7 +36,6 @@ module JackCompiler
       <<~VM_CODE
         push local #{local_memory_index}
         call #{object_class}.#{method_name} #{function_memory_index}
-        #{expression_node.emit_vm_code}
         pop temp #{local_memory_index}
       VM_CODE
     end

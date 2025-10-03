@@ -4,7 +4,7 @@ module JackCompiler
   class FunctionNode < Node
     NODE_NAME = Statement::SUBROUTINE_DESCRIPTION
 
-    attr_reader :class_name, :function_type, :function_name, :return_type, :local_memory_nodes
+    attr_reader :class_name, :function_type, :function_name, :return_type, :local_memory_nodes, :statement_nodes
 
     def initialize(xml_node, options = {})
       super(xml_node, options)
@@ -30,16 +30,14 @@ module JackCompiler
 
       # rubocop:disable Layout/LineLength
       self.statement_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}"
-      # rubocop:enable Layout/LineLength
 
-      # rubocop:disable Layout/LineLength
       self.return_node = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::RETURN_STATEMENT}"
       # rubocop:enable Layout/LineLength
     end
 
     def emit_vm_code
       <<~VM_CODE
-        #{class_name}.#{function_name}.#{local_memory_nodes.size}
+        {class_name}.#{function_name}.#{local_memory_nodes.size}
 
         #{emit_statements_code}
       VM_CODE
@@ -59,8 +57,9 @@ module JackCompiler
     end
 
     def emit_statements_code
-      # @statement_nodes.map(&:emit_vm_code)
-      ''
+      @statement_nodes
+        .map(&:emit_vm_code)
+        .join("\n")
     end
 
     def statement_nodes=(css_selector)

@@ -26,6 +26,8 @@ module JackCompiler
       function_nodes.map do |function_node|
         <<~VM_CODE
           function #{class_name}.#{function_node.function_name} #{class_variable_nodes.size}
+
+          #{function_node.emit_vm_code}
         VM_CODE
       end.join("\n")
       #     # TODO: Do I need this?

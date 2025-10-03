@@ -43,7 +43,14 @@ require_relative 'jack_compiler/statements_statement'
 
 # Traverse the Abstract Syntax Tree (AST)
 require_relative 'jack_compiler/node'
+
+## Expression nodes
+require_relative 'jack_compiler/execution_expression_node'
+require_relative 'jack_compiler/expression_node'
+
 require_relative 'jack_compiler/if_node'
+
+# NOTE: An **ExpressionListNode** is _not_ an **ExpressionNode**!
 require_relative 'jack_compiler/expression_list_node'
 require_relative 'jack_compiler/class_node'
 require_relative 'jack_compiler/memory_node'

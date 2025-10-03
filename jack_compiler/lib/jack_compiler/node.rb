@@ -5,8 +5,9 @@ module JackCompiler
     NODE_NAME = ''
     attr_reader :xml_node
 
-    def initialize(xml_node, _options = {})
+    def initialize(xml_node, options = {})
       @xml_node = xml_node
+      @options = options
     end
 
     def emit_vm_code
@@ -24,5 +25,7 @@ module JackCompiler
         .select { |item| item.instance_of? Nokogiri::XML::Element }
         .select { |item| item.name == name }
     end
+
+    attr_reader :options
   end
 end

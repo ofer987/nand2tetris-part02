@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class ExecutionExpressionNode < ExpressionNode
+  class ExecutionExpressionNode < Node
     REGEX = RegularExpressions::EXECUTION_EXPRESSION_STATEMENT
+    NODE_NAME = ''
 
     attr_reader :object, :method, :symbol, :expression_list_node
 
-    def initialize(xml_node)
-      super(xml_node)
+    def initialize(xml_node, options = {})
+      super(xml_node, options)
 
       @object, @method = find_child_nodes_with_css_selector(
         "> #{Statement::TERM_STATEMENT} > #{Statement::IDENTIFIER}"
@@ -15,7 +16,6 @@ module JackCompiler
         .map(&:text)
 
       self.expression_list_node = "> #{Statement::TERM_STATEMENT} > #{Statement::EXPRESSION_LIST}"
-        .first
 
       @symbol = find_child_nodes_with_css_selector("> #{Statement::SYMBOL}")
         .map(&:text)
@@ -35,6 +35,7 @@ module JackCompiler
 
       @expression_list_node = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node) }
+        .first
     end
   end
 end

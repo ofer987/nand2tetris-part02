@@ -6,12 +6,16 @@ module JackCompiler
     REGEX = //
     NODE_NAME = Statement::EXPRESSION_LIST
 
-    attr_reader :arguments
+    attr_reader :parameters
 
     def initialize(xml_node, options = {})
       super(xml_node, options)
 
       @parameters = []
+    end
+
+    def size
+      parameters.size
     end
 
     def emit_vm_code
