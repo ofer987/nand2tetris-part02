@@ -41,15 +41,22 @@ module JackCompiler
     def class_variable_nodes=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
-      @class_variable_nodes = xml_nodes
-        .map { |node| Utils::XML.convert_to_jack_node(node) }
+      @class_variable_nodes = []
+      xml_nodes.each_with_index do |node, index|
+        variable_node = Utils::XML.convert_to_jack_node(node, memory_index: index)
+        @class_variable_nodes << variable_node
+      end
     end
 
     def function_nodes=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
+      options = {
+        class_name: class_name,
+        class_variable_nodes: class_variable_nodes
+      }
       @function_nodes = xml_nodes
-        .map { |node| Utils::XML.convert_to_jack_node(node, class_name: class_name) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
     end
   end
 end

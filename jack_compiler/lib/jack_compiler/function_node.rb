@@ -22,10 +22,10 @@ module JackCompiler
         .map(&:text)
 
       @parameters_node = find_child_nodes(Statement::PARAMETER_LIST).first
-
       @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY)
         .first
 
+      @class_variable_nodes = options[:class_variable_nodes]
       self.local_memory_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}"
 
       # rubocop:disable Layout/LineLength
@@ -37,8 +37,6 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
-        {class_name}.#{function_name}.#{local_memory_nodes.size}
-
         #{emit_statements_code}
       VM_CODE
     end
@@ -69,7 +67,9 @@ module JackCompiler
         local_memory: local_memory_nodes
           .map { |node| [node.object_name, node.memory_index] }
           .to_h,
-        function_memory: {},
+        class_memory: class_variable_nodes
+          .map { |node| [node.object_name, node.memory_index] }
+          .to_h,
         object_classes: local_memory_nodes
           .map { |node| [node.object_name, node.object_class] }
           .to_h
@@ -90,5 +90,7 @@ module JackCompiler
     def return_statement
       @return_statement ||= ReturnStatement.new(@return_node)
     end
+
+    attr_reader :class_variable_nodes
   end
 end

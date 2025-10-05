@@ -7,12 +7,20 @@ module JackCompiler
 
     attr_reader :class_name, :object_name, :local_memory_index, :expression_node
 
-    def initialize(xml_node, local_memory)
-      super(xml_node, local_memory)
+    def initialize(xml_node, options)
+      super(xml_node, options)
 
-      @class_name = find_child_nodes(Statement::KEYWORD)
+      @keyword = find_child_nodes(Statement::KEYWORD)
+        .first
+        .text
       @object_name = find_child_nodes(Statement::IDENTIFIER)
-      @local_memory_index = local_memory[@object_name]
+        .first
+        .text
+      @local_memory_index = options[:local_memory][@object_name]
+      @object_class = options[:object_classes][@object_name]
+
+      # binding.pry
+      # @local_memory_index = local_memory[@object_name]
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
     end
