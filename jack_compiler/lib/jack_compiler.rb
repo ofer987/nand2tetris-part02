@@ -48,6 +48,7 @@ require_relative 'jack_compiler/node'
 require_relative 'jack_compiler/null_assignment_expression_node'
 require_relative 'jack_compiler/execution_expression_node'
 require_relative 'jack_compiler/string_assignment_expression_node'
+require_relative 'jack_compiler/integer_assignment_expression_node'
 require_relative 'jack_compiler/expression_node'
 
 require_relative 'jack_compiler/if_node'

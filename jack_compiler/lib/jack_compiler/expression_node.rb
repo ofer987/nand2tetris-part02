@@ -6,7 +6,8 @@ module JackCompiler
     EXPRESSION_NODE_CLASSES = [
       ExecutionExpressionNode,
       NullAssignmentExpressionNode,
-      StringAssignmentExpressionNode
+      StringAssignmentExpressionNode,
+      IntegerAssignmentExpressionNode
     ].freeze
 
     def initialize(xml_node, memory:)
@@ -24,8 +25,11 @@ module JackCompiler
 
     def init_execution_expression_node
       # TODO: change to switch or if/else using regex
-      @internal_expression_node = ExecutionExpressionNode.new(xml_node, options)
-      @internal_expression_node = StringAssignmentExpressionNode.new(xml_node, memory_index: memory.index)
+      internal_expression_class = EXPRESSION_NODE_CLASSES
+        .select { |klazz| klazz.is_execution_node?(xml_node) }
+        .first
+
+      @internal_expression_node = internal_expression_class.new(xml_node, memory: memory)
     end
 
     attr_reader :internal_expression_node, :memory
