@@ -2,8 +2,8 @@
 
 module JackCompiler
   class ExecutionExpressionNode < Node
-    REGEX = RegularExpressions::EXECUTION_EXPRESSION_STATEMENT
     NODE_NAME = ''
+    REGEX = RegularExpressions::EXECUTION_EXPRESSION_STATEMENT
 
     attr_reader :object, :method, :symbol, :expression_list_node
 
