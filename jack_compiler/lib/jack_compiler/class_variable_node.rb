@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class ClassVariableNode < MemoryNode
-    # TODO: implement MemoryNode properies
+  class ClassVariableNode < Node
+    # TODO: Use the same pattern as the VarStatementNode
     NODE_NAME = Statement::CLASS_VAR_DESCRIPTION
 
     attr_reader :modifier, :class_name, :object_name, :memory_index
@@ -19,7 +19,7 @@ module JackCompiler
     end
 
     def emit_vm_code
-      # Empty
+      ''
     end
   end
 end

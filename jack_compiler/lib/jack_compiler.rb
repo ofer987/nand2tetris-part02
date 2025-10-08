@@ -50,9 +50,12 @@ require_relative 'jack_compiler/expression_node'
 
 require_relative 'jack_compiler/if_node'
 
+require_relative 'jack_compiler/memory'
+require_relative 'jack_compiler/primitive_memory'
+require_relative 'jack_compiler/class_memory'
+
 # NOTE: An **ExpressionListNode** is _not_ an **ExpressionNode**!
 require_relative 'jack_compiler/expression_list_node'
-require_relative 'jack_compiler/memory_node'
 require_relative 'jack_compiler/var_statement_node'
 require_relative 'jack_compiler/class_variable_node'
 # require_relative 'jack_compiler/function_variable_node'
@@ -61,6 +64,7 @@ require_relative 'jack_compiler/statement_node'
 require_relative 'jack_compiler/function_node'
 require_relative 'jack_compiler/let_statement_node'
 require_relative 'jack_compiler/do_statement_node'
+require_relative 'jack_compiler/return_node'
 
 require_relative 'jack_compiler/version'
 require_relative 'jack_compiler/state_machine'

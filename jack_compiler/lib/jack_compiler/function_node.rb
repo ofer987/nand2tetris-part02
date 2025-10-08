@@ -6,6 +6,10 @@ module JackCompiler
 
     attr_reader :class_name, :function_type, :function_name, :return_type, :local_memory_nodes, :statement_nodes
 
+    def variable_size
+      @variable_size ||= local_memory_nodes.size
+    end
+
     def initialize(xml_node, options = {})
       super(xml_node, options)
 
@@ -38,6 +42,7 @@ module JackCompiler
     def emit_vm_code
       <<~VM_CODE
         #{emit_statements_code}
+        #{return_node.emit_vm_code}
       VM_CODE
     end
 
@@ -47,10 +52,34 @@ module JackCompiler
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
       @local_memory_nodes = []
-      xml_nodes.each_with_index do |node, index|
-        result = Utils::XML.convert_to_jack_node(node, memory_index: index)
+      index = 0
+      xml_nodes.each do |node|
+        var_node = Utils::XML.convert_to_jack_node(node)
 
-        @local_memory_nodes << result
+        var_node.object_names.each do |memory_name|
+          case var_node.memory_type
+          when Memory::CLASS
+            memory_item = ClassMemory.new(
+              name: memory_name,
+              memory_class: var_node.object_class,
+              location: var_node.memory_location,
+              index: index
+            )
+          when Memory::PRIMITIVE
+            memory_item = PrimitiveMemory.new(
+              name: memory_name,
+              memory_class: var_node.object_class,
+              location: var_node.memory_location,
+              index: index
+            )
+          else
+            raise "Invalid memory type '#{var_node.memory_type}'"
+          end
+
+          @local_memory_nodes << memory_item
+
+          index += 1
+        end
       end
     end
 
@@ -65,13 +94,13 @@ module JackCompiler
 
       options = {
         local_memory: local_memory_nodes
-          .map { |node| [node.object_name, node.memory_index] }
+          .map { |node| [node.name, node.index] }
           .to_h,
         class_memory: class_variable_nodes
           .map { |node| [node.object_name, node.memory_index] }
           .to_h,
         object_classes: local_memory_nodes
-          .map { |node| [node.object_name, node.object_class] }
+          .map { |node| [node.name, node.memory_class] }
           .to_h
       }
 
@@ -91,6 +120,6 @@ module JackCompiler
       @return_statement ||= ReturnStatement.new(@return_node)
     end
 
-    attr_reader :class_variable_nodes
+    attr_reader :class_variable_nodes, :return_node
   end
 end

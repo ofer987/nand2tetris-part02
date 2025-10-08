@@ -25,7 +25,7 @@ module JackCompiler
     def emit_vm_code
       function_nodes.map do |function_node|
         <<~VM_CODE
-          function #{class_name}.#{function_node.function_name} #{class_variable_nodes.size}
+          function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
 
           #{function_node.emit_vm_code}
         VM_CODE
