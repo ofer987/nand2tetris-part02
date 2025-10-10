@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class IntegerAssignmentExpressionNode < Node
+  class IntegerAssignmentExpression < Node
     class << self
       def execution_node?(xml_node, memory:)
         return false if memory.type != Memory::PRIMITIVE

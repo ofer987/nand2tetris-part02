@@ -4,10 +4,10 @@ module JackCompiler
   class ExpressionNode < Node
     NODE_NAME = Statement::EXPRESSION_STATEMENT
     EXPRESSION_NODE_CLASSES = [
-      NullAssignmentExpressionNode,
+      NullAssignmentExpression,
       ExecutionExpression,
-      StringAssignmentExpressionNode,
-      IntegerAssignmentExpressionNode
+      StringAssignmentExpression,
+      IntegerAssignmentExpression
     ].freeze
 
     def initialize(xml_node, options)
