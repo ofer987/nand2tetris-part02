@@ -3,9 +3,9 @@
 module JackCompiler
   class NullAssignmentExpressionNode < Node
     class << self
-      def execution_node?(xml_node)
-        null_node_text = xml_node
-          .find_child_nodes_with_css_selector("> #{Statement::EXPRESSION_STATEMENT} > #{Statement::TERM_STATEMENT} > #{Statement::NULL_CONSTANT}")
+      def execution_node?(xml_node, _options)
+        null_node_text = Utils::XML
+          .find_child_nodes_with_css_selector(xml_node, "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::TERM_STATEMENT} > #{Statement::NULL_CONSTANT}")
           .map(&:text)
           .first
 

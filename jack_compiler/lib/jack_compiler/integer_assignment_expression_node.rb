@@ -3,7 +3,9 @@
 module JackCompiler
   class IntegerAssignmentExpressionNode < Node
     class << self
-      def execution_node?(xml_node)
+      def execution_node?(xml_node, memory:)
+        return false if memory.type != Memory::PRIMITIVE
+
         xml_node
           .find_child_nodes_with_css_selector("> #{Statement::EXPRESSION_STATEMENT} > #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}")
           .any?

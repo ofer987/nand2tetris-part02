@@ -14,6 +14,16 @@ module Utils
         result
       end
 
+      def find_child_nodes_with_css_selector(xml_node, selector)
+        xml_node.css(selector)
+      end
+
+      def find_child_nodes(xml_node, name)
+        xml_node.children
+          .select { |item| item.instance_of? Nokogiri::XML::Element }
+          .select { |item| item.name == name }
+      end
+
       private
 
       def jack_node_classes

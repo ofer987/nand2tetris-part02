@@ -94,10 +94,10 @@ module JackCompiler
 
       options = {
         local_memory: local_memory_nodes
-          .map { |node| [node.name, node.index] }
+          .map { |node| [node.name, node] }
           .to_h,
         class_memory: class_variable_nodes
-          .map { |node| [node.object_name, node.memory_index] }
+          .map { |node| [node.object_name, node] }
           .to_h,
         object_classes: local_memory_nodes
           .map { |node| [node.name, node.memory_class] }

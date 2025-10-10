@@ -17,13 +17,11 @@ module JackCompiler
     protected
 
     def find_child_nodes_with_css_selector(selector)
-      xml_node.css(selector)
+      Utils::XML.find_child_nodes_with_css_selector(xml_node, selector)
     end
 
     def find_child_nodes(name)
-      xml_node.children
-        .select { |item| item.instance_of? Nokogiri::XML::Element }
-        .select { |item| item.name == name }
+      Utils::XML.find_child_nodes(xml_node, name)
     end
 
     attr_reader :options

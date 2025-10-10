@@ -4,7 +4,7 @@ module JackCompiler
   class DoStatementNode < StatementNode
     NODE_NAME = Statement::DO_STATEMENT
 
-    attr_reader :action, :object_name, :method_name, :local_memory_index, :class_memory_index, :object_class
+    attr_reader :action, :object_name, :method_name, :local_memory, :class_memory_index, :object_class
 
     def initialize(xml_node, options = {})
       super(xml_node, options)
@@ -19,7 +19,7 @@ module JackCompiler
       self.expression_list_node = "> #{Statement::EXPRESSION_LIST}"
 
       # local_memory = options[:local_memory]
-      @local_memory_index = options[:local_memory][@object_name]
+      @local_memory = options[:local_memory][@object_name]
       @object_class = options[:object_classes][@object_name]
 
       class_memory = options[:class_memory]
@@ -35,9 +35,9 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
-        push local #{local_memory_index}
+        push local #{local_memory.index}
         call #{object_class}.#{method_name} #{expression_list_node.size + 1}
-        pop temp #{local_memory_index}
+        pop temp #{local_memory.index}
       VM_CODE
     end
 

@@ -5,7 +5,7 @@ module JackCompiler
     REGEX = ''
     NODE_NAME = Statement::LET_STATEMENT
 
-    attr_reader :class_name, :object_name, :local_memory_index, :expression_node
+    attr_reader :class_name, :object_name, :expression_node
 
     def initialize(xml_node, options)
       super(xml_node, options)
@@ -16,7 +16,7 @@ module JackCompiler
       @object_name = find_child_nodes(Statement::IDENTIFIER)
         .first
         .text
-      @local_memory = options[:memory]
+      @memory = options[:local_memory][@object_name]
       # @local_memory_index = options[:local_memory][@object_name]
       # @object_class = options[:object_classes][@object_name]
 
@@ -29,7 +29,7 @@ module JackCompiler
     def emit_vm_code
       <<~VM_CODE
         #{expression_node.emit_vm_code}
-        pop local #{local_memory_index}
+        pop local #{memory.index}
       VM_CODE
     end
 
@@ -39,7 +39,7 @@ module JackCompiler
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
       @expression_node = xml_nodes
-        .map { |node| Utils::XML.convert_to_jack_node(node, memory:) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, memory: ) }
         .first
     end
 
