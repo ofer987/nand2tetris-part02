@@ -17,13 +17,16 @@ module JackCompiler
 
       @function_type, @return_type = find_child_nodes(Statement::KEYWORD)[0..1]
         .map(&:text)
+        .map(&:strip)
 
       @function_name = find_child_nodes(Statement::IDENTIFIER)
         .map(&:text)
+        .map(&:strip)
         .first
 
       @symbols = find_child_nodes(Statement::SYMBOL)
         .map(&:text)
+        .map(&:strip)
 
       @parameters_node = find_child_nodes(Statement::PARAMETER_LIST).first
       @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY)
@@ -33,16 +36,13 @@ module JackCompiler
       self.local_memory_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}"
 
       # rubocop:disable Layout/LineLength
-      self.statement_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}"
-
-      self.return_node = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::RETURN_STATEMENT}"
+      self.statement_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}, #{Statement::RETURN_STATEMENT}"
       # rubocop:enable Layout/LineLength
     end
 
     def emit_vm_code
       <<~VM_CODE
         #{emit_statements_code}
-        #{return_node.emit_vm_code}
       VM_CODE
     end
 
@@ -92,6 +92,7 @@ module JackCompiler
     def statement_nodes=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
+      # TODO: combine memory together
       options = {
         local_memory: local_memory_nodes
           .map { |node| [node.name, node] }

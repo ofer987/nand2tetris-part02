@@ -13,9 +13,11 @@ module JackCompiler
       @memory_index = options[:memory_index]
       @modifier, @class_name = find_child_nodes(Statement::KEYWORD)
         .map(&:text)
+        .map(&:strip)
       @object_name = find_child_nodes(Statement::IDENTIFIER)
         .first
         .text
+        .strip
     end
 
     def emit_vm_code

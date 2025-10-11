@@ -4,14 +4,10 @@ module Utils
   class XML
     class << self
       def convert_to_jack_node(xml_node, options = {})
-        result = jack_node_classes
+        jack_node_classes
           .select { |jack_node_class| xml_node.name == jack_node_class::NODE_NAME }
           .map { |klazz| klazz.new(xml_node, options) }
           .first
-
-        # raise "Failed to find Jack Node for #{xml_node.name}" if result.blank?
-
-        result
       end
 
       def find_child_nodes_with_css_selector(xml_node, selector)

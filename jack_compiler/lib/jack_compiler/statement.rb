@@ -38,6 +38,9 @@ module JackCompiler
     VARIABLE_CONSTANT = 'identifier'
     NULL_CONSTANT = 'keyword'
 
+    ELSE_STATEMENT = 'else'
+    NULL_VALUE = 'null'
+
     attr_reader :document
 
     def initialize(document)

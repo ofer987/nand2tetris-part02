@@ -24,7 +24,6 @@ module JackCompiler
     private
 
     def init_execution_expression_node
-      # TODO: change to switch or if/else using regex
       internal_expression_class = EXPRESSION_NODE_CLASSES
         .select { |klazz| klazz.execution_node?(xml_node, memory: memory) }
         .first

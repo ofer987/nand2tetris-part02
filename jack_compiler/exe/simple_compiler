@@ -13,3 +13,6 @@ root = ast.document.root
 root_jack_node = Utils::XML.convert_to_jack_node(root)
 
 puts root_jack_node.emit_vm_code
+  .split("\n")
+  .reject(&:blank?)
+  .join("\n")

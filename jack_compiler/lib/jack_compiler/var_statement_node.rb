@@ -18,7 +18,7 @@ module JackCompiler
       super(xml_node, options)
 
       @memory_index = options[:memory_index]
-      # binding.pry
+
       if find_child_nodes(Statement::KEYWORD).size > 1
         initialize_primitive_variable
       else
@@ -35,33 +35,19 @@ module JackCompiler
     def initialize_primitive_variable
       @memory_type = 'primitive'
 
-      @object_class = find_child_nodes(Statement::KEYWORD)[1].text
+      @object_class = find_child_nodes(Statement::KEYWORD)[1].text.strip
       @object_names = find_child_nodes(Statement::IDENTIFIER)
         .map(&:text)
+        .map(&:strip)
     end
 
     def initialize_class_variable
       @memory_type = 'class'
 
-      @object_class = find_child_nodes(Statement::IDENTIFIER)[0].text
+      @object_class = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
       @object_names = find_child_nodes(Statement::IDENTIFIER)[1..]
         .map(&:text)
+        .map(&:strip)
     end
-
-    # private
-    #
-    # def memory
-    #   return @memory if defined? @memory
-    #
-    #   return unless local_memory.include? @object_name
-    #
-    #   @memory = local_memory[@object_name]
-    # end
-    #
-    # def memory_type
-    #   @memory_type ||= memory.type
-    # end
-    #
-    # attr_reader :memory
   end
 end

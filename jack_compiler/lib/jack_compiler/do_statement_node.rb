@@ -11,25 +11,24 @@ module JackCompiler
 
       @action = find_child_nodes(Statement::KEYWORD)
         .map(&:text)
+        .map(&:strip)
         .first
 
       @object_name, @method_name = find_child_nodes_with_css_selector("> #{Statement::IDENTIFIER}")[0..1]
         .map(&:text)
+        .map(&:strip)
 
       self.expression_list_node = "> #{Statement::EXPRESSION_LIST}"
 
-      # local_memory = options[:local_memory]
       @local_memory = options[:local_memory][@object_name]
       @object_class = options[:object_classes][@object_name]
 
       class_memory = options[:class_memory]
       @class_memory_index = class_memory[@object_name]
 
-      # object_classes = options[:object_classes]
-      # @object_class = object_classes[@object_name]
-
       @symbol = find_child_nodes_with_css_selector("> #{Statement::SYMBOL}")
         .map(&:text)
+        .map(&:strip)
         .first
     end
 

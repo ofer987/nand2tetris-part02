@@ -2,72 +2,76 @@
 
 module JackCompiler
   class IfNode < Node
-    REGEX = RegularExpressions::IF_STATEMENT_REGEX
     NODE_NAME = Statement::IF_STATEMENT
 
-    def initialize(xml_node)
-      super(xml_node)
+    def initialize(xml_node, options)
+      super(xml_node, options)
 
-      @statements = find_child_nodes(Statement::STATEMENTS_STATEMENT)
-      @if_statements = statements[0]
-      @else_statements = statements[1]
+      if_statement, else_statement = find_child_nodes_with_css_selector("> #{Statement::STATEMENTS_STATEMENT}")[0..1]
+      # TODO: enable
+      # self.condition = " > #{Statement::EXPRESSION_STATEMENT}"
+
+      # rubocop:disable Layout/LineLength
+      @if_statements = get_conditional_statements(if_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}")
+      @else_statements = get_conditional_statements(else_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}") if else_statements_exist?
+      # rubocop:enable Layout/LineLength
     end
 
     def emit_vm_code
-      if statements.size > 1
-        emit_if_else_code
-      else
-        emit_if_code
-      end
+      # TODO: add back
+      ## #{condition.emit_vm_code}
+      <<~VM_CODE
+        push constant 0
+        if-goto #{if_true_label}
+        goto #{if_false_label}
+        label #{if_true_label}
+          #{if_statements.map(&:emit_vm_code).join("\n")}
+        goto #{if_end_label}
+        label #{if_false_label}
+          #{else_statements.map(&:emit_vm_code).join("\n")}
+        label #{if_end_label}
+      VM_CODE
     end
 
     private
 
-    def emit_if_else_code
-      # Store as lines in an array
-      result = <<~VM_CODE
-        #{expression}
-        not
-        if-goto #{else_label}
-        #{if_statements}
-        GOTO #{continue_label}
-        (#{else_label})
-        #{else_statements}
-        #{continue_label}
-      VM_CODE
-
-      result.split("\n")
+    def condition=(css_selector)
+      @condition = find_child_nodes_with_css_selector(css_selector)
+        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
+        .first
     end
 
-    def emit_if_code
-      # Store as lines in an array
-      result = <<~VM_CODE
-        #{expression}
-        not
-        if-goto #{continue_label}
-        #{if_statements}
-        #{continue_label}
-      VM_CODE
+    def get_conditional_statements(conditional_statement, css_selector)
+      return [] unless else_statements_exist?
 
-      result.split("\n")
+      conditional_statement.css(css_selector)
+        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
     end
 
-    def expression
-      ''
+    def else_statements_exist?
+      @else_statements_exist ||= find_child_nodes(Statement::KEYWORD)
+        .map(&:text)
+        .map(&:strip)
+        .select { |text| text == Statement::ELSE_STATEMENT }
+        .any?
     end
 
-    def continue_label
-      @continue_label ||= "CONTINUE_LABEL_#{uuid}"
+    def if_true_label
+      @if_true_label ||= "IF_TRUE_#{uuid}"
     end
 
-    def else_label
-      @else_label ||= "ELSE_LABEL_#{uuid}"
+    def if_end_label
+      @if_end_label ||= "IF_END_#{uuid}"
+    end
+
+    def if_false_label
+      @if_false_label ||= "IF_FALSE_#{uuid}"
     end
 
     def uuid
       @uuid ||= SecureRandom.uuid
     end
 
-    attr_reader :statements, :if_statements, :else_statements
+    attr_reader :condition, :if_statements, :else_statements, :memory
   end
 end

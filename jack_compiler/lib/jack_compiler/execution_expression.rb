@@ -8,9 +8,6 @@ module JackCompiler
       end
     end
 
-    NODE_NAME = ''
-    REGEX = RegularExpressions::EXECUTION_EXPRESSION_STATEMENT
-
     attr_reader :object, :method, :symbol, :expression_list_node
 
     def initialize(xml_node, memory:)
@@ -22,15 +19,19 @@ module JackCompiler
         "> #{Statement::TERM_STATEMENT} > #{Statement::IDENTIFIER}"
       )[0..1]
         .map(&:text)
+        .map(&:strip)
 
       self.expression_list_node = "> #{Statement::TERM_STATEMENT} > #{Statement::EXPRESSION_LIST}"
 
       @symbol = Utils::XML.find_child_nodes_with_css_selector(xml_node, "> #{Statement::SYMBOL}")
         .map(&:text)
+        .map(&:strip)
         .first
     end
 
     def emit_vm_code
+      return '' if expression_list_node.blank?
+
       <<~VM_CODE
         call #{object}.#{method} #{expression_list_node.size}
       VM_CODE

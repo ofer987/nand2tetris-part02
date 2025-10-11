@@ -23,7 +23,7 @@ module JackCompiler
       value_node = find_child_nodes(val).first
 
       @value = 0
-      @value = value_node.text unless value_node.nil?
+      @value = value_node.text.strip unless value_node.nil?
     end
   end
 end

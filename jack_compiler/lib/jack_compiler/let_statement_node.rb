@@ -13,15 +13,12 @@ module JackCompiler
       @keyword = find_child_nodes(Statement::KEYWORD)
         .first
         .text
+        .strip
       @object_name = find_child_nodes(Statement::IDENTIFIER)
         .first
         .text
+        .strip
       @memory = options[:local_memory][@object_name]
-      # @local_memory_index = options[:local_memory][@object_name]
-      # @object_class = options[:object_classes][@object_name]
-
-      # binding.pry
-      # @local_memory_index = local_memory[@object_name]
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
     end
@@ -39,7 +36,7 @@ module JackCompiler
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
       @expression_node = xml_nodes
-        .map { |node| Utils::XML.convert_to_jack_node(node, memory: ) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, memory:) }
         .first
     end
 
