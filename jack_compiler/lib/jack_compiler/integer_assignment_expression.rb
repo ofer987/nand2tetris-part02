@@ -19,7 +19,7 @@ module JackCompiler
       @xml_node = xml_node
       @memory = memory
 
-      self.value = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}"
+      self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}"
     end
 
     def emit_vm_code

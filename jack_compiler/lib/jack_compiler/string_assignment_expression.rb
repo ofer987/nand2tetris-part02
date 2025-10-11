@@ -19,17 +19,22 @@ module JackCompiler
       @xml_node = xml_node
       @memory = memory
 
-      self.value = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::TERM_STATEMENT} > #{Statement::STRING_CONSTANT}"
+      self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::STRING_CONSTANT}"
     end
 
     def emit_vm_code
-      characters.map do |character|
-        <<~VM_CODE
+      result = []
+      characters.each do |character|
+        result << <<~VM_CODE
           call String.appendChar #{memory.index}
           push constant #{character.ord}
         VM_CODE
       end
-      "push constant #{value}"
+
+      result << "push constant #{value}"
+
+      result
+        .join("\n")
     end
 
     private
@@ -45,6 +50,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node
+    attr_reader :xml_node, :memory
   end
 end
