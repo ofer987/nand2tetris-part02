@@ -20,6 +20,7 @@ module JackCompiler
       @memory = memory
 
       self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::STRING_CONSTANT}"
+      memory.value = value
     end
 
     def emit_vm_code

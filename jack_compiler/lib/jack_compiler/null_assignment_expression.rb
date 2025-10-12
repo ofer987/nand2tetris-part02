@@ -24,10 +24,16 @@ module JackCompiler
     def initialize(xml_node, memory:)
       @xml_node = xml_node
       @memory = memory
+
+      memory.value = 0
     end
 
     def emit_vm_code
       "push constant #{value}"
     end
+
+    private
+
+    attr_reader :memory
   end
 end

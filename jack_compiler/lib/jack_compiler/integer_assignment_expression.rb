@@ -20,6 +20,7 @@ module JackCompiler
       @memory = memory
 
       self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}"
+      memory.value = value
     end
 
     def emit_vm_code
@@ -35,6 +36,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node
+    attr_reader :xml_node, :memory
   end
 end

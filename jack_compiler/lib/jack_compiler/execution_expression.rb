@@ -27,6 +27,9 @@ module JackCompiler
         .map(&:text)
         .map(&:strip)
         .first
+
+      # TODO: store value in memory.value
+      # memory.value = ''
     end
 
     def emit_vm_code
@@ -47,6 +50,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node
+    attr_reader :xml_node, :memory
   end
 end
