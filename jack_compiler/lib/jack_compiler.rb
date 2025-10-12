@@ -4,6 +4,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'nokogiri'
 require 'securerandom'
+require 'rspec'
 
 require_relative 'jack_compiler/utils/xml'
 require_relative 'jack_compiler/regular_expressions'
@@ -40,6 +41,10 @@ require_relative 'jack_compiler/empty_return_statement'
 require_relative 'jack_compiler/assignment_expression_statement'
 require_relative 'jack_compiler/argument_statement'
 require_relative 'jack_compiler/statements_statement'
+
+# Infix and Postfix expression and utilities
+require_relative './jack_compiler/postfix_expression'
+require_relative './jack_compiler/utils/infix'
 
 # Traverse the Abstract Syntax Tree (AST)
 require_relative 'jack_compiler/node'
