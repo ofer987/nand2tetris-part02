@@ -7,6 +7,9 @@ module JackCompiler
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
 
+      evaluation_node = document.create_element(EVALUATION_STATEMENT, result[1].strip)
+      parent_node << evaluation_node
+
       term_node = document.create_element(TERM_STATEMENT)
       parent_node << term_node
 

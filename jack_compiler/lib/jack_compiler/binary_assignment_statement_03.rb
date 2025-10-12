@@ -7,8 +7,11 @@ module JackCompiler
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
 
+      evaluation_node = document.create_element(EVALUATION_STATEMENT, result[1])
+      parent_node << evaluation_node
+
       # First operand
-      next_statements(parent_node, result[1], assignment_expression_classes)
+      next_statements(parent_node, result[2], assignment_expression_classes)
 
       # operator
       symbol_node = document.create_element(SYMBOL, result[2])
@@ -18,7 +21,7 @@ module JackCompiler
       term_node = document.create_element(TERM_STATEMENT)
       parent_node << term_node
 
-      next_statements(term_node, result[3], unary_assignment_expression_classes)
+      next_statements(term_node, result[4], unary_assignment_expression_classes)
 
       lines.sub(REGEX, '')
     end

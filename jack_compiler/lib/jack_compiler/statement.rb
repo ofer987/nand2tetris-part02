@@ -33,6 +33,7 @@ module JackCompiler
     STATEMENTS_STATEMENT = 'statements'
     COMMA = ','
 
+    EVALUATION_STATEMENT = 'evaluation'
     STRING_CONSTANT = 'stringConstant'
     INTEGER_CONSTANT = 'integerConstant'
     VARIABLE_CONSTANT = 'identifier'
