@@ -121,6 +121,7 @@ module JackCompiler
                 raise "Could not find matching '#{OPEN_ROUND_BRACKET}' in '#{infix_expression}'"
               end
 
+              temp_stack = temp_stack.reverse
               while temp_stack.any? && (temp_value = temp_stack.pop)
                 postfix_stack << temp_value
               end

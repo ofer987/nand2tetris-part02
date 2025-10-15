@@ -34,5 +34,12 @@ RSpec.describe JackCompiler::Utils::Infix do
   include_examples '.to_postfix', '(3+4)', '3 4 +'
   include_examples '.to_postfix', '3+4 - 1', '3 4 + 1 -'
   include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7) - 8', '3 4 5 / 6 7 + * + 8 -'
+  # infix equals 7
+  # The postfix 3 4 5 / 6 7 8 + - + *
+  # equals
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7 - 8)', '3 4 5 / 6 7 + 8 - * +'
+  # infix equals 52.6
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7 * 8)', '3 4 5 / 6 7 8 * + * +'
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8)', '3 4 5 / 6 7 * 8 + * +'
   include_examples '.to_postfix fails', '3 + 4 - 1', '3 4 + 1 - /'
 end
