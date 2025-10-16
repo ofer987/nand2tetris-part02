@@ -4,11 +4,14 @@ module JackCompiler
   module Utils
     # rubocop:disable Metrics/ClassLength
     class Infix
-      OPERATOR_REGEX = %r{^\s*([*/+-])\s*}
+      OPERATORS_LIST_REGEX = %r{[*/+-]}
+      OPERATOR_REGEX = /^\s*(#{OPERATORS_LIST_REGEX})\s*/
       ARRAY_OPERAND_REGEX = /^\s*(\w+\[\d+\])\s*/
       OPERAND_REGEX = /^\s*(\d+)\s*/
       OPEN_ROUND_BRACKET_REGEX = /^\s*(\()\s*/
       CLOSE_ROUND_BRACKET_REGEX = /^\s*(\))\s*/
+
+      INVALID_REGEX = /#{OPERATORS_LIST_REGEX}\s*$/
 
       OPEN_ROUND_BRACKET = '('
       CLOSE_ROUND_BRACKET = ')'
@@ -69,6 +72,8 @@ module JackCompiler
           stack = []
           postfix_stack = []
           remaining_characters = infix_expression
+
+          raise 'expression cannot end with an operand' if infix_expression.match? INVALID_REGEX
 
           regex_keys = REGEXES[:start][:next_regex_keys]
           # rubocop:disable Metrics/BlockNesting
@@ -132,6 +137,8 @@ module JackCompiler
             remaining_characters = remaining_characters.sub(match[0], '')
           end
           # rubocop:enable Metrics/BlockNesting
+
+          raise 'bracket was not closed' if stack.include? OPEN_ROUND_BRACKET
 
           postfix_stack << stack.pop while stack.any?
 

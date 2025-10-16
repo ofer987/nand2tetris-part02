@@ -41,5 +41,25 @@ RSpec.describe JackCompiler::Utils::Infix do
   # infix equals 52.6
   include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7 * 8)', '3 4 5 / 6 7 8 * + * +'
   include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8)', '3 4 5 / 6 7 * 8 + * +'
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8)', '3 4 5 / 6 7 * 8 + * +'
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8) * 9 + 10', '3 4 5 / 6 7 * 8 + * 9 * + 10 +'
   include_examples '.to_postfix fails', '3 + 4 - 1', '3 4 + 1 - /'
+
+  describe 'to_postfix' do
+    it 'raises error' do
+      expect { subject.to_postfix '3 + 4 / 5 * (6 * 7 + 8) 8' }.to raise_error StandardError
+    end
+
+    it 'raises error' do
+      expect { subject.to_postfix '3 + 4 / 5 * (6 * 7 + 8 +' }.to raise_error StandardError
+    end
+
+    it 'raises error' do
+      expect { subject.to_postfix '3 + 4 / 5 * (6 * 7 + 8) +' }.to raise_error StandardError
+    end
+
+    it 'raises error' do
+      expect { subject.to_postfix '3 + 4 / 5 * (6 * 7 + 8 +) +' }.to raise_error StandardError
+    end
+  end
 end
