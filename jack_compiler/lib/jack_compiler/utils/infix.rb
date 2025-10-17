@@ -5,9 +5,11 @@ module JackCompiler
     # rubocop:disable Metrics/ClassLength
     class Infix
       OPERATORS_LIST_REGEX = %r{[*/+-]}
+
+      MONOMIAL_REGEX = /^\s*([+-])\s*/
       OPERATOR_REGEX = /^\s*(#{OPERATORS_LIST_REGEX})\s*/
       ARRAY_OPERAND_REGEX = /^\s*(\w+\[\d+\])\s*/
-      OPERAND_REGEX = /^\s*(\d+)\s*/
+      OPERAND_REGEX = /^\s*(\w+)\s*/
       OPEN_ROUND_BRACKET_REGEX = /^\s*(\()\s*/
       CLOSE_ROUND_BRACKET_REGEX = /^\s*(\))\s*/
 
@@ -33,7 +35,7 @@ module JackCompiler
       REGEXES = {
         start: {
           regex: nil,
-          next_regex_keys: %i[open_round_bracket array_operand operand],
+          next_regex_keys: %i[open_round_bracket array_operand operand monomial],
           stack_type: nil
         },
         operator: {
@@ -53,13 +55,18 @@ module JackCompiler
         },
         open_round_bracket: {
           regex: OPEN_ROUND_BRACKET_REGEX,
-          next_regex_keys: %i[open_round_bracket close_round_bracket array_operand operand],
+          next_regex_keys: %i[open_round_bracket close_round_bracket array_operand operand monomial],
           stack_type: :open_bracket
         },
         close_round_bracket: {
           regex: CLOSE_ROUND_BRACKET_REGEX,
           next_regex_keys: %i[operator],
           stack_type: :close_bracket
+        },
+        monomial: {
+          regex: MONOMIAL_REGEX,
+          next_regex_keys: %i[operand array_operand open_round_bracket],
+          stack_type: :monomial
         }
       }.freeze
 
@@ -96,6 +103,26 @@ module JackCompiler
             when :open_bracket
               stack << OPEN_ROUND_BRACKET
             when :stack
+              new_operator = match[1]
+
+              # Move existing operators out of stack unless they have
+              # higher priority
+              while stack.any? && OPERATORS.include?(stack[-1])
+                stack_operator = stack.pop
+
+                if compare_operator_priority(new_operator, stack_operator)
+                  stack << stack_operator
+
+                  break
+                else
+                  # Move existing operator from stack to postfix_stack
+                  # If new_operator has lower or same priority
+                  postfix_stack << stack_operator
+                end
+              end
+              stack << new_operator
+            when :monomial
+              postfix_stack << 0
               new_operator = match[1]
 
               # Move existing operators out of stack unless they have

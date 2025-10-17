@@ -27,6 +27,12 @@ end
 RSpec.describe JackCompiler::Utils::Infix do
   subject { described_class }
 
+  include_examples '.to_postfix', '- 1 + (3) * 4', '0 1 - 3 4 * +'
+  include_examples '.to_postfix', '- 1 + (i) * 4', '0 1 - i 4 * +'
+  include_examples '.to_postfix', '- index + (i) * j', '0 index - i j * +'
+  include_examples '.to_postfix', '- 1 + (3 + 4)', '0 1 - 3 4 + +'
+  include_examples '.to_postfix', '1 - ( - 1) + 3 + 4', '1 0 1 - - 3 + 4 +'
+  include_examples '.to_postfix', '- (3 + 4)', '0 3 4 + -'
   include_examples '.to_postfix', '(3 + 4)', '3 4 +'
   include_examples '.to_postfix', '3 + 4', '3 4 +'
   include_examples '.to_postfix', '3+ 4', '3 4 +'
@@ -43,6 +49,8 @@ RSpec.describe JackCompiler::Utils::Infix do
   include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8)', '3 4 5 / 6 7 * 8 + * +'
   include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8)', '3 4 5 / 6 7 * 8 + * +'
   include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8) * 9 + 10', '3 4 5 / 6 7 * 8 + * 9 * + 10 +'
+  include_examples '.to_postfix', '3 - 4 / 5 * (6 * 7 + 8) * 9 + 10', '3 4 5 / 6 7 * 8 + * 9 * - 10 +'
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8) * 9 - 10', '3 4 5 / 6 7 * 8 + * 9 * + 10 -'
   include_examples '.to_postfix fails', '3 + 4 - 1', '3 4 + 1 - /'
 
   describe 'to_postfix' do
