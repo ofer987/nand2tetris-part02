@@ -169,7 +169,7 @@ module JackCompiler
 
           postfix_stack << stack.pop while stack.any?
 
-          PostfixExpression.new(expression: postfix_stack.join(' '))
+          PostfixCalculator.new(expression: postfix_stack.join(' '))
         end
         # rubocop:enable Metrics/AbcSize
         # rubocop:enable Metrics/CyclomaticComplexity

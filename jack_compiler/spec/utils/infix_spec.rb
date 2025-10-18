@@ -3,10 +3,10 @@
 require_relative '../../lib/jack_compiler'
 
 RSpec.shared_examples '.to_postfix' do |infix_expression, postfix_expression|
-  it 'Is of type JackCompiler::PostfixExpression' do
+  it 'Is of type JackCompiler::PostfixCalculator' do
     actual = subject.to_postfix(infix_expression)
 
-    expect(actual).to be_kind_of(JackCompiler::PostfixExpression)
+    expect(actual).to be_kind_of(JackCompiler::PostfixCalculator)
   end
 
   it "convert '#{infix_expression}' to '#{postfix_expression}'" do

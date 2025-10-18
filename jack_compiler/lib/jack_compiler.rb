@@ -42,8 +42,8 @@ require_relative 'jack_compiler/assignment_expression_statement'
 require_relative 'jack_compiler/argument_statement'
 require_relative 'jack_compiler/statements_statement'
 
-# Infix and Postfix expression and utilities
-require_relative './jack_compiler/postfix_expression'
+# Infix and Postfix calculator and utilities
+require_relative './jack_compiler/postfix_calculator'
 require_relative './jack_compiler/utils/infix'
 
 # Traverse the Abstract Syntax Tree (AST)
