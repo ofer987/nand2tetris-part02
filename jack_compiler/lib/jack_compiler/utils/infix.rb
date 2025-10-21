@@ -6,7 +6,8 @@ module JackCompiler
     class Infix
       OPERATORS_LIST_REGEX = %r{[*/+-]}
 
-      MONOMIAL_REGEX = /^\s*([+-])\s*/
+      MONOMIAL_REGEX = /^\s*([+-])\s*(\w+)\s*/
+      MONOMIAL_REGEX_OPEN_ROUND_BRACKET = /^\s*([+-])\s*(\()\s*/
       OPERATOR_REGEX = /^\s*(#{OPERATORS_LIST_REGEX})\s*/
       ARRAY_OPERAND_REGEX = /^\s*(\w+\[\d+\])\s*/
       OPERAND_REGEX = /^\s*(\w+)\s*/
@@ -35,12 +36,12 @@ module JackCompiler
       REGEXES = {
         start: {
           regex: nil,
-          next_regex_keys: %i[open_round_bracket array_operand operand monomial],
+          next_regex_keys: %i[open_round_bracket array_operand operand monomial monomial_open_round_bracket],
           stack_type: nil
         },
         operator: {
           regex: OPERATOR_REGEX,
-          next_regex_keys: %i[array_operand operand open_round_bracket],
+          next_regex_keys: %i[array_operand operand open_round_bracket monomial],
           stack_type: :stack
         },
         array_operand: {
@@ -60,13 +61,18 @@ module JackCompiler
         },
         close_round_bracket: {
           regex: CLOSE_ROUND_BRACKET_REGEX,
-          next_regex_keys: %i[operator],
+          next_regex_keys: %i[operator close_round_bracket],
           stack_type: :close_bracket
         },
         monomial: {
           regex: MONOMIAL_REGEX,
-          next_regex_keys: %i[operand array_operand open_round_bracket],
+          next_regex_keys: %i[open_round_bracket],
           stack_type: :monomial
+        },
+        monomial_open_round_bracket: {
+          regex: MONOMIAL_REGEX_OPEN_ROUND_BRACKET,
+          next_regex_keys: %i[array_operand operand],
+          stack_type: :monomial_open_round_bracket
         }
       }.freeze
 
@@ -85,8 +91,6 @@ module JackCompiler
           regex_keys = REGEXES[:start][:next_regex_keys]
           # rubocop:disable Metrics/BlockNesting
           until remaining_characters.blank?
-            # executed = false
-
             matched_regex_key = regex_keys
               .select { |regex_key| remaining_characters.match? REGEXES[regex_key][:regex] }
               .first
@@ -100,29 +104,20 @@ module JackCompiler
             stack_type = REGEXES[matched_regex_key][:stack_type]
 
             case stack_type
+            when :monomial
+              remaining_characters = remaining_characters.sub(matched_regex, "(0 #{match[1]} #{match[2]})")
+
+              next
+            when :monomial_open_round_bracket
+              remaining_characters = remaining_characters.sub(matched_regex, "0 #{match[1]} #{match[2]}")
+
+              next
+            end
+
+            case stack_type
             when :open_bracket
               stack << OPEN_ROUND_BRACKET
             when :stack
-              new_operator = match[1]
-
-              # Move existing operators out of stack unless they have
-              # higher priority
-              while stack.any? && OPERATORS.include?(stack[-1])
-                stack_operator = stack.pop
-
-                if compare_operator_priority(new_operator, stack_operator)
-                  stack << stack_operator
-
-                  break
-                else
-                  # Move existing operator from stack to postfix_stack
-                  # If new_operator has lower or same priority
-                  postfix_stack << stack_operator
-                end
-              end
-              stack << new_operator
-            when :monomial
-              postfix_stack << 0
               new_operator = match[1]
 
               # Move existing operators out of stack unless they have
