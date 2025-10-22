@@ -21,8 +21,10 @@ module JackCompiler
       operator = nil
 
       stack.map(&:strip).each do |item|
-        if item.match? Utils::Infix::OPERAND_REGEX
+        if item.match? Utils::Infix::NUMERICAL_REGEX
           values_stack << item.to_i
+        elsif item.match? Utils::Infix::OPERAND_REGEX
+          raise 'Variables are not implemented yet'
         elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
           raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
 

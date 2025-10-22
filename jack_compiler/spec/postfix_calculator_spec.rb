@@ -43,5 +43,11 @@ RSpec.describe JackCompiler::PostfixCalculator do
         expect(subject.new(expression: '3 4 5 / 6 7 + * + 8 -').calculate).to eq(-5)
       end
     end
+
+    context 'when infix_expression is 1 + index ' do
+      it 'raises an exception' do
+        expect { subject.new(infix_expression: '1 + index').calculate }.to raise_error 'Variables are not implemented yet'
+      end
+    end
   end
 end
