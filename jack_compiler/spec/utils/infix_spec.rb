@@ -21,11 +21,13 @@ end
 RSpec.describe JackCompiler::Utils::Infix do
   subject { described_class }
 
+  include_examples '.to_postfix', '(3 + 4) * - 1', '3 4 + 0 1 - *'
   include_examples '.to_postfix', '- 1 + (3) * 4', '0 1 - 3 4 * +'
   include_examples '.to_postfix', '- 1 + (i) * 4', '0 1 - i 4 * +'
   include_examples '.to_postfix', '- index + (i) * j', '0 index - i j * +'
   include_examples '.to_postfix', '- 1 + (3 + 4)', '0 1 - 3 4 + +'
   include_examples '.to_postfix', '1 - ( - 1) + 3 + 4', '1 0 1 - - 3 + 4 +'
+  include_examples '.to_postfix', '(3 + 4) - 1', '3 4 + 1 -'
   include_examples '.to_postfix', '- (3 + 4)', '0 3 4 + -'
   include_examples '.to_postfix', '(3 + 4)', '3 4 +'
   include_examples '.to_postfix', '3 + 4', '3 4 +'
