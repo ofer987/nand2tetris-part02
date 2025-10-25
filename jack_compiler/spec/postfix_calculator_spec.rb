@@ -35,6 +35,11 @@ RSpec.describe JackCompiler::PostfixCalculator do
         expect { subject.new(infix_expression: '1 + index').calculate(memory:) }.not_to raise_error
         expect { subject.new(expression: '1 index +').calculate(memory:) }.not_to raise_error
       end
+
+      it 'raises an error if memory does not have the variable', :aggregate_failres do
+        expect { subject.new(infix_expression: '1 + j').calculate(memory:) }.to raise_error 'Variable \'j\' has not been declared'
+        expect { subject.new(expression: '1 j +').calculate(memory:) }.to raise_error 'Variable \'j\' has not been declared'
+      end
     end
   end
 end

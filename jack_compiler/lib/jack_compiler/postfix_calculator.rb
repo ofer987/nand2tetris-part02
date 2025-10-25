@@ -27,7 +27,7 @@ module JackCompiler
         elsif item.match? Utils::Infix::OPERAND_REGEX
           variable_name = item
 
-          raise "Variable '#{variable_name} has not been declared" unless memory.key? variable_name
+          raise "Variable '#{variable_name}' has not been declared" unless memory.key? variable_name
 
           variable = memory[variable_name]
 
