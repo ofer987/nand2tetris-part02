@@ -23,9 +23,18 @@ RSpec.describe JackCompiler::PostfixCalculator do
       expect(subject.new(expression: '3 4 5 / 6 7 + * + 8 -').calculate).to eq(-5)
     end
 
-    it 'raises error if expression contains variable', :aggregate_failres do
-      expect { subject.new(infix_expression: '1 + index').calculate }.to raise_error 'Variables are not implemented yet'
-      expect { subject.new(expression: '1 index +').calculate }.to raise_error 'Variables are not implemented yet'
+    context 'with variables' do
+      let(:index) { JackCompiler::PrimitiveMemory.new(name: 'index', memory_class: 'integer', index: 0, location: 0) }
+      let(:memory) { { 'index' => index } }
+
+      before(:each) do
+        index.value = 5
+      end
+
+      it 'does not raise an error if expression contains variable', :aggregate_failres do
+        expect { subject.new(infix_expression: '1 + index').calculate(memory:) }.not_to raise_error
+        expect { subject.new(expression: '1 index +').calculate(memory:) }.not_to raise_error
+      end
     end
   end
 end

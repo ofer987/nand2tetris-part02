@@ -16,7 +16,8 @@ module JackCompiler
     end
 
     # rubocop:disable Metrics/PerceivedComplexity
-    def calculate
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def calculate(memory: {})
       values_stack = []
       operator = nil
 
@@ -24,7 +25,13 @@ module JackCompiler
         if item.match? Utils::Infix::NUMERICAL_REGEX
           values_stack << item.to_i
         elsif item.match? Utils::Infix::OPERAND_REGEX
-          raise 'Variables are not implemented yet'
+          variable_name = item
+
+          raise "Variable '#{variable_name} has not been declared" unless memory.key? variable_name
+
+          variable = memory[variable_name]
+
+          values_stack << variable.value
         elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
           raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
 
@@ -48,6 +55,7 @@ module JackCompiler
 
       values_stack.first
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
 
     private
