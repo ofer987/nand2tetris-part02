@@ -34,10 +34,13 @@ module JackCompiler
     COMMA = ','
 
     EVALUATION_STATEMENT = 'evaluation'
+    EVALUATION_TYPE_STATEMENT = 'evaluation_type'
     STRING_CONSTANT = 'stringConstant'
     INTEGER_CONSTANT = 'integerConstant'
     VARIABLE_CONSTANT = 'identifier'
     NULL_CONSTANT = 'keyword'
+    INFIX_EXPRESSION = 'infix_expression'
+    ARRAY_VALUE = 'array'
 
     ELSE_STATEMENT = 'else'
     NULL_VALUE = 'null'

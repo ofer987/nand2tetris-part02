@@ -8,7 +8,10 @@ module JackCompiler
       result = lines.match(REGEX)
 
       evaluation_node = document.create_element(EVALUATION_STATEMENT, result[1])
+      evaluation_type_node = document.create_element(EVALUATION_TYPE_STATEMENT, INFIX_EXPRESSION)
+
       parent_node << evaluation_node
+      parent_node << evaluation_type_node
 
       # First operand
       next_statements(parent_node, result[2], assignment_expression_classes)

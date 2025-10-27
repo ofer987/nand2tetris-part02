@@ -18,6 +18,10 @@ module JackCompiler
         .first
         .text
         .strip
+      if @object_name.match? RegularExpressions::ARRAY_EXPRESSION
+        @object_name = @object_name.match(RegularExpressions::ARRAY_EXPRESSION)[2]
+      end
+
       @memory = options[:local_memory][@object_name]
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
