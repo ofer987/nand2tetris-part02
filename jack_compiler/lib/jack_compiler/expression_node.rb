@@ -4,6 +4,7 @@ module JackCompiler
   class ExpressionNode < Node
     NODE_NAME = Statement::EXPRESSION_STATEMENT
     EXPRESSION_NODE_CLASSES = [
+      InfixEvaluatorAssignmentExpression,
       StringAssignmentExpression,
       NullAssignmentExpression,
       ExecutionExpression,
