@@ -15,15 +15,17 @@ module JackCompiler
       super(xml_node, options)
 
       @memory = options[:memory]
-      @objects = options[:objects]
 
       init_execution_expression_node
-
-      internal_expression_node.calculate(objects)
-      internal_expression_node.emit_vm_code(objects)
     end
 
-    def emit_vm_code; end
+    def calculate(objects)
+      internal_expression_node.calculate(objects)
+    end
+
+    def emit_vm_code(objects)
+      internal_expression_node.emit_vm_code(objects)
+    end
 
     private
 
@@ -35,6 +37,6 @@ module JackCompiler
       @internal_expression_node = internal_expression_class.new(xml_node, memory:)
     end
 
-    attr_reader :internal_expression_node, :memory, :objects
+    attr_reader :internal_expression_node, :memory
   end
 end

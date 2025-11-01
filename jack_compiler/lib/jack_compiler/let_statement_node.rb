@@ -19,19 +19,21 @@ module JackCompiler
         .text
         .strip
       if @object_name.match? RegularExpressions::ARRAY_EXPRESSION
-        @object_name = @object_name.match(RegularExpressions::ARRAY_EXPRESSION)[2]
+        matches = @object_name.match(RegularExpressions::ARRAY_EXPRESSION)
+        @object_name = matches[2]
+        @offset = matches[4]
       end
 
       self.objects = options
       @memory = options[:local_memory][@object_name]
 
-      self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
+      self.expression_node = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
     end
 
     def emit_vm_code
       <<~VM_CODE
-        #{expression_node.emit_vm_code}
-        pop local #{memory.index}
+        #{expression_node.emit_vm_code(objects)}
+        #{memory.assignment_vm_code({ offset: offset })}
       VM_CODE
     end
 
@@ -52,11 +54,12 @@ module JackCompiler
     def expression_node=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
-      @expression_node = xml_nodes
+      @expression_node = xml_nodes[0..0]
+        .map(&:parent)
         .map { |node| Utils::XML.convert_to_jack_node(node, memory:, objects:) }
         .first
     end
 
-    attr_reader :memory, :objects
+    attr_reader :memory, :objects, :offset
   end
 end

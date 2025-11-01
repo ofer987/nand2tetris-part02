@@ -16,8 +16,10 @@ module JackCompiler
       @location = location
     end
 
-    def emit_vm_code
-      ''
+    def assignment_vm_code(_options = {})
+      <<~VM_CODE
+        pop #{location} #{index}
+      VM_CODE
     end
   end
 end

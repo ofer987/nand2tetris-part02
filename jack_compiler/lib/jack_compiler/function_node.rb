@@ -58,6 +58,13 @@ module JackCompiler
 
         var_node.object_names.each do |memory_name|
           case var_node.memory_type
+          when Memory::ARRAY
+            memory_item = ArrayMemory.new(
+              name: memory_name,
+              memory_class: var_node.object_class,
+              location: var_node.memory_location,
+              index: index
+            )
           when Memory::CLASS
             memory_item = ClassMemory.new(
               name: memory_name,

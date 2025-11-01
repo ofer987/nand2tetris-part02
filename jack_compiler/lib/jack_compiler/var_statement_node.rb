@@ -19,8 +19,12 @@ module JackCompiler
 
       @memory_index = options[:memory_index]
 
-      if find_child_nodes(Statement::KEYWORD).size > 1
+      keywords = find_child_nodes(Statement::KEYWORD)
+      identifiers = find_child_nodes(Statement::IDENTIFIER)
+      if keywords.size > 1
         initialize_primitive_variable
+      elsif identifiers.first.text == Statement::ARRAY_CLASS
+        initialize_array_variable
       else
         initialize_class_variable
       end
@@ -33,7 +37,7 @@ module JackCompiler
     private
 
     def initialize_primitive_variable
-      @memory_type = 'primitive'
+      @memory_type = Memory::PRIMITIVE
 
       @object_class = find_child_nodes(Statement::KEYWORD)[1].text.strip
       @object_names = find_child_nodes(Statement::IDENTIFIER)
@@ -41,8 +45,17 @@ module JackCompiler
         .map(&:strip)
     end
 
+    def initialize_array_variable
+      @memory_type = Memory::ARRAY
+
+      @object_class = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
+      @object_names = find_child_nodes(Statement::IDENTIFIER)[1..]
+        .map(&:text)
+        .map(&:strip)
+    end
+
     def initialize_class_variable
-      @memory_type = 'class'
+      @memory_type = Memory::CLASS
 
       @object_class = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
       @object_names = find_child_nodes(Statement::IDENTIFIER)[1..]

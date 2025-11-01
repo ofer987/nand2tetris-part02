@@ -62,6 +62,7 @@ require_relative 'jack_compiler/if_node'
 require_relative 'jack_compiler/memory'
 require_relative 'jack_compiler/primitive_memory'
 require_relative 'jack_compiler/class_memory'
+require_relative 'jack_compiler/array_memory'
 
 # NOTE: An **ExpressionListNode** is _not_ an **ExpressionNode**!
 require_relative 'jack_compiler/expression_list_node'
