@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'spec_helper'
 require_relative '../lib/jack_compiler'
 
 RSpec.describe JackCompiler::PostfixCalculator do
@@ -21,6 +22,11 @@ RSpec.describe JackCompiler::PostfixCalculator do
 
     it 'calculates expressions', :aggregate_failres do
       expect(subject.new(expression: '3 4 5 / 6 7 + * + 8 -').calculate).to eq(-5)
+      expect(subject.new(expression: '8 16 |').calculate).to eq(24)
+    end
+
+    it 'fails with unknown operator', :aggregate_failres do
+      expect { subject.new(expression: '8 16 &').calculate }.to raise_error 'Postfix expression 8 16 & is invalid: result has 2 values instead of one (1)'
     end
 
     context 'with variables' do
