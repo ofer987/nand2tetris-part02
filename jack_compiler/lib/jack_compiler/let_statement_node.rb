@@ -22,6 +22,7 @@ module JackCompiler
         @object_name = @object_name.match(RegularExpressions::ARRAY_EXPRESSION)[2]
       end
 
+      self.objects = options
       @memory = options[:local_memory][@object_name]
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
@@ -36,14 +37,26 @@ module JackCompiler
 
     private
 
+    def objects=(options)
+      @objects = {}
+
+      options[:class_memory].each do |name, memory|
+        @objects[name] = memory
+      end
+
+      options[:local_memory].each do |name, memory|
+        @objects[name] = memory
+      end
+    end
+
     def expression_node=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
       @expression_node = xml_nodes
-        .map { |node| Utils::XML.convert_to_jack_node(node, memory:) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, memory:, objects:) }
         .first
     end
 
-    attr_reader :memory
+    attr_reader :memory, :objects
   end
 end

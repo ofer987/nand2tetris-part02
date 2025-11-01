@@ -14,6 +14,7 @@ module JackCompiler
 
       @index = index
       @location = location
+      @value = 0
     end
 
     def emit_vm_code

@@ -27,7 +27,7 @@ module JackCompiler
       memory.value = value
     end
 
-    def emit_vm_code
+    def emit_vm_code(_objects)
       result = []
       characters.each do |character|
         result << <<~VM_CODE
@@ -41,6 +41,8 @@ module JackCompiler
       result
         .join("\n")
     end
+
+    def calculate(objects); end
 
     private
 

@@ -26,20 +26,19 @@ module JackCompiler
       @xml_node = xml_node
       @memory = memory
 
-      self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::STRING_CONSTANT}"
-      memory.value = value
+      self.value = "> #{Statement::EVALUATION_STATEMENT}"
     end
 
-    def emit_vm_code
-      result = []
-      characters.each do |character|
-        result << <<~VM_CODE
-          call String.appendChar #{memory.index}
-          push constant #{character.ord}
-        VM_CODE
-      end
+    def calculate(objects)
+      calculator = PostfixCalculator.new(expression: value)
 
-      result << "push constant #{value}"
+      memory.value = calculator.calculate(memory: objects)
+    end
+
+    def emit_vm_code(objects)
+      calculator = PostfixCalculator.new(expression: value)
+
+      result = calculator.emit_vm_code(memory: objects)
 
       result
         .join("\n")
@@ -52,10 +51,13 @@ module JackCompiler
     end
 
     def value=(css_selector)
-      @value = Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector)
+
+      infix_value = Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector)
         .map(&:text)
         .map(&:strip)
         .first
+
+      @value = Utils::Infix.to_postfix(infix_value)
     end
 
     attr_reader :xml_node, :memory

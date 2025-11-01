@@ -58,6 +58,10 @@ module JackCompiler
     # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
 
+    def emit_vm_code(memory: {})
+      []
+    end
+
     private
 
     def evaluate(first_value, second_value, operator)
@@ -70,6 +74,8 @@ module JackCompiler
         first_value * second_value
       when '/'
         first_value / second_value
+      when '|'
+        first_value | second_value
       else
         raise "operator '#{operator}' is invalid"
       end
