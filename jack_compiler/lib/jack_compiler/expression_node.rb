@@ -17,7 +17,6 @@ module JackCompiler
       @memory = options[:memory]
 
       init_execution_expression_node
-
     end
 
     def calculate(objects)

@@ -34,10 +34,12 @@ module JackCompiler
 
       characters.each do |character|
         result << <<~VM_CODE
-          call String.appendChar #{memory.index}
           push constant #{character.ord}
+          call String.appendChar #{memory.index}
         VM_CODE
       end
+
+      result << "pop #{memory.location} #{memory.index}"
 
       result
         .join("\n")
