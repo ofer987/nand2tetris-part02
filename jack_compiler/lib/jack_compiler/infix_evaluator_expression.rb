@@ -38,6 +38,7 @@ module JackCompiler
       calculator = PostfixCalculator.new(expression: value)
 
       result = calculator.emit_vm_code(memory: objects)
+      result << "pop #{memory.location} #{memory.index}"
 
       result
         .join("\n")

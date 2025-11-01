@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
+  # rubocop:disable Metrics/ClassLength
   class PostfixCalculator
     def initialize(infix_expression: '', expression: '')
       @infix_expression = infix_expression unless infix_expression.blank?
@@ -58,9 +59,56 @@ module JackCompiler
     # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
 
+    # rubocop:disable Metrics/PerceivedComplexity
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize
     def emit_vm_code(memory: {})
-      []
+      values_stack = []
+      operator = nil
+      result = []
+
+      stack.map(&:strip).each do |item|
+        if item.match? Utils::Infix::NUMERICAL_REGEX
+          values_stack << item.to_i
+          result << "push constant #{item.to_i}"
+        elsif item.match? Utils::Infix::OPERAND_REGEX
+          variable_name = item
+
+          raise "Variable '#{variable_name}' has not been declared" unless memory.key? variable_name
+
+          variable = memory[variable_name]
+
+          values_stack << variable.value
+          result << "push #{variable.location} #{variable.index}"
+        elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
+          raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
+
+          operator = item
+
+          raise 'Stack contains less than two (2) values' if values_stack.size < 2
+
+          second_value = values_stack.pop
+          first_value = values_stack.pop
+
+          values_stack << evaluate(first_value, second_value, operator)
+          vm_code_operators(operator).each do |vm_code|
+            result << vm_code
+          end
+
+          # Reset the operator
+          operator = nil
+        end
+      end
+
+      if values_stack.size != 1
+        raise "Postfix expression #{expression} is invalid: result has #{values_stack.size} values instead of one (1)"
+      end
+
+      result
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     private
 
@@ -81,10 +129,28 @@ module JackCompiler
       end
     end
 
+    def vm_code_operators(operator)
+      case operator
+      when '+'
+        ['add']
+      when '-'
+        %w[neg add]
+      when '*'
+        ['call Math.multiply 2']
+      when '/'
+        ['call Math.divide 2']
+      when '|'
+        ['or']
+      else
+        raise "operator '#{operator}' is invalid"
+      end
+    end
+
     def stack
       @stack ||= expression.split(' ')
     end
 
     attr_reader :infix_expression
   end
+  # rubocop:enable Metrics/ClassLength
 end
