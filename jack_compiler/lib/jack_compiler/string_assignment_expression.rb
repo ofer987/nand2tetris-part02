@@ -29,14 +29,15 @@ module JackCompiler
 
     def emit_vm_code(_objects)
       result = []
+      result << "push constant #{characters.size}"
+      result << "call String.new #{memory.index - 1}"
+
       characters.each do |character|
         result << <<~VM_CODE
           call String.appendChar #{memory.index}
           push constant #{character.ord}
         VM_CODE
       end
-
-      result << "push constant #{value}"
 
       result
         .join("\n")

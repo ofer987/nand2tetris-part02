@@ -4,7 +4,6 @@ module JackCompiler
   class InfixEvaluatorAssignmentExpression
     class << self
       def execution_node?(xml_node, memory:)
-        binding.pry
         return false if memory.type != Memory::PRIMITIVE
 
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
@@ -51,7 +50,6 @@ module JackCompiler
     end
 
     def value=(css_selector)
-
       infix_value = Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector)
         .map(&:text)
         .map(&:strip)

@@ -5,7 +5,7 @@ module JackCompiler
     REGEX = ''
     NODE_NAME = Statement::LET_STATEMENT
 
-    attr_reader :class_name, :object_name, :expression_node
+    attr_reader :class_name, :object_name, :expression_node, :emit_vm_code
 
     def initialize(xml_node, options)
       super(xml_node, options)
@@ -26,13 +26,9 @@ module JackCompiler
       @memory = options[:local_memory][@object_name]
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT}"
-    end
 
-    def emit_vm_code
-      <<~VM_CODE
-        #{expression_node.emit_vm_code}
-        pop local #{memory.index}
-      VM_CODE
+      expression_node.calculate(objects)
+      self.emit_vm_code = expression_node.emit_vm_code(objects)
     end
 
     private
@@ -58,5 +54,6 @@ module JackCompiler
     end
 
     attr_reader :memory, :objects
+    attr_writer :emit_vm_code
   end
 end
