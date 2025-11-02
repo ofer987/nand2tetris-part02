@@ -4,7 +4,7 @@ module JackCompiler
   class ExecutionExpression
     class << self
       def execution_node?(_xml_node, memory:)
-        memory.type == Memory::CLASS
+        memory.memory_type == Memory::CLASS
       end
     end
 
@@ -32,13 +32,15 @@ module JackCompiler
       # memory.value = ''
     end
 
-    def emit_vm_code
+    def emit_vm_code(_objects)
       return '' if expression_list_node.blank?
 
       <<~VM_CODE
         call #{object}.#{method} #{expression_list_node.size}
       VM_CODE
     end
+
+    def calculate(objects); end
 
     private
 

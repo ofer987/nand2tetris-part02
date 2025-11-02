@@ -10,6 +10,12 @@ module JackCompiler
       symbol_node = document.create_element(SYMBOL, result[1])
       parent_node << symbol_node
 
+      evaluation_node = document.create_element(EVALUATION_STATEMENT, result[1])
+      evaluation_type_node = document.create_element(EVALUATION_TYPE_STATEMENT, INFIX_EXPRESSION)
+
+      parent_node << evaluation_node
+      parent_node << evaluation_type_node
+
       expression_node = document.create_element(EXPRESSION_STATEMENT)
       parent_node << expression_node
 

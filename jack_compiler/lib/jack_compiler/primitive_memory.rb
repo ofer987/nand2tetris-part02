@@ -2,22 +2,37 @@
 
 module JackCompiler
   class PrimitiveMemory < Memory
-    attr_reader :name, :memory_class, :index, :location
+    attr_reader :name, :index, :type, :kind
     attr_accessor :value
 
-    def type
+    # TODO: rename to kind
+    # Where values are
+    # this for class field
+    # static (for class field)
+    # local for function/method
+    # argument for function/method
+    def memory_type
       PRIMITIVE
     end
 
-    def initialize(name:, memory_class:, index:, location:)
-      super(name:, memory_class:)
+    # values are
+    # String
+    # Array
+    # int
+    # and other classes
+    # def type
+    # end
 
-      @index = index
-      @location = location
+    def initialize(name:, type:, index:, kind:)
+      super(name:, type:, index:, kind:)
+
+      @value = 0
     end
 
-    def emit_vm_code
-      ''
+    def assignment_vm_code(_options = {})
+      <<~VM_CODE
+        pop #{kind} #{index}
+      VM_CODE
     end
   end
 end

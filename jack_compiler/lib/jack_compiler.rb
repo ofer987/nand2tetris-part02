@@ -54,6 +54,7 @@ require_relative 'jack_compiler/null_assignment_expression'
 require_relative 'jack_compiler/execution_expression'
 require_relative 'jack_compiler/string_assignment_expression'
 require_relative 'jack_compiler/integer_assignment_expression'
+require_relative 'jack_compiler/infix_evaluator_expression'
 require_relative 'jack_compiler/expression_node'
 
 require_relative 'jack_compiler/if_node'
@@ -61,6 +62,7 @@ require_relative 'jack_compiler/if_node'
 require_relative 'jack_compiler/memory'
 require_relative 'jack_compiler/primitive_memory'
 require_relative 'jack_compiler/class_memory'
+require_relative 'jack_compiler/array_memory'
 
 # NOTE: An **ExpressionListNode** is _not_ an **ExpressionNode**!
 require_relative 'jack_compiler/expression_list_node'

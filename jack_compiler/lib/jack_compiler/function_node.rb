@@ -58,18 +58,25 @@ module JackCompiler
 
         var_node.object_names.each do |memory_name|
           case var_node.memory_type
+          when Memory::ARRAY
+            memory_item = ArrayMemory.new(
+              name: memory_name,
+              kind: var_node.object_kind,
+              type: var_node.object_type,
+              index: index
+            )
           when Memory::CLASS
             memory_item = ClassMemory.new(
               name: memory_name,
-              memory_class: var_node.object_class,
-              location: var_node.memory_location,
+              kind: var_node.object_kind,
+              type: var_node.object_type,
               index: index
             )
           when Memory::PRIMITIVE
             memory_item = PrimitiveMemory.new(
               name: memory_name,
-              memory_class: var_node.object_class,
-              location: var_node.memory_location,
+              kind: var_node.object_kind,
+              type: var_node.object_type,
               index: index
             )
           else
@@ -101,7 +108,7 @@ module JackCompiler
           .map { |node| [node.object_name, node] }
           .to_h,
         object_classes: local_memory_nodes
-          .map { |node| [node.name, node.memory_class] }
+          .map { |node| [node.name, node.type] }
           .to_h
       }
 

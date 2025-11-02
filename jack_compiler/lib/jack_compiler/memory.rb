@@ -2,22 +2,30 @@
 
 module JackCompiler
   class Memory
+    ARRAY = 'array'
     CLASS = 'class'
     PRIMITIVE = 'primitive'
+
+    NULL_VALUE = 0
+    EMPTY_CLASS = 'classless'
+
+    module Kind
+      LOCAL = 'local'
+    end
 
     def name
       raise NotImplementedError
     end
 
-    def memory_class
+    def memory_type
       raise NotImplementedError
     end
 
     def type
-      NotImplementedError
+      raise NotImplementedError
     end
 
-    def location
+    def kind
       NotImplementedError
     end
 
@@ -29,12 +37,14 @@ module JackCompiler
       raise NotImplementedError
     end
 
-    def initialize(name:, memory_class:)
+    def initialize(name:, type:, index:, kind:)
       @name = name
-      @memory_class = memory_class
+      @type = type
+      @index = index
+      @kind = kind
     end
 
-    def emit_vm_code
+    def assignment_vm_code(_options = {})
       raise NotImplementedError
     end
   end

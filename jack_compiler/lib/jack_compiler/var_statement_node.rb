@@ -4,7 +4,7 @@ module JackCompiler
   class VarStatementNode < Node
     NODE_NAME = Statement::VAR_DESCRIPTION
 
-    attr_reader :memory_index, :object_class, :object_names, :memory_type
+    attr_reader :memory_index, :object_kind, :object_names, :memory_type, :object_type
 
     def size
       @size ||= @object_names.size
@@ -19,8 +19,12 @@ module JackCompiler
 
       @memory_index = options[:memory_index]
 
-      if find_child_nodes(Statement::KEYWORD).size > 1
+      keywords = find_child_nodes(Statement::KEYWORD)
+      identifiers = find_child_nodes(Statement::IDENTIFIER)
+      if keywords.size > 1
         initialize_primitive_variable
+      elsif identifiers.first.text == Statement::ARRAY_CLASS
+        initialize_array_variable
       else
         initialize_class_variable
       end
@@ -33,18 +37,30 @@ module JackCompiler
     private
 
     def initialize_primitive_variable
-      @memory_type = 'primitive'
+      @memory_type = Memory::PRIMITIVE
 
-      @object_class = find_child_nodes(Statement::KEYWORD)[1].text.strip
+      @object_kind = Memory::Kind::LOCAL
+      @object_type = find_child_nodes(Statement::KEYWORD)[1].text.strip
       @object_names = find_child_nodes(Statement::IDENTIFIER)
         .map(&:text)
         .map(&:strip)
     end
 
-    def initialize_class_variable
-      @memory_type = 'class'
+    def initialize_array_variable
+      @memory_type = Memory::ARRAY
 
-      @object_class = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
+      @object_kind = Memory::Kind::LOCAL
+      @object_type = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
+      @object_names = find_child_nodes(Statement::IDENTIFIER)[1..]
+        .map(&:text)
+        .map(&:strip)
+    end
+
+    def initialize_class_variable
+      @memory_type = Memory::CLASS
+
+      @object_kind = Memory::Kind::LOCAL
+      @object_type = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
       @object_names = find_child_nodes(Statement::IDENTIFIER)[1..]
         .map(&:text)
         .map(&:strip)

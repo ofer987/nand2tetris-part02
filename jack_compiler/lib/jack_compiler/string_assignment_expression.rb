@@ -4,12 +4,16 @@ module JackCompiler
   class StringAssignmentExpression
     class << self
       def execution_node?(xml_node, memory:)
-        return false if memory.type != Memory::CLASS
+        return false if memory.memory_type != Memory::CLASS
 
-        Utils::XML.find_child_nodes_with_css_selector(
+        evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
-          "> #{Statement::TERM_STATEMENT} > #{Statement::STRING_CONSTANT}"
-        ).any?
+          "> #{Statement::EVALUATION_TYPE_STATEMENT}"
+        ).first
+
+        return false if evaluation_node.blank?
+
+        evaluation_node.text == Statement::STRING_CONSTANT
       end
     end
 
@@ -23,20 +27,23 @@ module JackCompiler
       memory.value = value
     end
 
-    def emit_vm_code
+    def emit_vm_code(_objects)
       result = []
+      result << "push constant #{characters.size}"
+      result << "call String.new #{memory.index - 1}"
+
       characters.each do |character|
         result << <<~VM_CODE
-          call String.appendChar #{memory.index}
           push constant #{character.ord}
+          call String.appendChar #{memory.index}
         VM_CODE
       end
-
-      result << "push constant #{value}"
 
       result
         .join("\n")
     end
+
+    def calculate(objects); end
 
     private
 
