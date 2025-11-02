@@ -61,16 +61,32 @@ module JackCompiler
 
     # rubocop:disable Metrics/PerceivedComplexity
     # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
     def emit_vm_code(memory: {})
       values_stack = []
       operator = nil
       result = []
 
+      # rubocop:disable Metrics/BlockLength
       stack.map(&:strip).each do |item|
         if item.match? Utils::Infix::NUMERICAL_REGEX
-          values_stack << item.to_i
+          values_stack << 1
           result << "push constant #{item.to_i}"
+        elsif item.match? Utils::Infix::ARRAY_OPERAND_REGEX
+          matches = item.match(Utils::Infix::ARRAY_OPERAND_REGEX)
+          array_name = matches[2]
+          array_index = matches[3]
+          values_stack << 1
+
+          variable = memory[array_name]
+
+          result << "push constant #{array_index}"
+          result << "push #{variable.location} #{variable.index}"
+          result << 'add'
+
+          result << 'pop pointer 1'
+          result << 'push that 0'
         elsif item.match? Utils::Infix::OPERAND_REGEX
           variable_name = item
 
@@ -78,7 +94,7 @@ module JackCompiler
 
           variable = memory[variable_name]
 
-          values_stack << variable.value
+          values_stack << 1
           result << "push #{variable.location} #{variable.index}"
         elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
           raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
@@ -87,10 +103,10 @@ module JackCompiler
 
           raise 'Stack contains less than two (2) values' if values_stack.size < 2
 
-          second_value = values_stack.pop
-          first_value = values_stack.pop
+          values_stack.pop
+          values_stack.pop
 
-          values_stack << evaluate(first_value, second_value, operator)
+          values_stack << 1
           vm_code_operators(operator).each do |vm_code|
             result << vm_code
           end
@@ -99,6 +115,7 @@ module JackCompiler
           operator = nil
         end
       end
+      # rubocop:enable Metrics/BlockLength
 
       if values_stack.size != 1
         raise "Postfix expression #{expression} is invalid: result has #{values_stack.size} values instead of one (1)"
@@ -107,6 +124,7 @@ module JackCompiler
       result
     end
     # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
 

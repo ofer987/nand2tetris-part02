@@ -2,8 +2,11 @@
 
 module JackCompiler
   class Memory
+    ARRAY = 'array'
     CLASS = 'class'
     PRIMITIVE = 'primitive'
+
+    EMPTY_CLASS = 'classless'
 
     def name
       raise NotImplementedError
@@ -34,7 +37,7 @@ module JackCompiler
       @memory_class = memory_class
     end
 
-    def emit_vm_code
+    def assignment_vm_code(_options = {})
       raise NotImplementedError
     end
   end

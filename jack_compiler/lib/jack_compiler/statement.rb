@@ -40,7 +40,9 @@ module JackCompiler
     VARIABLE_CONSTANT = 'identifier'
     NULL_CONSTANT = 'keyword'
     INFIX_EXPRESSION = 'infix_expression'
+    ARRAY_CLASS = 'Array'
     ARRAY_VALUE = 'array'
+    EXECUTION_TYPE = 'execution'
 
     ELSE_STATEMENT = 'else'
     NULL_VALUE = 'null'

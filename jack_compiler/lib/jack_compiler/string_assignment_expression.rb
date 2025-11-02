@@ -39,8 +39,6 @@ module JackCompiler
         VM_CODE
       end
 
-      result << "pop #{memory.location} #{memory.index}"
-
       result
         .join("\n")
     end
