@@ -25,7 +25,7 @@ module JackCompiler
       parameter_list_node = document.create_element(PARAMETER_LIST)
       result_node << parameter_list_node
 
-      next_statements(parameter_list_node, result[4], next_argument_classes)
+      next_statements(parameter_list_node, result[4], next_parameter_classes)
 
       symbol_node = document.create_element(SYMBOL, CLOSE_PARENTHESIS)
       result_node << symbol_node
@@ -36,8 +36,8 @@ module JackCompiler
 
     private
 
-    def next_argument_classes
-      []
+    def next_parameter_classes
+      [ParametersStatement]
     end
 
     def next_classes

@@ -14,11 +14,12 @@ module JackCompiler
     def initialize(xml_node, options)
       super(xml_node, options)
 
-      @memory = options[:memory]
+      @variable = options[:variable]
 
       init_execution_expression_node
     end
 
+    # TODO: rename to memory_scope
     def calculate(objects)
       internal_expression_node.calculate(objects)
     end
@@ -31,12 +32,12 @@ module JackCompiler
 
     def init_execution_expression_node
       internal_expression_class = EXPRESSION_NODE_CLASSES
-        .select { |klazz| klazz.execution_node?(xml_node, memory:) }
+        .select { |klazz| klazz.execution_node?(xml_node, variable:) }
         .first
 
-      @internal_expression_node = internal_expression_class.new(xml_node, memory:)
+      @internal_expression_node = internal_expression_class.new(xml_node, variable:)
     end
 
-    attr_reader :internal_expression_node, :memory
+    attr_reader :internal_expression_node, :variable
   end
 end

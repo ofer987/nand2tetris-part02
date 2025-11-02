@@ -3,7 +3,7 @@
 module JackCompiler
   class InfixEvaluatorAssignmentExpression
     class << self
-      def execution_node?(xml_node, memory: {})
+      def execution_node?(xml_node, variable: {})
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
           "> #{Statement::EVALUATION_TYPE_STATEMENT}"
@@ -17,9 +17,9 @@ module JackCompiler
 
     attr_reader :value
 
-    def initialize(xml_node, memory:)
+    def initialize(xml_node, variable:)
       @xml_node = xml_node
-      @memory = memory
+      @variable = variable
 
       self.value = "> #{Statement::EVALUATION_STATEMENT}"
     end
@@ -27,7 +27,7 @@ module JackCompiler
     def calculate(objects)
       calculator = PostfixCalculator.new(expression: value)
 
-      memory.value = calculator.calculate(memory: objects)
+      variable.value = calculator.calculate(memory: objects)
     end
 
     def emit_vm_code(objects)
@@ -52,6 +52,6 @@ module JackCompiler
       @value = Utils::Infix.to_postfix(infix_value)
     end
 
-    attr_reader :xml_node, :memory
+    attr_reader :xml_node, :variable
   end
 end

@@ -3,8 +3,8 @@
 module JackCompiler
   class StringAssignmentExpression
     class << self
-      def execution_node?(xml_node, memory:)
-        return false if memory.memory_type != Memory::CLASS
+      def execution_node?(xml_node, variable:)
+        return false if variable.memory_type != Memory::CLASS
 
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
@@ -19,23 +19,23 @@ module JackCompiler
 
     attr_reader :value
 
-    def initialize(xml_node, memory:)
+    def initialize(xml_node, variable:)
       @xml_node = xml_node
-      @memory = memory
+      @variable = variable
 
       self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::STRING_CONSTANT}"
-      memory.value = value
+      variable.value = value
     end
 
     def emit_vm_code(_objects)
       result = []
       result << "push constant #{characters.size}"
-      result << "call String.new #{memory.index - 1}"
+      result << "call String.new #{variable.index - 1}"
 
       characters.each do |character|
         result << <<~VM_CODE
           push constant #{character.ord}
-          call String.appendChar #{memory.index}
+          call String.appendChar #{variable.index}
         VM_CODE
       end
 
@@ -58,6 +58,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node, :memory
+    attr_reader :xml_node, :variable
   end
 end
