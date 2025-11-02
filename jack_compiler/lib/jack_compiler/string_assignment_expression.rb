@@ -4,7 +4,7 @@ module JackCompiler
   class StringAssignmentExpression
     class << self
       def execution_node?(xml_node, memory:)
-        return false if memory.type != Memory::CLASS
+        return false if memory.memory_type != Memory::CLASS
 
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,

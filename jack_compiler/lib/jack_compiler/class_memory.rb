@@ -2,23 +2,22 @@
 
 module JackCompiler
   class ClassMemory < Memory
-    attr_reader :name, :memory_class, :index, :location
+    attr_reader :name, :index, :type, :kind
     attr_accessor :value
 
-    def type
+    def memory_type
       CLASS
     end
 
-    def initialize(name:, memory_class:, index:, location:)
-      super(name:, memory_class:)
+    def initialize(name:, type:, index:, kind:)
+      super(name:, type:, index:, kind:)
 
-      @index = index
-      @location = location
+      @value = Memory::NULL_VALUE
     end
 
     def assignment_vm_code(_options = {})
       <<~VM_CODE
-        pop #{location} #{index}
+        pop #{kind} #{index}
       VM_CODE
     end
   end
