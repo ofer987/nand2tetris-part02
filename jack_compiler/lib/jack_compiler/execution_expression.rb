@@ -4,7 +4,7 @@ module JackCompiler
   class ExecutionExpression
     class << self
       def execution_node?(_xml_node, memory:)
-        memory.type == Memory::CLASS
+        memory.memory_type == Memory::CLASS
       end
     end
 

@@ -2,30 +2,24 @@
 
 module JackCompiler
   class ArrayMemory < Memory
-    attr_reader :name, :index, :location
+    attr_reader :name, :index, :type, :kind
     attr_accessor :value
 
-    def type
+    def memory_type
       ARRAY
     end
 
-    def memory_class
-      EMPTY_CLASS
-    end
+    def initialize(name:, type:, index:, kind:)
+      super(name:, type:, index:, kind:)
 
-    def initialize(name:, memory_class:, index:, location:)
-      super(name:, memory_class:)
-
-      @index = index
-      @location = location
-      @value = 0
+      @value = Memory::NULL_VALUE
     end
 
     def assignment_vm_code(options = {})
       <<~VM_CODE
         pop temp 0
         push constant #{options[:offset]}
-        push #{location} #{index}
+        push #{kind} #{index}
         add
 
         pop pointer 1

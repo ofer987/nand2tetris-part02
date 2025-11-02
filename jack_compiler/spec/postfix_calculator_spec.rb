@@ -30,7 +30,7 @@ RSpec.describe JackCompiler::PostfixCalculator do
     end
 
     context 'with variables' do
-      let(:index) { JackCompiler::PrimitiveMemory.new(name: 'index', memory_class: 'integer', index: 0, location: 0) }
+      let(:index) { JackCompiler::PrimitiveMemory.new(name: 'index', type: 'int', index: 0, kind: JackCompiler::Memory::Kind::LOCAL) }
       let(:memory) { { 'index' => index } }
 
       before(:each) do
