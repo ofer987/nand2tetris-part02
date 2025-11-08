@@ -6,6 +6,7 @@ module JackCompiler
   class AssignmentExpressionStatement < ExpressionStatement
     REGEX = RegularExpressions::ASSIGNMENT_EXPRESSION_STATEMENT
 
+    # rubocop:disable Metrics/AbcSize
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
 
@@ -40,6 +41,7 @@ module JackCompiler
 
       lines.sub(REGEX, '')
     end
+    # rubocop:enable Metrics/AbcSize
 
     private
 

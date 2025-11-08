@@ -10,6 +10,7 @@ module JackCompiler
       @variable_size ||= memory_scope.local_size
     end
 
+    # rubocop:disable Metrics/PerceivedComplexity
     def initialize(xml_node, options = {})
       super(xml_node, options)
 
@@ -48,6 +49,7 @@ module JackCompiler
       self.statement_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}, #{Statement::RETURN_STATEMENT}"
       # rubocop:enable Layout/LineLength
     end
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def emit_vm_code
       <<~VM_CODE
