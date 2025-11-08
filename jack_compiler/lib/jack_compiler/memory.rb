@@ -11,6 +11,8 @@ module JackCompiler
 
     module Kind
       LOCAL = 'local'
+      STATIC = 'static'
+      ARGUMENT = 'argument'
     end
 
     def name

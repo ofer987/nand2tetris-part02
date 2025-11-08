@@ -19,11 +19,11 @@ module JackCompiler
       0
     end
 
-    def initialize(xml_node, memory:)
+    def initialize(xml_node, variable:)
       @xml_node = xml_node
-      @memory = memory
+      @variable = variable
 
-      memory.value = 0
+      variable.value = 0
     end
 
     def emit_vm_code(_objects)
@@ -36,6 +36,6 @@ module JackCompiler
 
     private
 
-    attr_reader :memory
+    attr_reader :variable
   end
 end

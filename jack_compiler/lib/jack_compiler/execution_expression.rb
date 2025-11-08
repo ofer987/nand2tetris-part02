@@ -3,16 +3,16 @@
 module JackCompiler
   class ExecutionExpression
     class << self
-      def execution_node?(_xml_node, memory:)
-        memory.memory_type == Memory::CLASS
+      def execution_node?(_xml_node, variable:)
+        variable.memory_type == Memory::CLASS
       end
     end
 
     attr_reader :object, :method, :symbol, :expression_list_node
 
-    def initialize(xml_node, memory:)
+    def initialize(xml_node, variable:)
       @xml_node = xml_node
-      @memory = memory
+      @variable = variable
 
       @object, @method = Utils::XML.find_child_nodes_with_css_selector(
         xml_node,
@@ -28,8 +28,7 @@ module JackCompiler
         .map(&:strip)
         .first
 
-      # TODO: store value in memory.value
-      # memory.value = ''
+      variable.value = Memory::NULL_VALUE
     end
 
     def emit_vm_code(_objects)
@@ -52,6 +51,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node, :memory
+    attr_reader :xml_node, :variable
   end
 end

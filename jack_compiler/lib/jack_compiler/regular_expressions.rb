@@ -2,9 +2,8 @@
 
 module JackCompiler
   class RegularExpressions
-    # PARAMETER_LIST = /\S+,\s*(\S+)
-    # IF = /(if)\s*(\(.+)/
-    # EXPRESSION = /\(\s*(\S+)\s*(\S+)\s*(\S+)/
+    PARAMETER_LIST = /^\s*,?\s*(\w+)\s+(\w+)/
+
     LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*([^;]+)(;)/
     ARRAY_EXPRESSION = /(([^\[]+)(\[)(\d+)(\]))/
     STRING_CONSTANT_ASSIGNMENT = /"(.*)"/

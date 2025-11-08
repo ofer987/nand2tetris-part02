@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class FunctionNode < Node
+  class FunctionNode < MemoryNode
     NODE_NAME = Statement::SUBROUTINE_DESCRIPTION
 
-    attr_reader :class_name, :function_type, :function_name, :return_type, :local_memory_nodes, :statement_nodes
+    attr_reader :class_name, :function_type, :function_name, :return_type, :statement_nodes
 
     def variable_size
-      @variable_size ||= local_memory_nodes.size
+      @variable_size ||= memory_scope.local_size
     end
 
     def initialize(xml_node, options = {})
@@ -28,12 +28,21 @@ module JackCompiler
         .map(&:text)
         .map(&:strip)
 
-      @parameters_node = find_child_nodes(Statement::PARAMETER_LIST).first
+      argument_memory_scope = init_new_memory_scope(outer_memory_scope)
+      nodes = memory_nodes("> #{Statement::PARAMETER_LIST} > #{Statement::TERM_STATEMENT}")
+      nodes.each do |node|
+        argument_memory_scope << node
+      end
+      # @argument_memory_scope.next_scope = outer_memory_scope
+
+      @memory_scope = init_new_memory_scope(argument_memory_scope)
+      nodes = memory_nodes("> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}")
+      nodes.each do |node|
+        @memory_scope << node
+      end
+
       @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY)
         .first
-
-      @class_variable_nodes = options[:class_variable_nodes]
-      self.local_memory_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}"
 
       # rubocop:disable Layout/LineLength
       self.statement_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}, #{Statement::RETURN_STATEMENT}"
@@ -48,48 +57,6 @@ module JackCompiler
 
     private
 
-    def local_memory_nodes=(css_selector)
-      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
-
-      @local_memory_nodes = []
-      index = 0
-      xml_nodes.each do |node|
-        var_node = Utils::XML.convert_to_jack_node(node)
-
-        var_node.object_names.each do |memory_name|
-          case var_node.memory_type
-          when Memory::ARRAY
-            memory_item = ArrayMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type,
-              index: index
-            )
-          when Memory::CLASS
-            memory_item = ClassMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type,
-              index: index
-            )
-          when Memory::PRIMITIVE
-            memory_item = PrimitiveMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type,
-              index: index
-            )
-          else
-            raise "Invalid memory type '#{var_node.memory_type}'"
-          end
-
-          @local_memory_nodes << memory_item
-
-          index += 1
-        end
-      end
-    end
-
     def emit_statements_code
       @statement_nodes
         .map(&:emit_vm_code)
@@ -99,21 +66,8 @@ module JackCompiler
     def statement_nodes=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
-      # TODO: combine memory together
-      options = {
-        local_memory: local_memory_nodes
-          .map { |node| [node.name, node] }
-          .to_h,
-        class_memory: class_variable_nodes
-          .map { |node| [node.object_name, node] }
-          .to_h,
-        object_classes: local_memory_nodes
-          .map { |node| [node.name, node.type] }
-          .to_h
-      }
-
       @statement_nodes = xml_nodes
-        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, memory_scope:) }
     end
 
     def return_node=(css_selector)
