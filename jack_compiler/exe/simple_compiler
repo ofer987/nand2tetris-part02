@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pry-byebug'
+
+require_relative '../lib/jack_compiler'
+
+path = ARGV[0].to_s
+
+ast = Nokogiri::XML(File.read(path))
+
+root = ast.document.root
+root_jack_node = JackCompiler::Utils::XML.convert_to_jack_node(root)
+
+puts root_jack_node.emit_vm_code
+  .split("\n")
+  .reject(&:blank?)
+  .map(&:strip)
+  .join("\n")

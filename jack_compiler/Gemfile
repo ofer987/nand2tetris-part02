@@ -9,4 +9,8 @@ gem 'activesupport', '~> 7.2.2'
 gem 'nokogiri', '~> 1.18.2'
 gem 'pry', '~> 0.15.2'
 gem 'rake', '~> 13.2'
+gem 'rspec', '~> 3.13'
 gem 'rubocop', '~> 1.71'
+gem 'securerandom', '~> 0.4.1'
+
+gem 'simplecov', require: false, group: :test

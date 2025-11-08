@@ -2,6 +2,7 @@
 
 module JackCompiler
   class ClassStatement < Statement
+    NODE_NAME = CLASS
     REGEX = RegularExpressions::CLASS
 
     def create_elements(parent_node, lines)

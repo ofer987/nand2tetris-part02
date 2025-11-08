@@ -2,6 +2,9 @@
 
 module JackCompiler
   class Statement
+    # Default NODE_NAME is empty
+    NODE_NAME = ''
+
     CLASS = 'class'
     KEYWORD = 'keyword'
     IDENTIFIER = 'identifier'
@@ -30,10 +33,19 @@ module JackCompiler
     STATEMENTS_STATEMENT = 'statements'
     COMMA = ','
 
+    EVALUATION_STATEMENT = 'evaluation'
+    EVALUATION_TYPE_STATEMENT = 'evaluation_type'
     STRING_CONSTANT = 'stringConstant'
     INTEGER_CONSTANT = 'integerConstant'
     VARIABLE_CONSTANT = 'identifier'
     NULL_CONSTANT = 'keyword'
+    INFIX_EXPRESSION = 'infix_expression'
+    ARRAY_CLASS = 'Array'
+    ARRAY_VALUE = 'array'
+    EXECUTION_TYPE = 'execution'
+
+    ELSE_STATEMENT = 'else'
+    NULL_VALUE = 'null'
 
     attr_reader :document
 
