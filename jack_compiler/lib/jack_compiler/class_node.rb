@@ -50,12 +50,14 @@ module JackCompiler
     #   end
     # end
 
+    # rubocop:disable Metrics/MethodLength
     def class_memory_scope=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
       class_memory_nodes = {}
       # TODO: index should be per kind
       index = 0
+      # rubocop:disable Metrics/BlockLength
       xml_nodes.each do |node|
         var_node = Utils::XML.convert_to_jack_node(node)
 
@@ -91,9 +93,11 @@ module JackCompiler
           index += 1
         end
       end
+      # rubocop:enable Metrics/BlockLength
 
       @class_memory_scope = MemoryScope.new(class_memory_nodes)
     end
+    # rubocop:enable Metrics/MethodLength
 
     def function_nodes=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
