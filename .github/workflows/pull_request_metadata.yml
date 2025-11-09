@@ -27,3 +27,14 @@ jobs:
         working-directory: ./jack_compiler
         run: |
           bundle exec rspec
+
+  trailing-whitespace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: ofer987/me-not-whitespace@v3
+        with:
+          BASE_REF: ${{ github.base_ref }}
