@@ -35,6 +35,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: ofer987/me-not-whitespace@v3
+      - uses: ofer987/me-not-whitespace@v4
         with:
           BASE_REF: ${{ github.base_ref }}
