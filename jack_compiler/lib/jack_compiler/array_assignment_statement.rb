@@ -25,7 +25,7 @@ module JackCompiler
       expression_node = document.create_element(EXPRESSION_STATEMENT)
       term_node << expression_node
 
-      next_statements(expression_node, result[4], next_expression_classes)
+      next_statements(expression_node, result[1], next_expression_classes)
 
       symbol_node = document.create_element(SYMBOL, result[5])
       term_node << symbol_node
@@ -34,7 +34,7 @@ module JackCompiler
     end
 
     def next_expression_classes
-      [IntegerAssignmentStatement]
+      [ArrrayExpressionStatement]
     end
   end
 end

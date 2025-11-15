@@ -50,10 +50,10 @@ module JackCompiler
         BinaryAssignmentStatement04,
         UnaryAssignmentStatement,
         AssignmentExpressionStatement,
+        ArrayAssignmentStatement,
         StringAssignmentStatement,
         NullAssignmentStatement,
         IntegerAssignmentStatement,
-        ArrayAssignmentStatement,
         VariableAssignmentStatement
       ]
     end

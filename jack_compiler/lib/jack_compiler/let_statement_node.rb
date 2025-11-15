@@ -18,14 +18,13 @@ module JackCompiler
         .first
         .text
         .strip
-      if @object_name.match? RegularExpressions::ARRAY_EXPRESSION
-        matches = @object_name.match(RegularExpressions::ARRAY_EXPRESSION)
-        @object_name = matches[2]
-        @offset = matches[4]
-      end
 
       @memory_scope = options[:memory_scope]
       @variable = memory_scope[@object_name]
+
+      if variable.type == Statement::ARRAY_CLASS
+        self.offset = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
+      end
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
     end
@@ -42,10 +41,16 @@ module JackCompiler
     def expression_node=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
 
-      @expression_node = xml_nodes[0..0]
+      @expression_node = xml_nodes[-1..]
         .map(&:parent)
         .map { |node| Utils::XML.convert_to_jack_node(node, variable:, memory_scope:) }
         .first
+    end
+
+    def offset=(css_selector)
+      @offset ||= find_child_nodes_with_css_selector(css_selector)
+        .first
+        .text
     end
 
     attr_reader :memory_scope, :offset
