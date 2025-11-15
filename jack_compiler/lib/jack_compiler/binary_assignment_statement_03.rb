@@ -17,7 +17,7 @@ module JackCompiler
       next_statements(parent_node, result[2], assignment_expression_classes)
 
       # operator
-      symbol_node = document.create_element(SYMBOL, result[2])
+      symbol_node = document.create_element(SYMBOL, result[3])
       parent_node << symbol_node
 
       # Second operand
