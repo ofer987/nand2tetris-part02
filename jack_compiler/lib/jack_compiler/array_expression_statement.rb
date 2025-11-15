@@ -7,18 +7,18 @@ module JackCompiler
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
 
-      identifier_node = document.create_element(IDENTIFIER, result[1])
+      identifier_node = document.create_element(IDENTIFIER, result[2])
       parent_node << identifier_node
 
-      symbol_node = document.create_element(SYMBOL, result[2])
+      symbol_node = document.create_element(SYMBOL, result[3])
       parent_node << symbol_node
 
       expression_node = document.create_element(EXPRESSION_STATEMENT)
       parent_node << expression_node
 
-      next_statements(expression_node, result[3], next_expression_classes)
+      next_statements(expression_node, result[4], next_expression_classes)
 
-      symbol_node = document.create_element(SYMBOL, result[4])
+      symbol_node = document.create_element(SYMBOL, result[5])
       parent_node << symbol_node
 
       lines.sub(REGEX, '')
@@ -27,7 +27,7 @@ module JackCompiler
     private
 
     def next_expression_classes
-      [IntegerAssignmentStatement]
+      [IntegerAssignmentStatement, VariableAssignmentStatement]
     end
   end
 end
