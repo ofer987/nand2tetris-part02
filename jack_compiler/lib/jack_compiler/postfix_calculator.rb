@@ -150,15 +150,15 @@ module JackCompiler
     def vm_code_operators(operator)
       case operator
       when '+'
-        ['add']
+        ['call Math.add 2']
       when '-'
-        %w[neg add]
+        ['call Math.sub 2']
       when '*'
         ['call Math.multiply 2']
       when '/'
         ['call Math.divide 2']
       when '|'
-        ['or']
+        ['call Math.or 2']
       else
         raise "operator '#{operator}' is invalid"
       end
