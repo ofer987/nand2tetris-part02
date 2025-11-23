@@ -23,34 +23,35 @@ RSpec.describe JackCompiler::Utils::Infix do
   subject { described_class }
 
   include_examples '.to_postfix', 'i | j', 'i j |'
-  include_examples '.to_postfix', 'i * (-j)', 'i 0 j - *'
-  include_examples '.to_postfix', '(3 + 4) * - 1', '3 4 + 0 1 - *'
-  include_examples '.to_postfix', '- 1 + (3) * 4', '0 1 - 3 4 * +'
-  include_examples '.to_postfix', '- 1 + (i) * 4', '0 1 - i 4 * +'
-  include_examples '.to_postfix', '- index + (i) * j', '0 index - i j * +'
-  include_examples '.to_postfix', '- 1 + (3 + 4)', '0 1 - 3 4 + +'
-  include_examples '.to_postfix', '1 - ( - 1) + 3 + 4', '1 0 1 - - 3 + 4 +'
-  include_examples '.to_postfix', '(3 + 4) - 1', '3 4 + 1 -'
-  include_examples '.to_postfix', '- (3 + 4)', '0 3 4 + -'
+  include_examples '.to_postfix', 'i * (~j)', 'i 0 j ~ *'
+  include_examples '.to_postfix', '(3 + 4) * ~ 1', '3 4 + 0 1 ~ *'
+  include_examples '.to_postfix', '~ 1 + (3) * 4', '0 1 ~ 3 4 * +'
+  include_examples '.to_postfix', '~ 1 + (i) * 4', '0 1 ~ i 4 * +'
+  include_examples '.to_postfix', '~ index + (i) * j', '0 index ~ i j * +'
+  include_examples '.to_postfix', '~ 1 + (3 + 4)', '0 1 ~ 3 4 + +'
+  include_examples '.to_postfix', '1 ~ ( ~ 1) + 3 + 4', '1 0 1 ~ ~ 3 + 4 +'
+  include_examples '.to_postfix', '(3 + 4) ~ 1', '3 4 + 1 ~'
+  include_examples '.to_postfix', '~ (3 + 4)', '0 3 4 + ~'
   include_examples '.to_postfix', '(3 + 4)', '3 4 +'
   include_examples '.to_postfix', '3 + 4', '3 4 +'
   include_examples '.to_postfix', '3+ 4', '3 4 +'
   include_examples '.to_postfix', '3+4', '3 4 +'
   include_examples '.to_postfix', '(3+4)', '3 4 +'
-  include_examples '.to_postfix', '3+4 - 1', '3 4 + 1 -'
-  include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7) - 8', '3 4 5 / 6 7 + * + 8 -'
+  include_examples '.to_postfix', '3+4 ~ 1', '3 4 + 1 ~'
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7) ~ 8', '3 4 5 / 6 7 + * + 8 ~'
   # infix equals 7
-  # The postfix 3 4 5 / 6 7 8 + - + *
+  # The postfix 3 4 5 / 6 7 8 + ~ + *
   # equals
-  include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7 - 8)', '3 4 5 / 6 7 + 8 - * +'
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7 ~ 8)', '3 4 5 / 6 7 + 8 ~ * +'
   # infix equals 52.6
   include_examples '.to_postfix', '3 + 4 / 5 * (6 + 7 * 8)', '3 4 5 / 6 7 8 * + * +'
   include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8)', '3 4 5 / 6 7 * 8 + * +'
   include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8)', '3 4 5 / 6 7 * 8 + * +'
+  include_examples '.to_postfix', '~1', '0 1 ~'
   include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8) * 9 + 10', '3 4 5 / 6 7 * 8 + * 9 * + 10 +'
-  include_examples '.to_postfix', '3 - 4 / 5 * (6 * 7 + 8) * 9 + 10', '3 4 5 / 6 7 * 8 + * 9 * - 10 +'
-  include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8) * 9 - 10', '3 4 5 / 6 7 * 8 + * 9 * + 10 -'
-  include_examples '.to_postfix fails', '3 + 4 - 1', '3 4 + 1 - /'
+  include_examples '.to_postfix', '3 ~ 4 / 5 * (6 * 7 + 8) * 9 + 10', '3 4 5 / 6 7 * 8 + * 9 * ~ 10 +'
+  include_examples '.to_postfix', '3 + 4 / 5 * (6 * 7 + 8) * 9 ~ 10', '3 4 5 / 6 7 * 8 + * 9 * + 10 ~'
+  include_examples '.to_postfix fails', '3 + 4 ~ 1', '3 4 + 1 ~ /'
 
   describe 'to_postfix' do
     it 'raises error', :aggregate_failres do
