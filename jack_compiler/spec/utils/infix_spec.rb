@@ -59,7 +59,7 @@ RSpec.describe JackCompiler::Utils::Infix do
       expect { subject.to_postfix '3 + 4 / 5 * (6 * 7 + 8 +' }.to raise_error StandardError
       expect { subject.to_postfix '3 + 4 / 5 * (6 * 7 + 8) +' }.to raise_error StandardError
       expect { subject.to_postfix '3 + 4 / 5 * (6 * 7 + 8 +) +' }.to raise_error StandardError
-      expect { subject.to_postfix '6 & 8' }.to raise_error "Failed to traverse '6 & 8'"
+      expect { subject.to_postfix '6 - 8' }.to raise_error "Failed to traverse '6 - 8'"
     end
   end
 end

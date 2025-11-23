@@ -4,7 +4,7 @@ module JackCompiler
   module Utils
     # rubocop:disable Metrics/ClassLength
     class Infix
-      OPERATORS_LIST_REGEX = %r{[|*/+~]}
+      OPERATORS_LIST_REGEX = %r{[|*/+~&]}
 
       MONOMIAL_REGEX = /^\s*([+~])\s*(\w+)\s*/
       MONOMIAL_REGEX_OPEN_ROUND_BRACKET = /^\s*([+~])\s*(\()\s*/
@@ -25,6 +25,7 @@ module JackCompiler
       MULTIPLY = '*'
       DIVIDE = '/'
       BITWISE_OR = '|'
+      BITWISE_AND = '&'
 
       OPERATORS = [PLUS, MINUS, MULTIPLY, DIVIDE, BITWISE_OR].freeze
 
@@ -33,7 +34,8 @@ module JackCompiler
         MINUS => 0,
         MULTIPLY => 1,
         DIVIDE => 1,
-        BITWISE_OR => 1
+        BITWISE_OR => 1,
+        BITWISE_AND => 1
       }.freeze
 
       REGEXES = {
