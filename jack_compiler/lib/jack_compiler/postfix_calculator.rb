@@ -134,7 +134,7 @@ module JackCompiler
       case operator
       when '+'
         first_value + second_value
-      when '-'
+      when '~'
         first_value - second_value
       when '*'
         first_value * second_value
@@ -151,7 +151,7 @@ module JackCompiler
       case operator
       when '+'
         ['add']
-      when '-'
+      when '~'
         %w[neg add]
       when '*'
         ['call Math.multiply 2']
