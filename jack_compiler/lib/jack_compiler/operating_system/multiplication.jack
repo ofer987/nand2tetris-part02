@@ -36,6 +36,34 @@ class Math {
     return x + y;
   }
 
+  function boolean is_negative(int x) {
+    var int value_of_power_of_two;
+    var int result;
+
+    let value_of_power_of_two = power_of_two(15);
+
+    let result = bitwise_and(x, value_of_power_of_two)
+
+    if (result > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function int absolute_value(int x, int y) {
+    if (is_negative(x)) {
+      return ~x;
+    }
+
+    return x;
+  }
+
+  function boolean result_is_positive(int x, int y) {
+    // XOR: Exclusive OR operation
+    return (is_negative(x) & is_negative(y)) | (is_negative(~x) & is_negative(~y))
+  }
+
   function boolean is_true(int x, int index) {
     if (index > 15 | index < 0) {
       return false;
