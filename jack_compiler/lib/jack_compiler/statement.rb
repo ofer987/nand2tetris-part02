@@ -35,6 +35,7 @@ module JackCompiler
 
     EVALUATION_STATEMENT = 'evaluation'
     EVALUATION_TYPE_STATEMENT = 'evaluation_type'
+    BOOLEAN_CONSTANT = 'booleanConstant'
     STRING_CONSTANT = 'stringConstant'
     INTEGER_CONSTANT = 'integerConstant'
     VARIABLE_CONSTANT = 'identifier'

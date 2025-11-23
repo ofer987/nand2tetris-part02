@@ -22,11 +22,7 @@ module JackCompiler
       expression_node = document.create_element(EXPRESSION_STATEMENT)
       result_node << expression_node
 
-      term_node = document.create_element(TERM_STATEMENT)
-      expression_node << term_node
-
-      keyword_node = document.create_element(KEYWORD, result[3])
-      term_node << keyword_node
+      next_statements(expression_node, result[3], next_expression_classes)
 
       symbol_node = document.create_element(SYMBOL, result[4])
       result_node << symbol_node
@@ -44,6 +40,17 @@ module JackCompiler
     # rubocop:enable Metrics/AbcSize
 
     protected
+
+    def next_expression_classes
+      [
+        BooleanAssignmentStatement,
+        ArrayAssignmentStatement,
+        StringAssignmentStatement,
+        NullAssignmentStatement,
+        IntegerAssignmentStatement,
+        InfixExpressionStatement
+      ]
+    end
 
     def next_classes
       [VariableStatement, StatementsStatement]
