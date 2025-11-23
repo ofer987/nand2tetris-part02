@@ -36,9 +36,6 @@ class Math {
     return x + y;
   }
 
-  function int negation(int x) {
-  }
-
   function boolean is_negative(int x) {
     var int value_of_power_of_two;
     var int result;
@@ -63,7 +60,8 @@ class Math {
   }
 
   function boolean result_is_positive(int x, int y) {
-    return (is_negative(x) & is_negative(y)) | (~is_negative(x) & ~is_negative(y))
+    // XOR: Exclusive OR operation
+    return (is_negative(x) & is_negative(y)) | (is_negative(~x) & is_negative(~y))
   }
 
   function boolean is_true(int x, int index) {
