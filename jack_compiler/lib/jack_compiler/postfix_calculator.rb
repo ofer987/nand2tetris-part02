@@ -140,6 +140,8 @@ module JackCompiler
         first_value * second_value
       when '/'
         first_value / second_value
+      when '&'
+        first_value & second_value
       when '|'
         first_value | second_value
       else
@@ -157,6 +159,8 @@ module JackCompiler
         ['call Math.multiply 2']
       when '/'
         ['call Math.divide 2']
+      when '&'
+        ['and']
       when '|'
         ['or']
       else
