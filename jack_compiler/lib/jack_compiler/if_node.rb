@@ -9,7 +9,7 @@ module JackCompiler
 
       if_statement, else_statement = find_child_nodes_with_css_selector("> #{Statement::STATEMENTS_STATEMENT}")[0..1]
       # TODO: enable
-      # self.condition = " > #{Statement::EXPRESSION_STATEMENT}"
+      self.condition = " > #{Statement::EXPRESSION_STATEMENT}"
 
       # rubocop:disable Layout/LineLength
       @if_statements = get_conditional_statements(if_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}")
@@ -36,8 +36,10 @@ module JackCompiler
     private
 
     def condition=(css_selector)
+      binding.pry
+      # TODO: change to NillVariable
       @condition = find_child_nodes_with_css_selector(css_selector)
-        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, variable: nil, memory_scope: options[:memory_scope]) }
         .first
     end
 
