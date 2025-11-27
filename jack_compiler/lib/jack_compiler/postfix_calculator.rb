@@ -85,8 +85,10 @@ module JackCompiler
           case item.match(Utils::Infix::BOOLEAN_CONSTANT_REGEX)[1]
           when 'true'
             values_stack << 1
+            result << 'push constant 1'
           when 'false'
             values_stack << 0
+            result << 'push constant 0'
           end
         elsif item.match? Utils::Infix::NUMERICAL_REGEX
           values_stack << 1
@@ -152,6 +154,8 @@ module JackCompiler
       case operator
       when '+'
         first_value + second_value
+      when '-'
+        first_value - second_value
       when '~'
         first_value - second_value
       when '*'
@@ -171,6 +175,8 @@ module JackCompiler
       case operator
       when '+'
         ['add']
+      when '-'
+        %w[neg add]
       when '~'
         %w[neg add]
       when '*'
