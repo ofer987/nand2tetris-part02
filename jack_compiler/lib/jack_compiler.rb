@@ -54,6 +54,7 @@ require_relative './jack_compiler/utils/infix'
 require_relative 'jack_compiler/node'
 
 ## Expression nodes
+require_relative 'jack_compiler/boolean_expression'
 require_relative 'jack_compiler/null_assignment_expression'
 require_relative 'jack_compiler/execution_expression'
 require_relative 'jack_compiler/string_assignment_expression'
