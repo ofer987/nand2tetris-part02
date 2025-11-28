@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  # TODO: Rename to StaticVariableNode
-  class ClassVariableNode < VariableNode
+  class FieldVariableNode < Node
     NODE_NAME = Statement::CLASS_VAR_DESCRIPTION
 
     def memory_kind
-      Memory::Kind::STATIC
+      Memory::Kind::FIELD
     end
 
     def initialize(xml_node, options = {})

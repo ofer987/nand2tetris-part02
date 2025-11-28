@@ -12,6 +12,7 @@ module JackCompiler
     module Kind
       LOCAL = 'local'
       STATIC = 'static'
+      FIELD = 'field'
       ARGUMENT = 'argument'
     end
 
