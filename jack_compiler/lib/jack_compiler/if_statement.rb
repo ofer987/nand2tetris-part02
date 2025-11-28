@@ -5,7 +5,6 @@ module JackCompiler
     REGEX = RegularExpressions::IF_STATEMENT_REGEX
     NODE_NAME = IF_STATEMENT
 
-    # rubocop:disable Metrics/AbcSize
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
 
@@ -37,7 +36,6 @@ module JackCompiler
 
       next_statements(result_node, next_lines, else_classes)
     end
-    # rubocop:enable Metrics/AbcSize
 
     protected
 
