@@ -28,11 +28,11 @@ module JackCompiler
     end
 
     def local_size
-      current_scope_size = memory_hash
-        .select { |_key, value| value.kind == Memory::Kind::LOCAL }
-        .size
+      kind_size(Memory::Kind::LOCAL)
+    end
 
-      current_scope_size + (next_scope&.local_size || 0)
+    def field_size
+      kind_size(Memory::Kind::FIELD)
     end
 
     def initialize(memory_hash, next_scope = nil)
