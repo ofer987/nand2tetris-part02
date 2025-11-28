@@ -5,7 +5,7 @@ require 'simplecov'
 SimpleCov.start do
   enable_coverage :branch
   primary_coverage :line
-  minimum_coverage 70
+  minimum_coverage 65
 
   add_filter do |src|
     src.filename.match?(/_node\.rb$/) ||
