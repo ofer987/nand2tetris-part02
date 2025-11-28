@@ -26,8 +26,6 @@ module JackCompiler
     # No UNARY operations
     BINARY_OPERATION_EXPRESSION_REGEX_04 = /(([^\s]+)\s*(#{OPERATIONS})\s*([^\s]+))/
     INFIX_EXPRESSION = /(.+)/
-    FUNCTION_ASSIGNMENT_REGEX = /(.+)/
-    METHOD_ASSIGNMENT_REGEX = /(.+)\.(.+)/
 
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
