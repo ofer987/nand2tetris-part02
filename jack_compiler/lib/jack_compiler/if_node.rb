@@ -9,7 +9,7 @@ module JackCompiler
 
       if_statement, else_statement = find_child_nodes_with_css_selector("> #{Statement::STATEMENTS_STATEMENT}")[0..1]
       # TODO: enable
-      # self.condition = " > #{Statement::EXPRESSION_STATEMENT}"
+      self.condition = " > #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
 
       # rubocop:disable Layout/LineLength
       @if_statements = get_conditional_statements(if_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}")
@@ -18,10 +18,8 @@ module JackCompiler
     end
 
     def emit_vm_code
-      # TODO: add back
-      ## #{condition.emit_vm_code}
       <<~VM_CODE
-        push constant 0
+        #{condition.emit_vm_code(options[:scope])}
         if-goto #{if_true_label}
         goto #{if_false_label}
         label #{if_true_label}
@@ -36,9 +34,9 @@ module JackCompiler
     private
 
     def condition=(css_selector)
-      @condition = find_child_nodes_with_css_selector(css_selector)
-        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
-        .first
+      value = find_child_nodes_with_css_selector(css_selector).first.text
+
+      @condition = BooleanExpression.new(value)
     end
 
     def get_conditional_statements(conditional_statement, css_selector)
