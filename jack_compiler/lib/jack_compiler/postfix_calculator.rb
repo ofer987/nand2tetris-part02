@@ -18,12 +18,21 @@ module JackCompiler
 
     # rubocop:disable Metrics/PerceivedComplexity
     # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/AbcSize
     def calculate(memory: {})
       values_stack = []
       operator = nil
 
       stack.map(&:strip).each do |item|
-        if item.match? Utils::Infix::NUMERICAL_REGEX
+        if item.match? Utils::Infix::BOOLEAN_CONSTANT_REGEX
+          case item.match(Utils::Infix::BOOLEAN_CONSTANT_REGEX)[1]
+          when 'true'
+            values_stack << 1
+          when 'false'
+            values_stack << 0
+          end
+        elsif item.match? Utils::Infix::NUMERICAL_REGEX
           values_stack << item.to_i
         elsif item.match? Utils::Infix::OPERAND_REGEX
           variable_name = item
@@ -56,6 +65,8 @@ module JackCompiler
 
       values_stack.first
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
 
@@ -70,7 +81,16 @@ module JackCompiler
 
       # rubocop:disable Metrics/BlockLength
       stack.map(&:strip).each do |item|
-        if item.match? Utils::Infix::NUMERICAL_REGEX
+        if item.match? Utils::Infix::BOOLEAN_CONSTANT_REGEX
+          case item.match(Utils::Infix::BOOLEAN_CONSTANT_REGEX)[1]
+          when 'true'
+            values_stack << 1
+            result << 'push constant 1'
+          when 'false'
+            values_stack << 0
+            result << 'push constant 0'
+          end
+        elsif item.match? Utils::Infix::NUMERICAL_REGEX
           values_stack << 1
           result << "push constant #{item.to_i}"
         elsif item.match? Utils::Infix::ARRAY_OPERAND_REGEX
@@ -134,6 +154,8 @@ module JackCompiler
       case operator
       when '+'
         first_value + second_value
+      when '-'
+        first_value - second_value
       when '~'
         first_value - second_value
       when '*'
@@ -153,6 +175,8 @@ module JackCompiler
       case operator
       when '+'
         ['add']
+      when '-'
+        %w[neg add]
       when '~'
         %w[neg add]
       when '*'

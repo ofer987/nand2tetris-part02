@@ -43,14 +43,14 @@ module JackCompiler
         VM_CODE
       end
 
-      def multiply(x, y)
-        # TODO: Check for positive sign
-
-        x = y
-        <<~VM_CODE
-
-        VM_CODE
-      end
+      # def multiply(x, y)
+      #   # TODO: Check for positive sign
+      #
+      #   x = y
+      #   <<~VM_CODE
+      #
+      #   VM_CODE
+      # end
     end
   end
 end

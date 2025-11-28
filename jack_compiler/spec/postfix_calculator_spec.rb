@@ -26,10 +26,18 @@ RSpec.describe JackCompiler::PostfixCalculator do
     it 'calculates expressions', :aggregate_failres do
       expect(subject.new(expression: '3 4 5 / 6 7 + * + 8 ~').calculate).to eq(-5)
       expect(subject.new(expression: '8 16 |').calculate).to eq(24)
+      expect(subject.new(expression: 'false true |').calculate).to eq(1)
+      expect(subject.new(expression: 'true true &').calculate).to eq(1)
+      expect(subject.new(expression: 'true true +').calculate).to eq(2)
+      expect(subject.new(expression: 'true false +').calculate).to eq(1)
+      expect(subject.new(expression: 'false false +').calculate).to eq(0)
+      expect(subject.new(expression: 'false true ~').calculate).to eq(-1)
+      expect(subject.new(expression: 'false true &').calculate).to eq(0)
+      expect(subject.new(expression: 'false true &').calculate).not_to eq(1)
     end
 
     it 'fails with unknown operator', :aggregate_failres do
-      expect { subject.new(expression: '8 16 -').calculate }.to raise_error 'Postfix expression 8 16 - is invalid: result has 2 values instead of one (1)'
+      expect { subject.new(expression: '8 16 #').calculate }.to raise_error 'Postfix expression 8 16 # is invalid: result has 2 values instead of one (1)'
     end
 
     context 'with variables' do
