@@ -2,15 +2,11 @@
 
 module JackCompiler
   class ArrayMemory < Memory
-    attr_reader :name, :type, :kind
+    attr_reader :type, :name, :kind
     attr_accessor :value, :index
 
-    def memory_type
-      ARRAY
-    end
-
-    def initialize(name:, type:,  kind:, index: 0)
-      super(name:, type:, index:, kind:)
+    def initialize(type:, name:, kind:, index: 0)
+      super(type:, name:, index:, kind:)
 
       @value = Memory::NULL_VALUE
     end

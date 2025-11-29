@@ -3,7 +3,7 @@
 module JackCompiler
   class NullAssignmentExpression
     class << self
-      def execution_node?(xml_node, _options)
+      def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
           "> #{Statement::EVALUATION_TYPE_STATEMENT}"
@@ -11,7 +11,7 @@ module JackCompiler
 
         return false if evaluation_node.blank?
 
-        evaluation_node.text == Statement::NULL_VALUE
+        evaluation_node.text == Statement::NULL_CONSTANT
       end
     end
 

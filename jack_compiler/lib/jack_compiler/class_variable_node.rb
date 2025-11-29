@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  # TODO: Rename to StaticVariableNode
   class ClassVariableNode < VariableNode
     NODE_NAME = Statement::CLASS_VAR_DESCRIPTION
 
-    def memory_kind
+    def kind
+      return Memory::Kind::FIELD if @keywords.first.text == Statement::FIELD_MEMORY
+
       Memory::Kind::STATIC
     end
 

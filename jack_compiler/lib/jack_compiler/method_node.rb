@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class FunctionNode < MemoryNode
+  class MethodNode < MemoryNode
     NODE_NAME = Statement::SUBROUTINE_DESCRIPTION
 
     attr_reader :class_name, :function_type, :function_name, :return_type, :statement_nodes
