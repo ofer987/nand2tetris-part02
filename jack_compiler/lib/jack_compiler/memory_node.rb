@@ -4,7 +4,16 @@ module JackCompiler
   class MemoryNode < Node
     NODE_NAME = ''
 
+    module FunctionType
+      FUNCTION = 'function'
+      METHOD = 'method'
+    end
+
     attr_reader :memory_scope, :outer_memory_scope
+
+    def function_type
+      raise NotImplementedError
+    end
 
     def initialize(xml_node, options = {})
       super(xml_node, options)

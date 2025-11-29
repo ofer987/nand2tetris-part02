@@ -2,15 +2,15 @@
 
 module JackCompiler
   class ClassMemory < Memory
-    attr_reader :name, :type, :kind
+    attr_reader :name, :kind
     attr_accessor :value, :index
 
-    def memory_type
-      CLASS
+    def type
+      Memory::Type::CLASS
     end
 
-    def initialize(name:, type:,  kind:, index: 0)
-      super(name:, type:, index:, kind:)
+    def initialize(name:, kind:, index: 0)
+      super(name:, index:, kind:)
 
       @value = Memory::NULL_VALUE
     end

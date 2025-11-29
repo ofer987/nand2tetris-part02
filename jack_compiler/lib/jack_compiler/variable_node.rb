@@ -5,14 +5,56 @@ module JackCompiler
     # TODO: Use the same pattern as the VarStatementNode
     NODE_NAME = ''
 
-    attr_reader :memory_index, :object_kind, :object_names, :memory_type, :object_type
+    attr_reader :memory_index
 
-    def memory_kind
-      raise NotImplementedError
+    def array?
+      return @array if defined? @array
+
+      @array = identifiers.first.text.strip == Statement::ARRAY_CLASS
+    end
+
+    def primitive?
+      @keywords.size >= 2
+    end
+
+    def reference?
+      @keywords.size == 1
+    end
+
+    def kind
+      Memory::Kind::LOCAL
     end
 
     def size
-      @size ||= @object_names.size
+      @size ||= @names.size
+    end
+
+    def type
+      return @type if defined? @type
+
+      if primitive?
+        @type = find_child_nodes(Statement::KEYWORD)[1].text.strip
+
+        return
+      end
+
+      @type = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
+    end
+
+    def names
+      return @names if defined? @names
+
+      if primitive?
+        @names = find_child_nodes(Statement::IDENTIFIER)
+          .map(&:text)
+          .map(&:strip)
+
+        return
+      end
+
+      @names ||= find_child_nodes(Statement::IDENTIFIER)[1..]
+        .map(&:text)
+        .map(&:strip)
     end
 
     def initialize(xml_node, options = {})
@@ -20,51 +62,16 @@ module JackCompiler
 
       @memory_index = options[:memory_index]
 
-      keywords = find_child_nodes(Statement::KEYWORD)
-      identifiers = find_child_nodes(Statement::IDENTIFIER)
-      if keywords.size > 1
-        initialize_primitive_variable
-      elsif identifiers.first.text == Statement::ARRAY_CLASS
-        initialize_array_variable
-      else
-        initialize_class_variable
-      end
+      @keywords = find_child_nodes(Statement::KEYWORD)
+      @identifiers = find_child_nodes(Statement::IDENTIFIER)
     end
 
     def emit_vm_code
       ''
     end
 
-    private
+    protected
 
-    def initialize_primitive_variable
-      @memory_type = Memory::PRIMITIVE
-
-      @object_kind = memory_kind
-      @object_type = find_child_nodes(Statement::KEYWORD)[1].text.strip
-      @object_names = find_child_nodes(Statement::IDENTIFIER)
-        .map(&:text)
-        .map(&:strip)
-    end
-
-    def initialize_array_variable
-      @memory_type = Memory::ARRAY
-
-      @object_kind = memory_kind
-      @object_type = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
-      @object_names = find_child_nodes(Statement::IDENTIFIER)[1..]
-        .map(&:text)
-        .map(&:strip)
-    end
-
-    def initialize_class_variable
-      @memory_type = Memory::CLASS
-
-      @object_kind = memory_kind
-      @object_type = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
-      @object_names = find_child_nodes(Statement::IDENTIFIER)[1..]
-        .map(&:text)
-        .map(&:strip)
-    end
+    attr_reader :keywords, :identifiers
   end
 end

@@ -1,10 +1,23 @@
 # frozen_string_literal: true
 
 module JackCompiler
+  # rubocop:disable Metrics/ClassLength
   class ClassNode < Node
     NODE_NAME = Statement::CLASS
 
-    attr_reader :file_name, :class_node, :class_name, :class_variable_nodes, :function_nodes, :class_memory_scope
+    attr_reader :file_name, :class_node, :class_name, :function_nodes, :method_nodes
+
+    def static_memory_scope
+      return @static_memory_scope if defined? @static_memory_scope
+
+      @static_memory_scope = MemoryScope.new(static_memory)
+    end
+
+    def field_memory_scope
+      return @field_memory_scope if defined? @field_memory_scope
+
+      @field_memory_scope = MemoryScope.new(field_memory, static_memory_scope)
+    end
 
     def initialize(xml_node, options = {})
       super(xml_node, options)
@@ -19,8 +32,10 @@ module JackCompiler
         .map(&:strip)
         .first
 
-      self.class_memory_scope = "> #{Statement::CLASS_VAR_DESCRIPTION}"
+      self.static_memory = "> #{Statement::CLASS_VAR_DESCRIPTION}"
+      self.field_memory = "> #{Statement::CLASS_VAR_DESCRIPTION}"
       self.function_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
+      self.method_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
     end
 
     def emit_vm_code
@@ -31,71 +46,93 @@ module JackCompiler
           #{function_node.emit_vm_code}
         VM_CODE
       end.join("\n")
-      #     # TODO: Do I need this?
-      #     #{class_variable_nodes.map(&:emit_vm_code).join("\n")}
-      #   VM_CODE
-      # end
     end
 
     private
 
-    #
-    # def class_variable_nodes=(css_selector)
-    #   xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
-    #
-    #   @class_variable_nodes = []
-    #   xml_nodes.each_with_index do |node, index|
-    #     variable_node = Utils::XML.convert_to_jack_node(node, memory_index: index)
-    #     @class_variable_nodes << variable_node
-    #   end
-    # end
-
     # rubocop:disable Metrics/MethodLength
-    def class_memory_scope=(css_selector)
-      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+    def static_memory=(css_selector)
+      static_xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+        .map { |node| Utils::XML.convert_to_jack_node(node) }
+        .select { |xml_node| xml_node.kind == Memory::Kind::STATIC }
 
-      class_memory_nodes = {}
-      # TODO: index should be per kind
+      @static_memory = {}
       index = 0
       # rubocop:disable Metrics/BlockLength
-      xml_nodes.each do |node|
-        var_node = Utils::XML.convert_to_jack_node(node)
-
-        var_node.object_names.each do |memory_name|
-          case var_node.memory_type
-          when Memory::ARRAY
+      static_xml_nodes.each do |xml_node|
+        var_node.names.each do |name|
+          case xml_node.type
+          when Memory::Type::ARRAY
             memory_item = ArrayMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type,
+              name: name,
+              kind: xml_node.kind,
               index: index
             )
-          when Memory::CLASS
+          when Memory::Type::CLASS
             memory_item = ClassMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type,
+              name: name,
+              kind: xml_node.kind,
               index: index
             )
-          when Memory::PRIMITIVE
+          when Memory::Type::PRIMITIVE
             memory_item = PrimitiveMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type,
+              name: name,
+              kind: xml_node.kind,
               index: index
             )
           else
-            raise "Invalid memory type '#{var_node.memory_type}'"
+            raise "Invalid memory type '#{xml_node.type}'"
           end
 
-          class_memory_nodes[memory_name] = memory_item
+          @static_memory[name] = memory_item
 
           index += 1
         end
       end
       # rubocop:enable Metrics/BlockLength
+    end
+    # rubocop:enable Metrics/MethodLength
 
-      @class_memory_scope = MemoryScope.new(class_memory_nodes)
+    # rubocop:disable Metrics/MethodLength
+    def field_memory=(css_selector)
+      field_xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+        .map { |node| Utils::XML.convert_to_jack_node(node) }
+        .select { |xml_node| xml_node.kind == Memory::Kind::STATIC }
+
+      @field_memory = {}
+      index = 0
+      # rubocop:disable Metrics/BlockLength
+      field_xml_nodes.each do |xml_node|
+        var_node.names.each do |name|
+          case xml_node.type
+          when Memory::Type::ARRAY
+            memory_item = ArrayMemory.new(
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          when Memory::Type::CLASS
+            memory_item = ClassMemory.new(
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          when Memory::Type::PRIMITIVE
+            memory_item = PrimitiveMemory.new(
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          else
+            raise "Invalid memory type '#{xml_node.type}'"
+          end
+
+          @field_memory[name] = memory_item
+
+          index += 1
+        end
+      end
+      # rubocop:enable Metrics/BlockLength
     end
     # rubocop:enable Metrics/MethodLength
 
@@ -104,10 +141,26 @@ module JackCompiler
 
       options = {
         class_name: class_name,
-        memory_scope: class_memory_scope
+        memory_scope: static_memory_scope
       }
       @function_nodes = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node, options) }
+        .select { |node| node.function_type == MemoryNode::FunctionType::FUNCTION }
     end
+
+    def method_nodes=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+
+      options = {
+        class_name: class_name,
+        memory_scope: field_memory_scope
+      }
+      @function_nodes = xml_nodes
+        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
+        .select { |node| node.function_type == MemoryNode::FunctionType::METHOD }
+    end
+
+    attr_reader :static_memory, :field_memory
   end
+  # rubocop:enable Metrics/ClassLength
 end

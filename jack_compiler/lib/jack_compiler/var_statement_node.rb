@@ -4,7 +4,7 @@ module JackCompiler
   class VarStatementNode < VariableNode
     NODE_NAME = Statement::VAR_DESCRIPTION
 
-    def memory_kind
+    def kind
       Memory::Kind::LOCAL
     end
 

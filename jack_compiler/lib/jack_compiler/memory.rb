@@ -2,25 +2,25 @@
 
 module JackCompiler
   class Memory
-    ARRAY = 'array'
-    CLASS = 'class'
-    PRIMITIVE = 'primitive'
+    # Three types of memory
+    module Type
+      ARRAY = 'array'
+      CLASS = 'class'
+      PRIMITIVE = 'primitive'
+    end
+
+    # Four types of scope
+    module Kind
+      LOCAL = 'local'
+      ARGUMENT = 'argument'
+      FIELD = 'field'
+      STATIC = 'static'
+    end
 
     NULL_VALUE = 0
     EMPTY_CLASS = 'classless'
 
-    module Kind
-      LOCAL = 'local'
-      STATIC = 'static'
-      FIELD = 'field'
-      ARGUMENT = 'argument'
-    end
-
     def name
-      raise NotImplementedError
-    end
-
-    def memory_type
       raise NotImplementedError
     end
 
@@ -40,9 +40,8 @@ module JackCompiler
       raise NotImplementedError
     end
 
-    def initialize(name:, type:, index:, kind:)
+    def initialize(name:, index:, kind:)
       @name = name
-      @type = type
       @index = index
       @kind = kind
     end
