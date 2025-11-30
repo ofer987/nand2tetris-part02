@@ -8,12 +8,15 @@ module JackCompiler
       result = lines.match(REGEX)
 
       evaluation_node = document.create_element(EVALUATION_STATEMENT, result[1])
+      evaluation_type_node = document.create_element(EVALUATION_TYPE_STATEMENT, REFERENCE_VARIABLE)
+
       parent_node << evaluation_node
+      parent_node << evaluation_type_node
 
       term_node = document.create_element(TERM_STATEMENT)
       parent_node << term_node
 
-      value_node = document.create_element(VARIABLE_CONSTANT, result[2])
+      value_node = document.create_element(VARIABLE_CONSTANT, result[1])
       term_node << value_node
 
       lines.sub(REGEX, '')

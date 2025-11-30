@@ -31,7 +31,9 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
+        // TODO: push rest of variables in the expression list
         push local #{variable.index}
+        // At least one parameter for the _this_ instance
         call #{variable.type}.#{method_name} #{expression_list_node.size + 1}
         pop temp #{variable.index}
       VM_CODE

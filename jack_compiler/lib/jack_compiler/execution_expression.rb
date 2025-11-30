@@ -38,9 +38,10 @@ module JackCompiler
       variable.value = Memory::NULL_VALUE
     end
 
-    def emit_vm_code(_objects)
+    def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
+      expression_list_node.emit_vm_code(memory_scope)
       <<~VM_CODE
         call #{object}.#{method} #{expression_list_node.size}
       VM_CODE
@@ -58,6 +59,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node, :variable
+    attr_reader :xml_node, :variable, :memory_scope
   end
 end
