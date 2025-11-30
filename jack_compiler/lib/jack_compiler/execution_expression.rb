@@ -3,8 +3,15 @@
 module JackCompiler
   class ExecutionExpression
     class << self
-      def execution_node?(_xml_node, variable:)
-        variable.memory_type == Memory::CLASS
+      def execution_node?(xml_node)
+        evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
+          xml_node,
+          "> #{Statement::EVALUATION_TYPE_STATEMENT}"
+        ).first
+
+        return false if evaluation_node.blank?
+
+        evaluation_node.text == Statement::EXECUTION_TYPE
       end
     end
 

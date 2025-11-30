@@ -30,7 +30,7 @@ module JackCompiler
         .map(&:strip)
 
       argument_memory_scope = init_new_memory_scope(outer_memory_scope)
-      nodes = memory_nodes("> #{Statement::PARAMETER_LIST} > #{Statement::TERM_STATEMENT}")
+      nodes = memory_nodes("> #{Statement::PARAMETER_LIST} > #{Statement::PARAMETER}")
       nodes.each do |node|
         argument_memory_scope << node
       end

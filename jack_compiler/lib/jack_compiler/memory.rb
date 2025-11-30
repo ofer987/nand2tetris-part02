@@ -40,7 +40,8 @@ module JackCompiler
       raise NotImplementedError
     end
 
-    def initialize(name:, index:, kind:)
+    def initialize(type:, name:, index:, kind:)
+      @type = type
       @name = name
       @index = index
       @kind = kind

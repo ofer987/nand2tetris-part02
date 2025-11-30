@@ -33,26 +33,26 @@ module JackCompiler
       return @type if defined? @type
 
       if primitive?
-        @type = find_child_nodes(Statement::KEYWORD)[1].text.strip
+        @type = @keywords[1].text.strip
 
-        return
+        return @type
       end
 
-      @type = find_child_nodes(Statement::IDENTIFIER)[0].text.strip
+      @type = @identifiers.first.text.strip
     end
 
     def names
       return @names if defined? @names
 
       if primitive?
-        @names = find_child_nodes(Statement::IDENTIFIER)
+        @names = @identifiers
           .map(&:text)
           .map(&:strip)
 
-        return
+        return @names
       end
 
-      @names ||= find_child_nodes(Statement::IDENTIFIER)[1..]
+      @names ||= @identifiers[1..]
         .map(&:text)
         .map(&:strip)
     end

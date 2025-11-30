@@ -9,6 +9,7 @@ module JackCompiler
     KEYWORD = 'keyword'
     IDENTIFIER = 'identifier'
     PARAMETER_LIST = 'parameterList'
+    PARAMETER = 'parameter'
     OPEN_PARENTHESIS = '('
     CLOSE_PARENTHESIS = ')'
     OPEN_BRACE = '{'
@@ -21,6 +22,7 @@ module JackCompiler
     SEMI_COLON = ';'
     EQUAL_SIGN = '='
     IF_STATEMENT = 'ifStatement'
+    ELSE_STATEMENT = 'else'
     LET_STATEMENT = 'letStatement'
     LET_KEYWORD = 'let'
     DO_STATEMENT = 'doStatement'
@@ -37,9 +39,9 @@ module JackCompiler
     EVALUATION_TYPE_STATEMENT = 'evaluation_type'
     BOOLEAN_CONSTANT = 'booleanConstant'
     STRING_CONSTANT = 'stringConstant'
+    NULL_CONSTANT = 'nullConstant'
     INTEGER_CONSTANT = 'integerConstant'
     VARIABLE_CONSTANT = 'identifier'
-    NULL_CONSTANT = 'keyword'
     INFIX_EXPRESSION = 'infix_expression'
     LOCAL_MEMORY = 'var'
     STATIC_MEMORY = 'static'
@@ -47,9 +49,6 @@ module JackCompiler
     ARRAY_CLASS = 'Array'
     ARRAY_VALUE = 'array'
     EXECUTION_TYPE = 'execution'
-
-    ELSE_STATEMENT = 'else'
-    NULL_VALUE = 'null'
 
     attr_reader :document
 

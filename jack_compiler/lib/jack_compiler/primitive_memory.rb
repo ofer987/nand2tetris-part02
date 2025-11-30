@@ -2,18 +2,8 @@
 
 module JackCompiler
   class PrimitiveMemory < Memory
-    attr_reader :name, :kind
+    attr_reader :type, :name, :kind
     attr_accessor :value, :index
-
-    # TODO: rename to kind
-    # Where values are
-    # this for class field
-    # static (for class field)
-    # local for function/method
-    # argument for function/method
-    def type
-      PRIMITIVE
-    end
 
     # values are
     # String
@@ -23,8 +13,8 @@ module JackCompiler
     # def type
     # end
 
-    def initialize(name:, kind:, index: 0)
-      super(name:, index:, kind:)
+    def initialize(type:, name:, kind:, index: 0)
+      super(type:, name:, index:, kind:)
 
       @value = 0
     end

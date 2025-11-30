@@ -35,33 +35,37 @@ module JackCompiler
 
       # rubocop:disable Metrics/BlockLength
       xml_nodes.each do |node|
-        var_node = Utils::XML.convert_to_jack_node(node)
+        xml_node = Utils::XML.convert_to_jack_node(node)
 
-        var_node.object_names.each do |memory_name|
-          case var_node.memory_type
-          when Memory::ARRAY
-            memory_item = ArrayMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type
-            )
-          when Memory::CLASS
-            memory_item = ClassMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type
-            )
-          when Memory::PRIMITIVE
+        index = 0
+        xml_node.names.each do |name|
+          if xml_node.primitive?
             memory_item = PrimitiveMemory.new(
-              name: memory_name,
-              kind: var_node.object_kind,
-              type: var_node.object_type
+              type: xml_node.type,
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          elsif xml_node.array?
+            memory_item = ArrayMemory.new(
+              type: xml_node.type,
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          elsif xml_node.reference?
+            memory_item = ClassMemory.new(
+              type: xml_node.type,
+              name: name,
+              kind: xml_node.kind,
+              index: index
             )
           else
-            raise "Invalid memory type '#{var_node.memory_type}'"
+            raise "Invalid memory type '#{xml_node.type}'"
           end
 
           memory_nodes << memory_item
+          index += 1
         end
       end
       # rubocop:enable Metrics/BlockLength

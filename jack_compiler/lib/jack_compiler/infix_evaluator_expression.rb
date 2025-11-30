@@ -3,8 +3,7 @@
 module JackCompiler
   class InfixEvaluatorAssignmentExpression
     class << self
-      # rubocop:disable Lint/UnusedMethodArgument
-      def execution_node?(xml_node, variable: {})
+      def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
           "> #{Statement::EVALUATION_TYPE_STATEMENT}"
@@ -14,7 +13,6 @@ module JackCompiler
 
         evaluation_node.text == Statement::INFIX_EXPRESSION
       end
-      # rubocop:enable Lint/UnusedMethodArgument
     end
 
     attr_reader :value

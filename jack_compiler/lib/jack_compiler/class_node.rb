@@ -51,6 +51,7 @@ module JackCompiler
     private
 
     # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/PerceivedComplexity
     def static_memory=(css_selector)
       static_xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
         .map { |node| Utils::XML.convert_to_jack_node(node) }
@@ -60,22 +61,24 @@ module JackCompiler
       index = 0
       # rubocop:disable Metrics/BlockLength
       static_xml_nodes.each do |xml_node|
-        var_node.names.each do |name|
-          case xml_node.type
-          when Memory::Type::ARRAY
-            memory_item = ArrayMemory.new(
-              name: name,
-              kind: xml_node.kind,
-              index: index
-            )
-          when Memory::Type::CLASS
-            memory_item = ClassMemory.new(
-              name: name,
-              kind: xml_node.kind,
-              index: index
-            )
-          when Memory::Type::PRIMITIVE
+        xml_node.names.each do |name|
+          if xml_node.primitive?
             memory_item = PrimitiveMemory.new(
+              type: xml_node.type,
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          elsif xml_node.array?
+            memory_item = ArrayMemory.new(
+              type: xml_node.type,
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          elsif xml_node.reference?
+            memory_item = ClassMemory.new(
+              type: xml_node.type,
               name: name,
               kind: xml_node.kind,
               index: index
@@ -91,9 +94,11 @@ module JackCompiler
       end
       # rubocop:enable Metrics/BlockLength
     end
+    # rubocop:enable Metrics/PerceivedComplexity
     # rubocop:enable Metrics/MethodLength
 
     # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/PerceivedComplexity
     def field_memory=(css_selector)
       field_xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
         .map { |node| Utils::XML.convert_to_jack_node(node) }
@@ -103,22 +108,24 @@ module JackCompiler
       index = 0
       # rubocop:disable Metrics/BlockLength
       field_xml_nodes.each do |xml_node|
-        var_node.names.each do |name|
-          case xml_node.type
-          when Memory::Type::ARRAY
-            memory_item = ArrayMemory.new(
-              name: name,
-              kind: xml_node.kind,
-              index: index
-            )
-          when Memory::Type::CLASS
-            memory_item = ClassMemory.new(
-              name: name,
-              kind: xml_node.kind,
-              index: index
-            )
-          when Memory::Type::PRIMITIVE
+        xml_node.names.each do |name|
+          if xml_node.primitive?
             memory_item = PrimitiveMemory.new(
+              type: xml_node.type,
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          elsif xml_node.array?
+            memory_item = ArrayMemory.new(
+              type: xml_node.type,
+              name: name,
+              kind: xml_node.kind,
+              index: index
+            )
+          elsif xml_node.reference?
+            memory_item = ClassMemory.new(
+              type: xml_node.type,
               name: name,
               kind: xml_node.kind,
               index: index
@@ -134,6 +141,7 @@ module JackCompiler
       end
       # rubocop:enable Metrics/BlockLength
     end
+    # rubocop:enable Metrics/PerceivedComplexity
     # rubocop:enable Metrics/MethodLength
 
     def function_nodes=(css_selector)
@@ -155,7 +163,7 @@ module JackCompiler
         class_name: class_name,
         memory_scope: field_memory_scope
       }
-      @function_nodes = xml_nodes
+      @method_nodes = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node, options) }
         .select { |node| node.function_type == MemoryNode::FunctionType::METHOD }
     end

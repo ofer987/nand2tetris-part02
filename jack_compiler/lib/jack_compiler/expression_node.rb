@@ -7,8 +7,8 @@ module JackCompiler
       InfixEvaluatorAssignmentExpression,
       StringAssignmentExpression,
       NullAssignmentExpression,
-      ExecutionExpression,
-      IntegerAssignmentExpression
+      IntegerAssignmentExpression,
+      ExecutionExpression
     ].freeze
 
     def initialize(xml_node, options)
@@ -32,7 +32,7 @@ module JackCompiler
 
     def init_execution_expression_node
       internal_expression_class = EXPRESSION_NODE_CLASSES
-        .select { |klazz| klazz.execution_node?(xml_node, variable:) }
+        .select { |klazz| klazz.execution_node?(xml_node) }
         .first
 
       @internal_expression_node = internal_expression_class.new(xml_node, variable:)
