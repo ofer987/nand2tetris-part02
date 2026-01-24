@@ -40,19 +40,10 @@ module JackCompiler
       VM_CODE
     end
 
-    def assignment_vm_code(options = {})
+    def assignment_vm_code(_options = {})
       <<~VM_CODE
-        // pop #{kind} #{index}
-
-        pop temp 0
-        push constant #{options[:offset]}
-        push #{kind} #{index}
-        add
-
-        pop pointer 1
-        push temp 0
-
-        pop that 0
+        // Pop variable on stack into the "this" segment
+        pop pointer 0
       VM_CODE
     end
   end

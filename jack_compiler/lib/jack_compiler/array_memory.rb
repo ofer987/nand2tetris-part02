@@ -13,14 +13,19 @@ module JackCompiler
 
     def assignment_vm_code(options = {})
       <<~VM_CODE
-        pop temp 0
+        // Pop current value of array into temp
+        // pop that 0
+        // push pointer 1
+        // pop temp 0
+
+        // Assume the result has already been placed on the Stack
+        // Now set the "that"'s memory address
         push constant #{options[:offset]}
         push #{kind} #{index}
         add
-
         pop pointer 1
-        push temp 0
 
+        // And push the results into the Array directly via "that"'s memory address
         pop that 0
       VM_CODE
     end

@@ -32,9 +32,9 @@ module JackCompiler
     def emit_vm_code(memory_scope)
       init_parameters(memory_scope)
 
-      # TODO: implement
-      <<~VM_CODE
-      VM_CODE
+      parameters
+        .map { |item| argument_vm_code(item) }
+        .join("\n")
     end
 
     private
