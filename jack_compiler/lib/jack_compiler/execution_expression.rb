@@ -41,7 +41,6 @@ module JackCompiler
     def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
-      binding.pry
       <<~VM_CODE
         // Call alloc
         call Memory.alloc 1

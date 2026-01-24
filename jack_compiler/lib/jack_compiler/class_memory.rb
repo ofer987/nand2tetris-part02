@@ -41,7 +41,6 @@ module JackCompiler
     end
 
     def assignment_vm_code(_options = {})
-      binding.pry
       <<~VM_CODE
         // Pop variable on stack into the "this" segment
         pop pointer 0
