@@ -41,9 +41,21 @@ module JackCompiler
     def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
-      expression_list_node.emit_vm_code(memory_scope)
+      binding.pry
       <<~VM_CODE
+        // Call alloc
+        call Memory.alloc 1
+        // Set up the "this" segment
+        push pointer 0
+
+        // Not required: Pop arguments
+        // push Arguments
+        #{expression_list_node.emit_vm_code(memory_scope)}
+
         call #{object}.#{method} #{expression_list_node.size}
+
+        // TODO: Method should pop the pointer into local variable
+        // TODO: Both Functions/Methods should pop the stack into argument variables
       VM_CODE
     end
 
