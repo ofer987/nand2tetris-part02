@@ -8,3 +8,5 @@
 /tmp/
 
 tests/*.vm
+*.vm
+*.xml
