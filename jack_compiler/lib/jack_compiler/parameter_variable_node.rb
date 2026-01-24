@@ -2,7 +2,7 @@
 
 module JackCompiler
   class ParameterVariableNode < VariableNode
-    NODE_NAME = "#{Statement::PARAMETER_LIST} > #{Statement::PARAMETER}".freeze
+    NODE_NAME = Statement::PARAMETER
 
     def kind
       Memory::Kind::ARGUMENT
