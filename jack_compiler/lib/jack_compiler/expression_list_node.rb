@@ -44,7 +44,7 @@ module JackCompiler
         "push constant #{argument[:value]}"
       else
         variable = argument[:value]
-        "push #{variable.type} #{variable.index}"
+        "push #{variable.kind} #{variable.index}"
       end
     end
 

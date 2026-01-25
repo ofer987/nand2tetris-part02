@@ -18,7 +18,7 @@ class Main {
 
       let i = x + 2;
       let game = SquareGame.new(2, 4);
-      do game.run();
+      do game.run(2, i);
       do game.dispose();
       return;
     }
