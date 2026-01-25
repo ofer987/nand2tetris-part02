@@ -58,28 +58,30 @@ module JackCompiler
         .select { |xml_node| xml_node.kind == Memory::Kind::STATIC }
 
       @static_memory = {}
-      index = 0
       # rubocop:disable Metrics/BlockLength
       static_xml_nodes.each do |xml_node|
+        index = Memory.next_static_memory_index
+
         xml_node.names.each do |name|
           if xml_node.primitive?
+            static_name = "#{class_name}.#{name}"
             memory_item = PrimitiveMemory.new(
               type: xml_node.type,
-              name: name,
+              name: static_name,
               kind: xml_node.kind,
               index: index
             )
           elsif xml_node.array?
             memory_item = ArrayMemory.new(
               type: xml_node.type,
-              name: name,
+              name: static_name,
               kind: xml_node.kind,
               index: index
             )
           elsif xml_node.reference?
             memory_item = ClassMemory.new(
               type: xml_node.type,
-              name: name,
+              name: static_name,
               kind: xml_node.kind,
               index: index
             )
@@ -87,9 +89,7 @@ module JackCompiler
             raise "Invalid memory type '#{xml_node.type}'"
           end
 
-          @static_memory[name] = memory_item
-
-          index += 1
+          @static_memory[static_name] = memory_item
         end
       end
       # rubocop:enable Metrics/BlockLength

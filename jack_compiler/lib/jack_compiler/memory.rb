@@ -2,6 +2,23 @@
 
 module JackCompiler
   class Memory
+    def self.next_static_memory_index
+      unless defined? @next_static_memory_index
+        @next_static_memory_index = 16
+
+        return @next_static_memory_index
+      end
+
+      if @next_static_memory_index >= MAX_STATIC_MEMORY
+        raise "Failed to allocate static memory at #{@next_static_memory_index + 1}, " \
+          'because static memory can only be allocated within the range 16 to 255'
+      end
+
+      @next_static_memory_index += 1
+    end
+
+    MAX_STATIC_MEMORY = 255
+
     # Three types of memory
     module Type
       ARRAY = 'array'
