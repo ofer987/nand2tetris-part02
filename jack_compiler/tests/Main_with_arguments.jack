@@ -7,8 +7,10 @@
 
 /** Initializes a new Square game and starts running it. */
 class Main {
-    static boolean test;    // Added for testing -- there is no static keyword
-                            // in the Square files.
+    static boolean test;          // Added for testing -- there is no static keyword
+    static boolean anotherTest;
+    static boolean anotherTest123;
+
     function void main(int x) {
       var int i, j;
       var int k;
