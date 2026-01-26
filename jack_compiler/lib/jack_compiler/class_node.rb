@@ -33,7 +33,7 @@ module JackCompiler
         .first
 
       self.static_memory = "> #{Statement::CLASS_VAR_DESCRIPTION}"
-      self.field_memory = "> #{Statement::CLASS_VAR_DESCRIPTION}"
+      self.field_memory = "> #{Statement::CLASS_FIELD_VAR_DESCRIPTION}"
       self.function_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
       self.method_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
     end
@@ -102,7 +102,7 @@ module JackCompiler
     def field_memory=(css_selector)
       field_xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
         .map { |node| Utils::XML.convert_to_jack_node(node) }
-        .select { |xml_node| xml_node.kind == Memory::Kind::STATIC }
+        .select { |xml_node| xml_node.kind == Memory::Kind::FIELD }
 
       @field_memory = {}
       index = 0

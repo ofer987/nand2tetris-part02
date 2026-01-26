@@ -35,6 +35,7 @@ module JackCompiler
     OPEN_BRACE = /({)/
     CLOSE_BRACE = /}/
     CLASS_VAR_STATEMENT = /(static)\s+(\S+)\s+(\S+)\s*;/
+    CLASS_FIELD_VAR_STATEMENT = /(field)\s+(\S+)\s+(\S+)\s*;/
     ASSIGNMENT_EXPRESSION_STATEMENT = /(\S+)(\.)(\S+)(\()([^)]*)(\))\s*/
     VAR_STATEMENT = /(var)\s+(\S+)\s+([^;]+)\s*(;)/
     DO_STATEMENT = /(do)\s*(#{ASSIGNMENT_EXPRESSION_STATEMENT})(;)/

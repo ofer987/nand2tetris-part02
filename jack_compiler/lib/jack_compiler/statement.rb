@@ -16,6 +16,7 @@ module JackCompiler
     CLOSE_BRACE = '}'
     SYMBOL = 'symbol'
     CLASS_VAR_DESCRIPTION = 'classVarDec'
+    CLASS_FIELD_VAR_DESCRIPTION = 'classFieldVarDec'
     SUBROUTINE_DESCRIPTION = 'subroutineDec'
     SUBROUTINE_BODY = 'subroutineBody'
     VAR_DESCRIPTION = 'varDec'
