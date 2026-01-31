@@ -30,6 +30,7 @@ module JackCompiler
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
     METHOD = /(method)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
+    CONSTRUCTOR = /(constructor)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
     SUBROUTINE_BODY = //
     ENDING_STATEMENT = /;/
     OPEN_BRACE = /({)/
