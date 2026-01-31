@@ -32,7 +32,7 @@ module JackCompiler
     def emit_vm_code
       <<~VM_CODE
         #{expression_node.emit_vm_code(memory_scope)}
-        #{variable.assignment_vm_code({ offset: offset })}
+        // #{variable.assignment_vm_code({ offset: offset })}
       VM_CODE
     end
 

@@ -64,15 +64,15 @@ module JackCompiler
     private
 
     def init_field_memory
-      results = field_memory.map do |_node_name, memory|
-        memory.assign_value(ConstantMemory.new(value: memory.value))
+      field_memory.map do |_node_name, memory|
+        # TODO: do not assume that memory is Constant, because
+        # It might be a variable or a String
+        # memory.assign_value(ConstantMemory.new(value: memory.value))
         <<~MEMORY_SCOPE
           push constant #{memory.value}
           pop this #{memory.index}
         MEMORY_SCOPE
       end.join("\n")
-
-      results
     end
 
     def emit_statements_code

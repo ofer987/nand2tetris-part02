@@ -40,29 +40,33 @@ module JackCompiler
     end
 
     def emit_vm_code
-      function_nodes.map do |function_node|
-        <<~VM_CODE
+      result = []
+
+      function_nodes.each do |function_node|
+        result << <<~VM_CODE
           function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
 
           #{function_node.emit_vm_code}
         VM_CODE
-      end.join("\n")
+      end
 
-      constructor_nodes.map do |function_node|
-        <<~VM_CODE
-          function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
+      constructor_nodes.each do |constructor_node|
+        result << <<~VM_CODE
+          function #{class_name}.#{constructor_node.function_name} #{constructor_node.variable_size}
 
-          #{function_node.emit_vm_code}
+          #{constructor_node.emit_vm_code}
         VM_CODE
-      end.join("\n")
+      end
 
-      method_nodes.map do |function_node|
-        <<~VM_CODE
-          function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
+      method_nodes.each do |method_node|
+        result << <<~VM_CODE
+          function #{class_name}.#{method_node.function_name} #{method_node.variable_size}
 
-          #{function_node.emit_vm_code}
+          #{method_node.emit_vm_code}
         VM_CODE
-      end.join("\n")
+      end
+
+      result.join("\n")
     end
 
     private

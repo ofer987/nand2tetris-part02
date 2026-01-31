@@ -2,8 +2,6 @@
 
 module JackCompiler
   class Memory
-    # attr_reader :type, :name, :kind, :value, :index
-
     def self.next_static_memory_index
       unless defined? @next_static_memory_index
         @next_static_memory_index = 16
@@ -64,8 +62,16 @@ module JackCompiler
     end
 
     def assign_value(memory_value)
+      # rubocop:disable Style/ConditionalAssignment
+      if memory_value.match?(/^\d+$/)
+        value = "push constant #{memory_value}"
+      else
+        value = memory_value.read_memory
+      end
+      # rubocop:enable Style/ConditionalAssignment
+
       <<~MEMORY_SCOPE
-        #{memory_value.read_memory}
+        #{value}
         pop #{memory_location} #{index}
       MEMORY_SCOPE
     end
