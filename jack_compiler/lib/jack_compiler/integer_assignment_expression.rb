@@ -22,7 +22,6 @@ module JackCompiler
       @variable = variable
 
       self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}"
-      variable.value = value
     end
 
     def emit_vm_code(_objects)
@@ -43,7 +42,6 @@ module JackCompiler
         .first
 
       @value = result
-      ## @value = ConstantMemory.new(value: result) if result.match?(/\d+/)
     end
 
     attr_reader :xml_node, :variable

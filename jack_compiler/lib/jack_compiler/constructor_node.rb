@@ -16,7 +16,6 @@ module JackCompiler
 
       @class_name = options[:class_name]
 
-      # binding.pry
       @function_type, @return_type = find_child_nodes(Statement::KEYWORD)[0..1]
         .map(&:text)
         .map(&:strip)
