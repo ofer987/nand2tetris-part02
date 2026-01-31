@@ -5,7 +5,7 @@ module JackCompiler
   class ClassNode < Node
     NODE_NAME = Statement::CLASS
 
-    attr_reader :file_name, :class_node, :class_name, :function_nodes, :method_nodes, :constructor
+    attr_reader :file_name, :class_node, :class_name, :function_nodes, :method_nodes, :constructor_nodes
 
     def static_memory_scope
       return @static_memory_scope if defined? @static_memory_scope
@@ -41,6 +41,22 @@ module JackCompiler
 
     def emit_vm_code
       function_nodes.map do |function_node|
+        <<~VM_CODE
+          function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
+
+          #{function_node.emit_vm_code}
+        VM_CODE
+      end.join("\n")
+
+      constructor_nodes.map do |function_node|
+        <<~VM_CODE
+          function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
+
+          #{function_node.emit_vm_code}
+        VM_CODE
+      end.join("\n")
+
+      method_nodes.map do |function_node|
         <<~VM_CODE
           function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
 

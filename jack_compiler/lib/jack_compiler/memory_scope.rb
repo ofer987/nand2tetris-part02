@@ -31,6 +31,24 @@ module JackCompiler
       kind_size(Memory::Kind::LOCAL)
     end
 
+    def field_memory
+      results = {}
+      scope = self
+
+      until scope.nil?
+        hash = scope.memory_hash
+        hash.each do |name, memory|
+          next unless memory.kind == Memory::Kind::FIELD
+
+          results[name] = memory
+        end
+
+        scope = scope.next_scope
+      end
+
+      results
+    end
+
     def field_size
       kind_size(Memory::Kind::FIELD)
     end
