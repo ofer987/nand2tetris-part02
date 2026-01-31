@@ -24,6 +24,7 @@ module JackCompiler
       ARRAY = 'array'
       CLASS = 'class'
       PRIMITIVE = 'primitive'
+      CONSTANT = 'constant'
     end
 
     # Four types of scope
@@ -32,10 +33,48 @@ module JackCompiler
       ARGUMENT = 'argument'
       FIELD = 'field'
       STATIC = 'static'
+      NOT_APPLICABLE = 'NA'
+    end
+
+    module Location
+      LOCAL = 'local'
+      CONSTANT = 'constant'
+      STATIC = 'static'
+      OBJECT = 'this'
+      ARRAY = 'that'
+      ARGUMENT = 'argument'
     end
 
     NULL_VALUE = 0
     EMPTY_CLASS = 'classless'
+
+    def memory_location
+      return Location::CONSTANT if type == Location::CONSTANT
+      return Location::LOCAL if kind == Kind::LOCAL
+      return Location::ARGUMENT if kind == Kind::ARGUMENT
+      return Location::OBJECT if kind == Kind::FIELD
+
+      raise "Memory Location could not be found for Type '#{type}' and Kind '#{kind}'"
+    end
+
+    def read_memory
+      "push #{memory_location} #{index}"
+    end
+
+    def assign_value(memory_value)
+      # rubocop:disable Style/ConditionalAssignment
+      if memory_value.match?(/^\d+$/)
+        value = "push constant #{memory_value}"
+      else
+        value = memory_value.read_memory
+      end
+      # rubocop:enable Style/ConditionalAssignment
+
+      <<~MEMORY_SCOPE
+        #{value}
+        pop #{memory_location} #{index}
+      MEMORY_SCOPE
+    end
 
     def name
       raise NotImplementedError

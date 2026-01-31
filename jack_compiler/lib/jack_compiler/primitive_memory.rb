@@ -3,7 +3,7 @@
 module JackCompiler
   class PrimitiveMemory < Memory
     attr_reader :type, :name, :kind
-    attr_accessor :value, :index
+    attr_accessor :index, :value
 
     # values are
     # String
@@ -17,6 +17,10 @@ module JackCompiler
       super(type:, name:, index:, kind:)
 
       @value = 0
+    end
+
+    def read_memory
+      "push #{memory_location} #{index}"
     end
 
     def assignment_vm_code(_options = {})

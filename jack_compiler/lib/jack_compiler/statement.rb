@@ -18,6 +18,8 @@ module JackCompiler
     CLASS_VAR_DESCRIPTION = 'classVarDec'
     CLASS_FIELD_VAR_DESCRIPTION = 'classFieldVarDec'
     SUBROUTINE_DESCRIPTION = 'subroutineDec'
+    METHOD_DESCRIPTION = 'methodDec'
+    CONSTRUCTOR_DESCRIPTION = 'constructorDec'
     SUBROUTINE_BODY = 'subroutineBody'
     VAR_DESCRIPTION = 'varDec'
     SEMI_COLON = ';'

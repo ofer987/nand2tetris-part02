@@ -7,6 +7,7 @@ module JackCompiler
     module FunctionType
       FUNCTION = 'function'
       METHOD = 'method'
+      CONSTRUCTOR = 'constructor'
     end
 
     attr_reader :memory_scope, :outer_memory_scope

@@ -5,7 +5,7 @@ module JackCompiler
   class ClassNode < Node
     NODE_NAME = Statement::CLASS
 
-    attr_reader :file_name, :class_node, :class_name, :function_nodes, :method_nodes
+    attr_reader :file_name, :class_node, :class_name, :function_nodes, :method_nodes, :constructor_nodes
 
     def static_memory_scope
       return @static_memory_scope if defined? @static_memory_scope
@@ -35,17 +35,38 @@ module JackCompiler
       self.static_memory = "> #{Statement::CLASS_VAR_DESCRIPTION}"
       self.field_memory = "> #{Statement::CLASS_FIELD_VAR_DESCRIPTION}"
       self.function_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
-      self.method_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
+      self.method_nodes = "> #{Statement::METHOD_DESCRIPTION}"
+      self.constructor_nodes = "> #{Statement::CONSTRUCTOR_DESCRIPTION}"
     end
 
     def emit_vm_code
-      function_nodes.map do |function_node|
-        <<~VM_CODE
+      result = []
+
+      function_nodes.each do |function_node|
+        result << <<~VM_CODE
           function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
 
           #{function_node.emit_vm_code}
         VM_CODE
-      end.join("\n")
+      end
+
+      constructor_nodes.each do |constructor_node|
+        result << <<~VM_CODE
+          function #{class_name}.#{constructor_node.function_name} #{constructor_node.variable_size}
+
+          #{constructor_node.emit_vm_code}
+        VM_CODE
+      end
+
+      method_nodes.each do |method_node|
+        result << <<~VM_CODE
+          function #{class_name}.#{method_node.function_name} #{method_node.variable_size}
+
+          #{method_node.emit_vm_code}
+        VM_CODE
+      end
+
+      result.join("\n")
     end
 
     private
@@ -166,6 +187,18 @@ module JackCompiler
       @method_nodes = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node, options) }
         .select { |node| node.function_type == MemoryNode::FunctionType::METHOD }
+    end
+
+    def constructor_nodes=(css_selector)
+      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+
+      options = {
+        class_name: class_name,
+        memory_scope: field_memory_scope
+      }
+      @constructor_nodes = xml_nodes
+        .map { |node| Utils::XML.convert_to_jack_node(node, options) }
+        .select { |node| node.function_type == MemoryNode::FunctionType::CONSTRUCTOR }
     end
 
     attr_reader :static_memory, :field_memory

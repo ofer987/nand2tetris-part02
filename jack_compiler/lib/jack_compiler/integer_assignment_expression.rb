@@ -22,12 +22,12 @@ module JackCompiler
       @variable = variable
 
       self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}"
-      variable.value = value
     end
 
     def emit_vm_code(_objects)
+      # TODO: modify value to be of type Memory
       <<~VM_CODE
-        push constant #{value}
+        #{variable.assign_value(value)}
       VM_CODE
     end
 
@@ -36,10 +36,12 @@ module JackCompiler
     private
 
     def value=(css_selector)
-      @value = Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector)
+      result = Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector)
         .map(&:text)
         .map(&:strip)
         .first
+
+      @value = result
     end
 
     attr_reader :xml_node, :variable
