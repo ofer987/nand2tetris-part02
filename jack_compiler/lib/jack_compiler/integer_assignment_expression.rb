@@ -25,7 +25,6 @@ module JackCompiler
     end
 
     def emit_vm_code(_objects)
-      # TODO: modify value to be of type Memory
       <<~VM_CODE
         #{variable.assign_value(value)}
       VM_CODE

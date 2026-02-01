@@ -33,8 +33,10 @@ module JackCompiler
     def emit_vm_code(objects)
       calculator = PostfixCalculator.new(expression: value)
 
-      calculator.emit_vm_code(memory: objects)
-        .join("\n")
+      result = calculator.emit_vm_code(memory: objects)
+      result << variable.assign_value_from_stack
+
+      result.join("\n")
     end
 
     private
