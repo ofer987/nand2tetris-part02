@@ -1,0 +1,108 @@
+class Math {
+  static int powers_of_two;
+
+  function void init() {
+    let powers_of_two = Array.new(16);
+
+    let powers_of_two[0] = 1;
+    let powers_of_two[1] = 2;
+    let powers_of_two[2] = 4;
+    let powers_of_two[3] = 8;
+    let powers_of_two[4] = 16;
+    let powers_of_two[5] = 32;
+    let powers_of_two[6] = 64;
+    let powers_of_two[7] = 128;
+    let powers_of_two[8] = 256;
+    let powers_of_two[9] = 512;
+    let powers_of_two[10] = 1024;
+    let powers_of_two[11] = 2048;
+    let powers_of_two[12] = 4096;
+    let powers_of_two[13] = 8192;
+    let powers_of_two[14] = 16384;
+    let powers_of_two[15] = 32768;
+
+    return;
+  }
+
+  function int power_of_two(int index) {
+    if (index > 15 | index < 0) {
+      return 0;
+    }
+
+    return powers_of_two[index];
+  }
+
+  function int add(int x, int y) {
+    return x + y;
+  }
+
+  function boolean is_negative(int x) {
+    var int value_of_power_of_two;
+    var int result;
+
+    let value_of_power_of_two = power_of_two(15);
+
+    let result = bitwise_and(x, value_of_power_of_two)
+
+    if (result > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function int absolute_value(int x, int y) {
+    if (is_negative(x)) {
+      return ~x;
+    }
+
+    return x;
+  }
+
+  function boolean result_is_positive(int x, int y) {
+    // XOR: Exclusive OR operation
+    return (is_negative(x) & is_negative(y)) | (is_negative(~x) & is_negative(~y))
+  }
+
+  function boolean is_true(int x, int index) {
+    if (index > 15 | index < 0) {
+      return false;
+    }
+
+    var int value_of_power_of_two;
+    var int result;
+    let value_of_power_of_two = power_of_two(index);
+
+    let result = bitwise_and(x, value_of_power_of_two)
+
+    if (result > 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function int bitwise_and(int x, int y) {
+    // TODO emit VM_CODE
+  }
+
+  function int multiply(int x, int y) {
+    // TODO: validate that x and y are positive numbers
+    var int shiftedX, j, sum;
+    let shiftedX = x;
+    let sum = 0;
+    let j = 0;
+
+    while (j < 16) {
+      var value_of_power_of_two = power_of_two(j)
+      if (is_true(y, value_of_power_of_two)) {
+        sum = sum + shiftedX;
+      }
+
+      shiftedX = shiftedX + shiftedX;
+      j = j + 1;
+    }
+
+    return sum;
+  }
+}

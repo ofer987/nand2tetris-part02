@@ -3,8 +3,15 @@
 module JackCompiler
   class ExecutionExpression
     class << self
-      def execution_node?(_xml_node, variable:)
-        variable.memory_type == Memory::CLASS
+      def execution_node?(xml_node)
+        evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
+          xml_node,
+          "> #{Statement::EVALUATION_TYPE_STATEMENT}"
+        ).first
+
+        return false if evaluation_node.blank?
+
+        evaluation_node.text == Statement::EXECUTION_TYPE
       end
     end
 
@@ -31,11 +38,27 @@ module JackCompiler
       variable.value = Memory::NULL_VALUE
     end
 
-    def emit_vm_code(_objects)
+    def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
       <<~VM_CODE
+        // Set up the "this" segment
+        push pointer 0
+
+        // Not required: Pop arguments
+        // push Arguments
+        #{expression_list_node.emit_vm_code(memory_scope)}
+
         call #{object}.#{method} #{expression_list_node.size}
+
+        // TODO: Method should pop the pointer into local variable
+        // TODO: Both Functions/Methods should pop the stack into argument variables
+        #{variable.assign_value_from_stack}
+
+        // Reconfigure the caller's _this_ and its arguments will be automatically reconfigured
+        push temp 0
+        pop pointer 0
+        push this 0
       VM_CODE
     end
 
@@ -51,6 +74,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node, :variable
+    attr_reader :xml_node, :variable, :memory_scope
   end
 end

@@ -55,19 +55,19 @@ class SquareGame {
   /** Moves the square in the current direction. */
   method void moveSquare() {
     if (direction = 1) {
-      do square.moveUp(); 
+      do square.moveUp();
     }
 
-    if (direction = 2) { 
-      do square.moveDown(); 
+    if (direction = 2) {
+      do square.moveDown();
     }
 
     if (direction = 3) {
-      do square.moveLeft(); 
+      do square.moveLeft();
     }
 
     if (direction = 4) {
-      do square.moveRight(); 
+      do square.moveRight();
     }
 
     do Sys.wait(5);  // delays the next movement

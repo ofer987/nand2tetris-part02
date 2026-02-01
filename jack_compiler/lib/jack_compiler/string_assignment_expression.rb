@@ -3,9 +3,7 @@
 module JackCompiler
   class StringAssignmentExpression
     class << self
-      def execution_node?(xml_node, variable:)
-        return false if variable.memory_type != Memory::CLASS
-
+      def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
           "> #{Statement::EVALUATION_TYPE_STATEMENT}"
@@ -38,6 +36,8 @@ module JackCompiler
           call String.appendChar #{variable.index}
         VM_CODE
       end
+
+      result << variable.assign_value_from_stack
 
       result
         .join("\n")

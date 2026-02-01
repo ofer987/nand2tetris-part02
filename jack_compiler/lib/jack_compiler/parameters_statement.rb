@@ -8,7 +8,7 @@ module JackCompiler
       while lines.match? REGEX
         result = lines.match(REGEX)
 
-        result_node = document.create_element(TERM_STATEMENT)
+        result_node = document.create_element(Statement::PARAMETER)
         parent_node << result_node
 
         keyword_node = document.create_element(KEYWORD, Statement::ARGUMENT_STATEMENT)

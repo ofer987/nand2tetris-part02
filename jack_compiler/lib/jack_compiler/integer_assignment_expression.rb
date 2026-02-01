@@ -3,9 +3,7 @@
 module JackCompiler
   class IntegerAssignmentExpression
     class << self
-      def execution_node?(xml_node, variable:)
-        return false if variable.memory_type != Memory::PRIMITIVE
-
+      def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
           "> #{Statement::EVALUATION_TYPE_STATEMENT}"
@@ -24,12 +22,11 @@ module JackCompiler
       @variable = variable
 
       self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}"
-      variable.value = value
     end
 
     def emit_vm_code(_objects)
       <<~VM_CODE
-        push constant #{value}
+        #{variable.assign_value(value)}
       VM_CODE
     end
 
@@ -38,10 +35,12 @@ module JackCompiler
     private
 
     def value=(css_selector)
-      @value = Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector)
+      result = Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector)
         .map(&:text)
         .map(&:strip)
         .first
+
+      @value = result
     end
 
     attr_reader :xml_node, :variable
