@@ -55,12 +55,21 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
+        #{allocate_memory_for_object}
         #{init_field_memory}
         #{emit_statements_code}
       VM_CODE
     end
 
     private
+
+    def allocate_memory_for_object
+      <<~CONSTRUCTOR
+        call Memory.alloc #{field_memory.size + 1}
+        pop pointer 0
+        push this 0
+      CONSTRUCTOR
+    end
 
     def init_field_memory
       field_memory.map do |_node_name, memory|

@@ -42,8 +42,6 @@ module JackCompiler
       return '' if expression_list_node.blank?
 
       <<~VM_CODE
-        // Call alloc
-        call Memory.alloc 1
         // Set up the "this" segment
         push pointer 0
 
@@ -56,6 +54,11 @@ module JackCompiler
         // TODO: Method should pop the pointer into local variable
         // TODO: Both Functions/Methods should pop the stack into argument variables
         #{variable.assign_value_from_stack}
+
+        // Reconfigure the caller's _this_ and its arguments will be automatically reconfigured
+        push temp 0
+        pop pointer 0
+        push this 0
       VM_CODE
     end
 
