@@ -37,6 +37,8 @@ module JackCompiler
         VM_CODE
       end
 
+      result << variable.assign_value_from_stack
+
       result
         .join("\n")
     end

@@ -61,6 +61,12 @@ module JackCompiler
       "push #{memory_location} #{index}"
     end
 
+    def assign_value_from_stack
+      <<~MEMORY_SCOPE
+        pop #{memory_location} #{index}
+      MEMORY_SCOPE
+    end
+
     def assign_value(memory_value)
       # rubocop:disable Style/ConditionalAssignment
       if memory_value.match?(/^\d+$/)

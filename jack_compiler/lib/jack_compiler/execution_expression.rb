@@ -55,6 +55,7 @@ module JackCompiler
 
         // TODO: Method should pop the pointer into local variable
         // TODO: Both Functions/Methods should pop the stack into argument variables
+        #{variable.assign_value_from_stack}
       VM_CODE
     end
 
