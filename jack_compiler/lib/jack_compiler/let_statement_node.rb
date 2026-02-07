@@ -19,12 +19,12 @@ module JackCompiler
         .text
         .strip
 
+      @object_name, @object_index = @object_name.match(/^(.+)\[(.+)\]$/)[1..2] if /\[.+/.match?(@object_name)
+
       @memory_scope = options[:memory_scope]
       @variable = memory_scope[@object_name]
 
-      if variable.type == Statement::ARRAY_CLASS
-        self.offset = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
-      end
+      @offset = @object_index if variable.type == Memory::Type::ARRAY
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
     end
@@ -32,7 +32,6 @@ module JackCompiler
     def emit_vm_code
       <<~VM_CODE
         #{expression_node.emit_vm_code(memory_scope)}
-        #{variable.assignment_vm_code({ offset: offset })}
       VM_CODE
     end
 
@@ -43,14 +42,8 @@ module JackCompiler
 
       @expression_node = xml_nodes[-1..]
         .map(&:parent)
-        .map { |node| Utils::XML.convert_to_jack_node(node, variable:, memory_scope:) }
+        .map { |node| Utils::XML.convert_to_jack_node(node, variable:, memory_scope:, offset:) }
         .first
-    end
-
-    def offset=(css_selector)
-      @offset ||= find_child_nodes_with_css_selector(css_selector)
-        .first
-        .text
     end
 
     attr_reader :memory_scope, :offset

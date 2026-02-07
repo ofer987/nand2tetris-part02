@@ -4,12 +4,13 @@ module JackCompiler
   module Utils
     # rubocop:disable Metrics/ClassLength
     class Infix
-      OPERATORS_LIST_REGEX = %r{[|*/+-]}
+      OPERATORS_LIST_REGEX = %r{[|*/+~\-&]}
 
-      MONOMIAL_REGEX = /^\s*([+-])\s*(\w+)\s*/
-      MONOMIAL_REGEX_OPEN_ROUND_BRACKET = /^\s*([+-])\s*(\()\s*/
+      MONOMIAL_REGEX = /^\s*([+~-])\s*(\w+)\s*/
+      MONOMIAL_REGEX_OPEN_ROUND_BRACKET = /^\s*([+~-])\s*(\()\s*/
       OPERATOR_REGEX = /^\s*(#{OPERATORS_LIST_REGEX})\s*/
       ARRAY_OPERAND_REGEX = /^\s*((\w+)\[(\d+)\])\s*/
+      BOOLEAN_CONSTANT_REGEX = /(false|true)/
       NUMERICAL_REGEX = /^\s*(\d+)\s*/
       OPERAND_REGEX = /^\s*(\w+)\s*/
       OPEN_ROUND_BRACKET_REGEX = /^\s*(\()\s*/
@@ -21,19 +22,23 @@ module JackCompiler
       CLOSE_ROUND_BRACKET = ')'
 
       PLUS = '+'
-      MINUS = '-'
+      MINUS = '~'
+      MINUS_01 = '-'
       MULTIPLY = '*'
       DIVIDE = '/'
       BITWISE_OR = '|'
+      BITWISE_AND = '&'
 
-      OPERATORS = [PLUS, MINUS, MULTIPLY, DIVIDE, BITWISE_OR].freeze
+      OPERATORS = [PLUS, MINUS, MINUS_01, MULTIPLY, DIVIDE, BITWISE_OR].freeze
 
       OPERATOR_PRIORITY = {
         PLUS => 0,
         MINUS => 0,
+        MINUS_01 => 0,
         MULTIPLY => 1,
         DIVIDE => 1,
-        BITWISE_OR => 1
+        BITWISE_OR => 1,
+        BITWISE_AND => 1
       }.freeze
 
       REGEXES = {

@@ -3,8 +3,7 @@
 module JackCompiler
   class InfixEvaluatorAssignmentExpression
     class << self
-      # rubocop:disable Lint/UnusedMethodArgument
-      def execution_node?(xml_node, variable: {})
+      def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
           "> #{Statement::EVALUATION_TYPE_STATEMENT}"
@@ -14,14 +13,14 @@ module JackCompiler
 
         evaluation_node.text == Statement::INFIX_EXPRESSION
       end
-      # rubocop:enable Lint/UnusedMethodArgument
     end
 
     attr_reader :value
 
-    def initialize(xml_node, variable:)
+    def initialize(xml_node, variable:, offset:)
       @xml_node = xml_node
       @variable = variable
+      @offset = offset
 
       self.value = "> #{Statement::EVALUATION_STATEMENT}"
     end
@@ -35,8 +34,10 @@ module JackCompiler
     def emit_vm_code(objects)
       calculator = PostfixCalculator.new(expression: value)
 
-      calculator.emit_vm_code(memory: objects)
-        .join("\n")
+      result = calculator.emit_vm_code(memory: objects)
+      result << variable.assign_value_from_stack(offset: offset)
+
+      result.join("\n")
     end
 
     private
@@ -54,6 +55,6 @@ module JackCompiler
       @value = Utils::Infix.to_postfix(infix_value)
     end
 
-    attr_reader :xml_node, :variable
+    attr_reader :xml_node, :variable, :offset
   end
 end

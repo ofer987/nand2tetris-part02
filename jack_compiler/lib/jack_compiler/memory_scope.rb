@@ -28,11 +28,29 @@ module JackCompiler
     end
 
     def local_size
-      current_scope_size = memory_hash
-        .select { |_key, value| value.kind == Memory::Kind::LOCAL }
-        .size
+      kind_size(Memory::Kind::LOCAL)
+    end
 
-      current_scope_size + (next_scope&.local_size || 0)
+    def field_memory
+      results = {}
+      scope = self
+
+      until scope.nil?
+        hash = scope.memory_hash
+        hash.each do |name, memory|
+          next unless memory.kind == Memory::Kind::FIELD
+
+          results[name] = memory
+        end
+
+        scope = scope.next_scope
+      end
+
+      results
+    end
+
+    def field_size
+      kind_size(Memory::Kind::FIELD)
     end
 
     def initialize(memory_hash, next_scope = nil)

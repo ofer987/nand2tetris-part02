@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class VarStatementNode < VariableNode
-    NODE_NAME = Statement::VAR_DESCRIPTION
+  class ClassFieldVariableNode < VariableNode
+    NODE_NAME = Statement::CLASS_FIELD_VAR_DESCRIPTION
 
     def kind
-      Memory::Kind::LOCAL
+      Memory::Kind::FIELD
     end
 
     def initialize(xml_node, options = {})
