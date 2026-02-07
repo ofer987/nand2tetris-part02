@@ -56,7 +56,7 @@ module JackCompiler
             )
           elsif xml_node.reference?
             memory_item = ClassMemory.new(
-              type: Memory::Type::CLASS,
+              type: xml_node.class_name,
               name: name,
               kind: xml_node.kind,
               index: index

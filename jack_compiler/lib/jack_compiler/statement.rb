@@ -56,6 +56,8 @@ module JackCompiler
     ARRAY_VALUE = 'array'
     EXECUTION_TYPE = 'execution'
 
+    CONSTRUCTOR_METHOD_CALL = 'new'
+
     attr_reader :document
 
     def initialize(document)

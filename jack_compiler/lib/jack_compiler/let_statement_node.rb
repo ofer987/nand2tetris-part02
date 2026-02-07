@@ -24,7 +24,7 @@ module JackCompiler
       @memory_scope = options[:memory_scope]
       @variable = memory_scope[@object_name]
 
-      @offset = @object_index if variable.type == Memory::Type::ARRAY
+      @offset = @object_index if variable.instance_of? ArrayMemory
 
       self.expression_node = "> #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
     end

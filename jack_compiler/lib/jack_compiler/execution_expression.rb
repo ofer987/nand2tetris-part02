@@ -42,6 +42,14 @@ module JackCompiler
     def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
+      object_name = object
+      begin
+        object_in_memory = memory_scope[object]
+        object_name = object_in_memory.type if object_in_memory.instance_of?(ClassMemory) && non_constructor_method?
+      rescue ArgumentError
+        object_name = object
+      end
+
       <<~VM_CODE
         // Set up the "this" segment
         push pointer 0
@@ -50,7 +58,7 @@ module JackCompiler
         // push Arguments
         #{expression_list_node.emit_vm_code(memory_scope)}
 
-        call #{object}.#{method} #{expression_list_node.size}
+        call #{object_name}.#{method} #{expression_list_node.size + 1}
 
         // TODO: Method should pop the pointer into local variable
         // TODO: Both Functions/Methods should pop the stack into argument variables
@@ -66,6 +74,20 @@ module JackCompiler
     def calculate(objects); end
 
     private
+
+    def non_constructor_method?
+      xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(
+        xml_node,
+        "> #{Statement::TERM_STATEMENT} > #{Statement::IDENTIFIER}"
+      ))
+
+      return false if xml_nodes.size < 2
+
+      # The method name is the second identifier
+      # Return true if this is a regular method
+      # Return false if this is a constructor
+      true if xml_nodes.map(&:text)[1] != Statement::CONSTRUCTOR_METHOD_CALL
+    end
 
     def expression_list_node=(css_selector)
       xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector))
