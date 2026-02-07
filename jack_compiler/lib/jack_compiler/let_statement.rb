@@ -15,12 +15,8 @@ module JackCompiler
 
       parent_node << result_node
 
-      if result[2].match? ArrrayExpressionStatement::REGEX
-        next_statements(result_node, result[2], array_classes)
-      else
-        value_node = document.create_element(IDENTIFIER, result[2])
-        result_node << value_node
-      end
+      value_node = document.create_element(IDENTIFIER, result[2])
+      result_node << value_node
 
       symbol_node = document.create_element(SYMBOL, result[3])
       result_node << symbol_node

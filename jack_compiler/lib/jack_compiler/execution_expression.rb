@@ -17,9 +17,10 @@ module JackCompiler
 
     attr_reader :object, :method, :symbol, :expression_list_node
 
-    def initialize(xml_node, variable:)
+    def initialize(xml_node, variable:, offset:)
       @xml_node = xml_node
       @variable = variable
+      @offset = offset
 
       @object, @method = Utils::XML.find_child_nodes_with_css_selector(
         xml_node,
@@ -74,6 +75,6 @@ module JackCompiler
         .first
     end
 
-    attr_reader :xml_node, :variable, :memory_scope
+    attr_reader :xml_node, :variable, :memory_scope, :offset
   end
 end

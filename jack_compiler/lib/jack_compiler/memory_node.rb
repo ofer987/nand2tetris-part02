@@ -49,14 +49,14 @@ module JackCompiler
             )
           elsif xml_node.array?
             memory_item = ArrayMemory.new(
-              type: xml_node.type,
+              type: Memory::Type::ARRAY,
               name: name,
               kind: xml_node.kind,
               index: index
             )
           elsif xml_node.reference?
             memory_item = ClassMemory.new(
-              type: xml_node.type,
+              type: Memory::Type::CLASS,
               name: name,
               kind: xml_node.kind,
               index: index

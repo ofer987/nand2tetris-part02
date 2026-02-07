@@ -17,9 +17,10 @@ module JackCompiler
 
     attr_reader :value
 
-    def initialize(xml_node, variable:)
+    def initialize(xml_node, variable:, offset:)
       @xml_node = xml_node
       @variable = variable
+      @offset = offset
 
       self.value = "> #{Statement::TERM_STATEMENT} > #{Statement::INTEGER_CONSTANT}"
     end
@@ -43,6 +44,6 @@ module JackCompiler
       @value = result
     end
 
-    attr_reader :xml_node, :variable
+    attr_reader :xml_node, :variable, :offset
   end
 end

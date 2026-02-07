@@ -61,7 +61,19 @@ module JackCompiler
       "push #{memory_location} #{index}"
     end
 
-    def assign_value_from_stack
+    def assign_value_from_stack(offset: 0)
+      if type == Type::ARRAY
+        return <<~OFFSET
+          push #{offset}
+          push #{memory_location} #{index}
+          add
+
+          pop pointer 1
+
+          pop that 0
+        OFFSET
+      end
+
       <<~MEMORY_SCOPE
         pop #{memory_location} #{index}
       MEMORY_SCOPE

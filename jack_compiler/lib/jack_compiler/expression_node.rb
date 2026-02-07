@@ -15,6 +15,7 @@ module JackCompiler
       super(xml_node, options)
 
       @variable = options[:variable]
+      @offset = options[:offset]
 
       init_execution_expression_node
     end
@@ -35,9 +36,9 @@ module JackCompiler
         .select { |klazz| klazz.execution_node?(xml_node) }
         .first
 
-      @internal_expression_node = internal_expression_class.new(xml_node, variable:)
+      @internal_expression_node = internal_expression_class.new(xml_node, variable:, offset:)
     end
 
-    attr_reader :internal_expression_node, :variable
+    attr_reader :internal_expression_node, :variable, :offset
   end
 end

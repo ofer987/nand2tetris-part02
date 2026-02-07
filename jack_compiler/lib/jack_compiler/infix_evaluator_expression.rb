@@ -17,9 +17,10 @@ module JackCompiler
 
     attr_reader :value
 
-    def initialize(xml_node, variable:)
+    def initialize(xml_node, variable:, offset:)
       @xml_node = xml_node
       @variable = variable
+      @offset = offset
 
       self.value = "> #{Statement::EVALUATION_STATEMENT}"
     end
@@ -34,7 +35,7 @@ module JackCompiler
       calculator = PostfixCalculator.new(expression: value)
 
       result = calculator.emit_vm_code(memory: objects)
-      result << variable.assign_value_from_stack
+      result << variable.assign_value_from_stack(offset: offset)
 
       result.join("\n")
     end
@@ -54,6 +55,6 @@ module JackCompiler
       @value = Utils::Infix.to_postfix(infix_value)
     end
 
-    attr_reader :xml_node, :variable
+    attr_reader :xml_node, :variable, :offset
   end
 end

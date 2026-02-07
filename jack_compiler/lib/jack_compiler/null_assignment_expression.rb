@@ -19,9 +19,10 @@ module JackCompiler
       0
     end
 
-    def initialize(xml_node, variable:)
+    def initialize(xml_node, variable:, offset:)
       @xml_node = xml_node
       @variable = variable
+      @offset = offset
 
       variable.value = 0
     end
@@ -37,6 +38,6 @@ module JackCompiler
 
     private
 
-    attr_reader :variable
+    attr_reader :variable, :offset
   end
 end
