@@ -29,7 +29,13 @@ module JackCompiler
     private
 
     def next_classes
-      [ClassVariableStatement, ClassFieldVariableStatement, ClassSubroutineStatement, ClassMethodStatement, ClassConstructorStatement]
+      [
+        ClassVariableStatement,
+        ClassFieldVariableStatement,
+        ClassSubroutineStatement,
+        ClassMethodStatement,
+        ClassConstructorStatement
+      ]
     end
 
     def end_classes

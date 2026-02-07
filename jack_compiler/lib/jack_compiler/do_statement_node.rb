@@ -75,8 +75,6 @@ module JackCompiler
       @expression_list_node = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node) }
         .first
-
-
     end
 
     attr_reader :expression_list_node
