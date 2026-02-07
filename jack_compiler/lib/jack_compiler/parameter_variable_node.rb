@@ -2,9 +2,9 @@
 
 module JackCompiler
   class ParameterVariableNode < VariableNode
-    NODE_NAME = Statement::TERM_STATEMENT
+    NODE_NAME = Statement::PARAMETER
 
-    def memory_kind
+    def kind
       Memory::Kind::ARGUMENT
     end
 

@@ -6,6 +6,7 @@ module JackCompiler
 
     LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*([^;]+)(;)/
     ARRAY_EXPRESSION = /(([^\[]+)(\[)(\d+)(\]))/
+    BOOLEAN_CONSTANT_ASSIGNMENT = /(false|true)/
     STRING_CONSTANT_ASSIGNMENT = /"(.*)"/
     INTEGER_CONSTANT_ASSIGNMENT = /(\d+)/
     NULL_CONSTANT_ASSIGNMENT = /(null)/
@@ -24,14 +25,18 @@ module JackCompiler
     BINARY_OPERATION_EXPRESSION_REGEX_03 = /(([^\s]+)\s*(#{OPERATIONS})\s*((\().+(\))))/
     # No UNARY operations
     BINARY_OPERATION_EXPRESSION_REGEX_04 = /(([^\s]+)\s*(#{OPERATIONS})\s*([^\s]+))/
+    INFIX_EXPRESSION = /(.+)/
 
     CLASS = /class\s+(\S+)\s+{/
     FUNCTION = /(function)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
+    METHOD = /(method)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
+    CONSTRUCTOR = /(constructor)\s+(\S+)\s+(\S+)\(([^)]*)\)\s*/
     SUBROUTINE_BODY = //
     ENDING_STATEMENT = /;/
     OPEN_BRACE = /({)/
     CLOSE_BRACE = /}/
     CLASS_VAR_STATEMENT = /(static)\s+(\S+)\s+(\S+)\s*;/
+    CLASS_FIELD_VAR_STATEMENT = /(field)\s+(\S+)\s+(\S+)\s*;/
     ASSIGNMENT_EXPRESSION_STATEMENT = /(\S+)(\.)(\S+)(\()([^)]*)(\))\s*/
     VAR_STATEMENT = /(var)\s+(\S+)\s+([^;]+)\s*(;)/
     DO_STATEMENT = /(do)\s*(#{ASSIGNMENT_EXPRESSION_STATEMENT})(;)/
@@ -41,7 +46,7 @@ module JackCompiler
     RETURN_STATEMENT = /(return)\s*(\S+)(;)/
     EMPTY_RETURN_STATEMENT = /(return)\s*(;)/
     ARGUMENT_STATEMENT = /([^,]+),?/
-    IF_STATEMENT_REGEX = /(if)\s*(\()\s*(\S+)\s*(\))\s*({)/
+    IF_STATEMENT_REGEX = /(if)\s*(\()([^{]+)(\))\s*({)/
     ELSE_STATEMENT_REGEX = /(else)\s*({)/
     STATEMENTS_REGEX = /if|let|do|return/
   end

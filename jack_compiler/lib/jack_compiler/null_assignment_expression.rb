@@ -3,7 +3,7 @@
 module JackCompiler
   class NullAssignmentExpression
     class << self
-      def execution_node?(xml_node, _options)
+      def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
           xml_node,
           "> #{Statement::EVALUATION_TYPE_STATEMENT}"
@@ -11,7 +11,7 @@ module JackCompiler
 
         return false if evaluation_node.blank?
 
-        evaluation_node.text == Statement::NULL_VALUE
+        evaluation_node.text == Statement::NULL_CONSTANT
       end
     end
 
@@ -19,9 +19,10 @@ module JackCompiler
       0
     end
 
-    def initialize(xml_node, variable:)
+    def initialize(xml_node, variable:, offset:)
       @xml_node = xml_node
       @variable = variable
+      @offset = offset
 
       variable.value = 0
     end
@@ -29,6 +30,7 @@ module JackCompiler
     def emit_vm_code(_objects)
       <<~VM_CODE
         push constant #{value}
+        #{variable.assign_value_from_stack}
       VM_CODE
     end
 
@@ -36,6 +38,6 @@ module JackCompiler
 
     private
 
-    attr_reader :variable
+    attr_reader :variable, :offset
   end
 end
