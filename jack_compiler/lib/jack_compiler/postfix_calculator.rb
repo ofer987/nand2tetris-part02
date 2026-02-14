@@ -102,7 +102,7 @@ module JackCompiler
           variable = memory[array_name]
 
           result << "push constant #{array_index}"
-          result << "push #{variable.kind} #{variable.index}"
+          result << "push #{variable.memory_location} #{variable.index}"
           result << 'add'
 
           result << 'pop pointer 1'
@@ -115,7 +115,7 @@ module JackCompiler
           variable = memory[variable_name]
 
           values_stack << 1
-          result << "push #{variable.kind} #{variable.index}"
+          result << "push #{variable.memory_location} #{variable.index}"
         elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
           raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
 

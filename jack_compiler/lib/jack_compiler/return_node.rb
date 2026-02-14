@@ -26,7 +26,10 @@ module JackCompiler
           return
         VM_CODE
       else
-        memory_scope[value].read_memory
+        <<~VM_CODE
+          #{memory_scope[value].read_memory}
+          return
+        VM_CODE
       end
     end
 
