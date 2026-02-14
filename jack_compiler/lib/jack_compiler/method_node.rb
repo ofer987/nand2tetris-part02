@@ -30,11 +30,13 @@ module JackCompiler
         .map(&:strip)
 
       argument_memory_scope = init_new_memory_scope(outer_memory_scope)
-      nodes = memory_nodes("> #{Statement::PARAMETER_LIST} > #{Statement::PARAMETER}")
+      this_node = ClassMemory.new(type: class_name, kind: Memory::Kind::ARGUMENT, name: 'this', index: 0)
+      nodes = memory_nodes("> #{Statement::PARAMETER_LIST} > #{Statement::PARAMETER}", index: 1)
+
+      argument_memory_scope << this_node
       nodes.each do |node|
         argument_memory_scope << node
       end
-      # @argument_memory_scope.next_scope = outer_memory_scope
 
       @memory_scope = init_new_memory_scope(argument_memory_scope)
       nodes = memory_nodes("> #{Statement::SUBROUTINE_BODY} > #{Statement::VAR_DESCRIPTION}")
@@ -53,11 +55,19 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
+        #{emit_this_variable}
         #{emit_statements_code}
       VM_CODE
     end
 
     private
+
+    def emit_this_variable
+      <<~VM_CODE
+        push argument 0
+        pop pointer 0
+      VM_CODE
+    end
 
     def emit_statements_code
       @statement_nodes

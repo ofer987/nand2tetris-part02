@@ -15,7 +15,7 @@ module JackCompiler
       return if key? memory_node&.name
 
       next_index = kind_size(memory_node.kind)
-      memory_node.index = next_index
+      memory_node.index = next_index if memory_node.kind == Memory::Kind::LOCAL
 
       memory_hash[memory_node.name] = memory_node
     end

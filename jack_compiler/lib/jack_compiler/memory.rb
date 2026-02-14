@@ -117,8 +117,8 @@ module JackCompiler
     def initialize(type:, name:, index:, kind:)
       @type = type
       @name = name
-      @index = index
       @kind = kind
+      @index = index
     end
 
     def assignment_vm_code(_options = {})
