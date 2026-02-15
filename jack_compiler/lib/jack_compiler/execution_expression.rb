@@ -47,27 +47,21 @@ module JackCompiler
         object_in_memory = memory_scope[object]
         object_name = object_in_memory.type if object_in_memory.instance_of?(ClassMemory) && non_constructor_method?
       rescue ArgumentError
+        return emit_vm_code_for_constructor if memory_scope.class?(object)
+
         object_name = object
       end
 
+      # TODO: add this to the expression list if it is a method call
+      # And then remove the `+ 1` operand
       <<~VM_CODE
-        // Set up the "this" segment
-        push pointer 0
-
-        // Not required: Pop arguments
-        // push Arguments
-        #{expression_list_node.emit_vm_code(memory_scope)}
-
         call #{object_name}.#{method} #{expression_list_node.size + 1}
+      VM_CODE
+    end
 
-        // TODO: Method should pop the pointer into local variable
-        // TODO: Both Functions/Methods should pop the stack into argument variables
-        #{variable.assign_value_from_stack}
-
-        // Reconfigure the caller's _this_ and its arguments will be automatically reconfigured
-        push temp 0
-        pop pointer 0
-        push this 0
+    def emit_vm_code_for_constructor
+      <<~VM_CODE
+        call #{object}.new #{expression_list_node.size}
       VM_CODE
     end
 
