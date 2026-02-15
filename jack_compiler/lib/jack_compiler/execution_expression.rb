@@ -42,32 +42,44 @@ module JackCompiler
     def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
-      object_name = object
       begin
-        object_in_memory = memory_scope[object]
-        object_name = object_in_memory.type if object_in_memory.instance_of?(ClassMemory) && non_constructor_method?
+        obj = memory_scope[object]
       rescue ArgumentError
         return emit_vm_code_for_constructor if memory_scope.class?(object)
 
-        object_name = object
+        throw "Illegal object #{object} does not exist in application memory as either a variable or type"
       end
 
       # TODO: add this to the expression list if it is a method call
       # And then remove the `+ 1` operand
+      # TODO: the method / function should store the local variable
       <<~VM_CODE
-        call #{object_name}.#{method} #{expression_list_node.size + 1}
+        call #{obj.name}.#{function_name} #{expression_list_node.size + 1}
+        pop #{variable.memory_location} #{variable.index}
+        push #{obj.memory_location} #{obj.index}
       VM_CODE
     end
 
     def emit_vm_code_for_constructor
       <<~VM_CODE
         call #{object}.new #{expression_list_node.size}
+        pop #{variable.memory_location} #{variable.index}
+        push #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 
     def calculate(objects); end
 
     private
+
+    def function_name
+      xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(
+        xml_node,
+        "> #{Statement::TERM_STATEMENT} > #{Statement::IDENTIFIER}"
+      ))
+
+      xml_nodes[1].text
+    end
 
     def non_constructor_method?
       xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(

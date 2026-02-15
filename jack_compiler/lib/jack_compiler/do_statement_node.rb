@@ -32,8 +32,13 @@ module JackCompiler
     def emit_vm_code
       # TODO: add this to the expression list if it is a method call
       # And then remove the `+ 1` operand
+
+      # TODO: the method / function should store the local variable
       <<~VM_CODE
         call #{variable.type}.#{method_name} #{expression_list_node.size + 1}
+
+        pop temp 0
+        push #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 
