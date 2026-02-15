@@ -61,7 +61,7 @@ module JackCompiler
       "push #{memory_location} #{index}"
     end
 
-    def assign_value_from_stack
+    def assign_value_from_stack(offset: 0)
       <<~MEMORY_SCOPE
         pop #{memory_location} #{index}
       MEMORY_SCOPE

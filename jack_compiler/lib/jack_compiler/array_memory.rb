@@ -21,8 +21,11 @@ module JackCompiler
       VM_CODE
     end
 
-    def assign_value_from_stack
+    def assign_value_from_stack(offset:)
       <<~MEMORY_SCOPE
+        push constant #{offset}
+        push #{memory_location} #{index}
+        add
         pop temp 0
         pop pointer 1
         push temp 0
