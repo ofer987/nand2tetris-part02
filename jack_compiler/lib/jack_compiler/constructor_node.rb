@@ -56,7 +56,6 @@ module JackCompiler
     def emit_vm_code
       <<~VM_CODE
         #{allocate_memory_for_object}
-        #{init_field_memory}
         #{emit_statements_code}
       VM_CODE
     end
@@ -68,20 +67,7 @@ module JackCompiler
         push constant 2
         call Memory.alloc 1
         pop pointer 0
-        push this 0
       CONSTRUCTOR
-    end
-
-    def init_field_memory
-      field_memory.map do |_node_name, memory|
-        # TODO: do not assume that memory is Constant, because
-        # It might be a variable or a String
-        # memory.assign_value(ConstantMemory.new(value: memory.value))
-        <<~MEMORY_SCOPE
-          push constant #{memory.value}
-          pop this #{memory.index}
-        MEMORY_SCOPE
-      end.join("\n")
     end
 
     def emit_statements_code
