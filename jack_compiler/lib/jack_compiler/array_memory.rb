@@ -30,6 +30,15 @@ module JackCompiler
       VM_CODE
     end
 
+    def assign_value_from_stack
+      <<~MEMORY_SCOPE
+        pop temp 0
+        pop pointer 1
+        push temp 0
+        pop that 0
+      MEMORY_SCOPE
+    end
+
     def emit_vm_code
       ''
     end
