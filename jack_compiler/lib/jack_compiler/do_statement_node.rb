@@ -21,7 +21,13 @@ module JackCompiler
       self.expression_list_node = "> #{Statement::EXPRESSION_LIST}"
 
       @memory_scope = options[:memory_scope]
-      @variable = memory_scope[@object_name]
+      begin
+        @variable = memory_scope[@object_name]
+      rescue ArgumentError
+        @variable = @object_name
+
+        self.should_emit_function_vm_code = true
+      end
 
       @symbol = find_child_nodes_with_css_selector("> #{Statement::SYMBOL}")
         .map(&:text)
@@ -30,21 +36,46 @@ module JackCompiler
     end
 
     def emit_vm_code
-      # TODO: add this to the expression list if it is a method call
-      # And then remove the `+ 1` operand
+      return emit_function_vm_code if should_emit_function_vm_code
 
-      # TODO: the method / function should store the local variable
-      # The this is always the first argument for methods
-      # NOTE: discard the value in the empty return statement
-      <<~VM_CODE
-        push #{variable.memory_location} #{variable.index}
+      result = []
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
+
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      result << <<~VM_CODE
         call #{variable.type}.#{method_name} #{expression_list_node.size + 1}
 
         pop temp 0
       VM_CODE
+
+      result.join("\n")
     end
 
     private
+
+    def emit_function_vm_code
+      result = []
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
+
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      result << <<~VM_CODE
+        call #{object_name}.#{method_name} #{expression_list_node.size}
+
+        pop temp 0
+      VM_CODE
+
+      result.join("\n")
+    end
 
     def push_into_argument_memory(expression_list_node_size)
       expression_list_node_size.times
@@ -67,5 +98,6 @@ module JackCompiler
     end
 
     attr_reader :expression_list_node
+    attr_accessor :should_emit_function_vm_code
   end
 end

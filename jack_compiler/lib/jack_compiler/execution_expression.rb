@@ -47,14 +47,9 @@ module JackCompiler
       rescue ArgumentError
         return emit_vm_code_for_constructor if memory_scope.class?(object)
 
-        throw "Illegal object #{object} does not exist in application memory as either a variable or type"
+        return emit_function_vm_code
       end
 
-      # TODO: add this to the expression list if it is a method call
-      # And then remove the `+ 1` operand
-      # TODO: the method / function should store the local variable
-      # The this is always the first argument for methods
-      # NOTE: Store the value of the return statement in variable
       result = []
       if obj.instance_of? ClassMemory
         result << <<~VM_CODE
@@ -78,16 +73,35 @@ module JackCompiler
       result.join("\n")
     end
 
+    def calculate(objects); end
+
+    private
+
+    def emit_function_vm_code
+      result = []
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
+
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      result << <<~VM_CODE
+        call #{object_name}.#{method_name} #{expression_list_node.size}
+
+        pop temp 0
+      VM_CODE
+
+      result.join("\n")
+    end
+
     def emit_vm_code_for_constructor
       <<~VM_CODE
         call #{object}.new #{expression_list_node.size}
         pop #{variable.memory_location} #{variable.index}
       VM_CODE
     end
-
-    def calculate(objects); end
-
-    private
 
     def method_name
       xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(
