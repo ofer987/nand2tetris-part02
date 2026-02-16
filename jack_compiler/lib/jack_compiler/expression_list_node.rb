@@ -12,21 +12,17 @@ module JackCompiler
       Statement::BOOLEAN_CONSTANT
     ].freeze
 
-    attr_reader :parameters
+    def parameters
+      return @parameters if defined? @parameters
+
+      @parameters = find_child_nodes_with_css_selector(Statement::EVALUATION_STATEMENT)
+        .map(&:text)
+    end
 
     def size
       return @size if defined? @size
 
-      values = find_child_nodes_with_css_selector(Statement::EVALUATION_STATEMENT)
-        .map(&:text)
-      value_types = find_child_nodes_with_css_selector(Statement::EVALUATION_TYPE_STATEMENT)
-        .map(&:text)
-
-      unless values.size == value_types.size
-        raise "Parameter list has #{values.size} values, but only #{value_types.size} types"
-      end
-
-      @size = values.size
+      @size = parameters.size
     end
 
     def emit_vm_code(memory_scope)

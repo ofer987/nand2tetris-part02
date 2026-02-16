@@ -55,11 +55,27 @@ module JackCompiler
       # TODO: the method / function should store the local variable
       # The this is always the first argument for methods
       # NOTE: Store the value of the return statement in variable
-      <<~VM_CODE
-        push #{obj.memory_location} #{obj.index}
+      result = []
+      if obj.instance_of? ClassMemory
+        result << <<~VM_CODE
+          push #{obj.memory_location} #{obj.index}
+        VM_CODE
+      end
+
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
+
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      result << <<~VM_CODE
         call #{obj.name}.#{method_name} #{expression_list_node.size + 1}
         pop #{variable.memory_location} #{variable.index}
       VM_CODE
+
+      result.join("\n")
     end
 
     def emit_vm_code_for_constructor
