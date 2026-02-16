@@ -34,11 +34,13 @@ module JackCompiler
       # And then remove the `+ 1` operand
 
       # TODO: the method / function should store the local variable
+      # The this is always the first argument for methods
+      # NOTE: discard the value in the empty return statement
       <<~VM_CODE
+        push #{variable.memory_location} #{variable.index}
         call #{variable.type}.#{method_name} #{expression_list_node.size + 1}
 
         pop temp 0
-        push #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 

@@ -53,10 +53,12 @@ module JackCompiler
       # TODO: add this to the expression list if it is a method call
       # And then remove the `+ 1` operand
       # TODO: the method / function should store the local variable
+      # The this is always the first argument for methods
+      # NOTE: Store the value of the return statement in variable
       <<~VM_CODE
-        call #{obj.name}.#{function_name} #{expression_list_node.size + 1}
-        pop #{variable.memory_location} #{variable.index}
         push #{obj.memory_location} #{obj.index}
+        call #{obj.name}.#{method_name} #{expression_list_node.size + 1}
+        pop #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 
@@ -64,7 +66,6 @@ module JackCompiler
       <<~VM_CODE
         call #{object}.new #{expression_list_node.size}
         pop #{variable.memory_location} #{variable.index}
-        push #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 
@@ -72,7 +73,7 @@ module JackCompiler
 
     private
 
-    def function_name
+    def method_name
       xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(
         xml_node,
         "> #{Statement::TERM_STATEMENT} > #{Statement::IDENTIFIER}"
