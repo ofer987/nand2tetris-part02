@@ -80,6 +80,19 @@ module JackCompiler
       next_klass = next_classes
         .select { |klass| next_lines.match?(/^#{klass::REGEX}/) }
         .first
+
+      if next_klass.blank? && !next_lines.strip.blank?
+        parsed_line = next_lines.split(';').first
+        puts <<~PARSE_FAILURE
+          Failed to parse this line:
+          ```jack
+          #{parsed_line}
+          ```
+        PARSE_FAILURE
+
+        exit 1
+      end
+
       return next_lines if next_klass.blank?
 
       next_klass
