@@ -39,6 +39,11 @@ module JackCompiler
       return emit_function_vm_code if should_emit_function_vm_code
 
       result = []
+
+      # the this object
+      result << variable.read_memory
+
+      # The parameters
       expression_list_node.parameters.each do |parameter|
         parameter_memory = memory_scope[parameter]
 
@@ -47,6 +52,8 @@ module JackCompiler
         VM_CODE
       end
 
+      # Now let us call the method
+      # And discard the return statement
       result << <<~VM_CODE
         call #{variable.type}.#{method_name} #{expression_list_node.size + 1}
 
