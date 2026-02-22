@@ -37,32 +37,23 @@ module JackCompiler
       self.function_nodes = "> #{Statement::SUBROUTINE_DESCRIPTION}"
       self.method_nodes = "> #{Statement::METHOD_DESCRIPTION}"
       self.constructor_nodes = "> #{Statement::CONSTRUCTOR_DESCRIPTION}"
+
+      init_child_node_names
     end
 
     def emit_vm_code
       result = []
 
-      function_nodes.each do |function_node|
+      child_nodes = all_child_nodes
+      child_node_names.each do |node_name|
+        node = child_nodes
+          .select { |item| item.function_name == node_name }
+          .first
+
         result << <<~VM_CODE
-          function #{class_name}.#{function_node.function_name} #{function_node.variable_size}
+          function #{class_name}.#{node.function_name} #{node.variable_size}
 
-          #{function_node.emit_vm_code}
-        VM_CODE
-      end
-
-      constructor_nodes.each do |constructor_node|
-        result << <<~VM_CODE
-          function #{class_name}.#{constructor_node.function_name} #{constructor_node.variable_size}
-
-          #{constructor_node.emit_vm_code}
-        VM_CODE
-      end
-
-      method_nodes.each do |method_node|
-        result << <<~VM_CODE
-          function #{class_name}.#{method_node.function_name} #{method_node.variable_size}
-
-          #{method_node.emit_vm_code}
+          #{node.emit_vm_code}
         VM_CODE
       end
 
@@ -201,7 +192,19 @@ module JackCompiler
         .select { |node| node.function_type == MemoryNode::FunctionType::CONSTRUCTOR }
     end
 
-    attr_reader :static_memory, :field_memory
+    def init_child_node_names
+      allowed_nodes = [Statement::METHOD_DESCRIPTION, Statement::SUBROUTINE_DESCRIPTION, Statement::CONSTRUCTOR_DESCRIPTION]
+
+      @child_node_names = xml_node.children
+        .select { |item| allowed_nodes.include? item.name }
+        .map { |item| item.children.select { |child| child.name == 'identifier' }.first.text }
+    end
+
+    def all_child_nodes
+      function_nodes.concat(method_nodes).concat(constructor_nodes)
+    end
+
+    attr_reader :static_memory, :field_memory, :child_node_names
   end
   # rubocop:enable Metrics/ClassLength
 end
