@@ -4,9 +4,21 @@
 require 'pry-byebug'
 require_relative '../lib/jack_compiler'
 
-paths = ARGV[0..].map(&:strip)
+dir = ARGV[0].strip
 
-paths.each do |path|
+unless File.stat(dir).directory?
+  puts "#{dir} is not a Directory!"
+
+  exit 1
+end
+
+jack_paths = Dir.entries(dir)
+  .map { |item| File.join(dir, item) }
+  .select { |item| File.lstat(item).file? }
+  .select { |item| item.end_with? '.jack' }
+  .sort
+
+jack_paths.each do |path|
   state_machine = JackCompiler::StateMachine.new(path)
   state_machine.parse
 
