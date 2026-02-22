@@ -66,7 +66,7 @@ module JackCompiler
       end
 
       result << <<~VM_CODE
-        call #{obj.name}.#{method_name} #{expression_list_node.size + 1}
+        call #{obj.type}.#{method_name} #{expression_list_node.size + 1}
         pop #{variable.memory_location} #{variable.index}
       VM_CODE
 
