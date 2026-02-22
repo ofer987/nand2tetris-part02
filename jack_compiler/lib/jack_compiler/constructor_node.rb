@@ -64,7 +64,7 @@ module JackCompiler
 
     def allocate_memory_for_object
       <<~CONSTRUCTOR
-        push constant 2
+        push constant #{field_memory.size}
         call Memory.alloc 1
         pop pointer 0
       CONSTRUCTOR
