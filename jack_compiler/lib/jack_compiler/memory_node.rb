@@ -29,7 +29,7 @@ module JackCompiler
     end
 
     # rubocop:disable Metrics/MethodLength
-    def memory_nodes(css_selector)
+    def memory_nodes(css_selector, index: 0)
       memory_nodes = []
 
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
@@ -38,7 +38,6 @@ module JackCompiler
       xml_nodes.each do |node|
         xml_node = Utils::XML.convert_to_jack_node(node)
 
-        index = 0
         xml_node.names.each do |name|
           if xml_node.primitive?
             memory_item = PrimitiveMemory.new(
@@ -56,7 +55,7 @@ module JackCompiler
             )
           elsif xml_node.reference?
             memory_item = ClassMemory.new(
-              type: Memory::Type::CLASS,
+              type: xml_node.class_name,
               name: name,
               kind: xml_node.kind,
               index: index

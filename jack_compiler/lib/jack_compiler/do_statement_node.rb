@@ -21,7 +21,13 @@ module JackCompiler
       self.expression_list_node = "> #{Statement::EXPRESSION_LIST}"
 
       @memory_scope = options[:memory_scope]
-      @variable = memory_scope[@object_name]
+      begin
+        @variable = memory_scope[@object_name]
+      rescue ArgumentError
+        @variable = @object_name
+
+        self.should_emit_function_vm_code = true
+      end
 
       @symbol = find_child_nodes_with_css_selector("> #{Statement::SYMBOL}")
         .map(&:text)
@@ -30,32 +36,53 @@ module JackCompiler
     end
 
     def emit_vm_code
-      <<~VM_CODE
-        // Temporarily remember the current value of _this_
-        push pointer 0
-        pop temp 0
+      return emit_function_vm_code if should_emit_function_vm_code
 
-        // TODO: push rest of variables in the expression list
-        // Push the object first, and the rest of the parameters into the stack
-        push #{variable.kind} #{variable.index}
-        #{expression_list_node.emit_vm_code(memory_scope)}
+      result = []
 
-        // Now we pop the values off the stack into the argument memory in reverse order
-        #{pop_into_argument_memory(expression_list_node.size)}
+      # the this object
+      result << variable.read_memory
+
+      # The parameters
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
+
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      # Now let us call the method
+      # And discard the return statement
+      result << <<~VM_CODE
         call #{variable.type}.#{method_name} #{expression_list_node.size + 1}
-        // TODO: Configure the "Call" to pop the first argument into pointer 0 and then into push into _this 0_
 
-        // pop the empty return statement off the stack
         pop temp 0
-
-        // Reconfigure the caller's _this_ and its arguments will be automatically reconfigured
-        push temp 0
-        pop pointer 0
-        push this 0
       VM_CODE
+
+      result.join("\n")
     end
 
     private
+
+    def emit_function_vm_code
+      result = []
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
+
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      result << <<~VM_CODE
+        call #{object_name}.#{method_name} #{expression_list_node.size}
+
+        pop temp 0
+      VM_CODE
+
+      result.join("\n")
+    end
 
     def push_into_argument_memory(expression_list_node_size)
       expression_list_node_size.times
@@ -78,5 +105,6 @@ module JackCompiler
     end
 
     attr_reader :expression_list_node
+    attr_accessor :should_emit_function_vm_code
   end
 end

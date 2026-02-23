@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pry-byebug'
+require_relative '../lib/jack_compiler'
+
+dir = ARGV[0].strip
+
+unless File.stat(dir).directory?
+  puts "#{dir} is not a Directory!"
+
+  exit 1
+end
+
+jack_paths = Dir.entries(dir)
+  .map { |item| File.join(dir, item) }
+  .select { |item| File.lstat(item).file? }
+  .select { |item| item.end_with? '.jack' }
+  .sort
+
+jack_paths.each do |path|
+  state_machine = JackCompiler::StateMachine.new(path)
+  state_machine.parse
+
+  root = state_machine.document.root
+
+  root_jack_node = JackCompiler::Utils::XML.convert_to_jack_node(root)
+
+  puts root_jack_node.emit_vm_code
+    .split("\n")
+    .reject(&:blank?)
+    .map(&:strip)
+    .join("\n")
+end

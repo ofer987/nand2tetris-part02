@@ -42,30 +42,89 @@ module JackCompiler
     def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
-      <<~VM_CODE
-        // Set up the "this" segment
-        push pointer 0
+      begin
+        obj = memory_scope[object]
+      rescue ArgumentError
+        return emit_vm_code_for_constructor if memory_scope.class?(object)
 
-        // Not required: Pop arguments
-        // push Arguments
-        #{expression_list_node.emit_vm_code(memory_scope)}
+        return emit_function_vm_code
+      end
 
-        call #{object}.#{method} #{expression_list_node.size}
+      result = []
+      if obj.instance_of? ClassMemory
+        result << <<~VM_CODE
+          push #{obj.memory_location} #{obj.index}
+        VM_CODE
+      end
 
-        // TODO: Method should pop the pointer into local variable
-        // TODO: Both Functions/Methods should pop the stack into argument variables
-        #{variable.assign_value_from_stack}
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
 
-        // Reconfigure the caller's _this_ and its arguments will be automatically reconfigured
-        push temp 0
-        pop pointer 0
-        push this 0
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      result << <<~VM_CODE
+        call #{obj.type}.#{method_name} #{expression_list_node.size + 1}
+        pop #{variable.memory_location} #{variable.index}
       VM_CODE
+
+      result.join("\n")
     end
 
     def calculate(objects); end
 
     private
+
+    def emit_function_vm_code
+      result = []
+      expression_list_node.parameters.each do |parameter|
+        parameter_memory = memory_scope[parameter]
+
+        result << <<~VM_CODE
+          push #{parameter_memory.memory_location} #{parameter_memory.index}
+        VM_CODE
+      end
+
+      result << <<~VM_CODE
+        call #{object_name}.#{method_name} #{expression_list_node.size}
+
+        pop temp 0
+      VM_CODE
+
+      result.join("\n")
+    end
+
+    def emit_vm_code_for_constructor
+      <<~VM_CODE
+        call #{object}.new #{expression_list_node.size}
+        pop #{variable.memory_location} #{variable.index}
+      VM_CODE
+    end
+
+    def method_name
+      xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(
+        xml_node,
+        "> #{Statement::TERM_STATEMENT} > #{Statement::IDENTIFIER}"
+      ))
+
+      xml_nodes[1].text
+    end
+
+    def non_constructor_method?
+      xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(
+        xml_node,
+        "> #{Statement::TERM_STATEMENT} > #{Statement::IDENTIFIER}"
+      ))
+
+      return false if xml_nodes.size < 2
+
+      # The method name is the second identifier
+      # Return true if this is a regular method
+      # Return false if this is a constructor
+      true if xml_nodes.map(&:text)[1] != Statement::CONSTRUCTOR_METHOD_CALL
+    end
 
     def expression_list_node=(css_selector)
       xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(xml_node, css_selector))

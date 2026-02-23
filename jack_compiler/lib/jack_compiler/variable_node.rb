@@ -5,7 +5,7 @@ module JackCompiler
     # TODO: Use the same pattern as the VarStatementNode
     NODE_NAME = ''
 
-    attr_reader :memory_index
+    attr_reader :memory_index, :keywords, :identifiers
 
     def array?
       return @array if defined? @array
@@ -19,6 +19,12 @@ module JackCompiler
 
     def reference?
       @keywords.size == 1
+    end
+
+    def class_name
+      return identifiers.first.text if reference?
+
+      raise 'This is not a class object'
     end
 
     def kind
@@ -69,9 +75,5 @@ module JackCompiler
     def emit_vm_code
       ''
     end
-
-    protected
-
-    attr_reader :keywords, :identifiers
   end
 end

@@ -4,6 +4,16 @@ module JackCompiler
   class MemoryScope
     attr_accessor :memory_hash, :next_scope
 
+    def class?(name)
+      return true if memory_hash
+        .select { |_name, object| object.instance_of? ClassMemory }
+        .any?
+
+      return memory_hash.next_scope.find_class(name) unless memory_hash&.next_scope.nil?
+
+      false
+    end
+
     def key?(name)
       return true if memory_hash.include? name
       return true if next_scope&.key? name
@@ -15,7 +25,7 @@ module JackCompiler
       return if key? memory_node&.name
 
       next_index = kind_size(memory_node.kind)
-      memory_node.index = next_index
+      memory_node.index = next_index if memory_node.kind == Memory::Kind::LOCAL
 
       memory_hash[memory_node.name] = memory_node
     end
