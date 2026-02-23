@@ -85,6 +85,7 @@ module JackCompiler
         parsed_line = next_lines.split(';').first
         puts <<~PARSE_FAILURE
           Failed to parse this line:
+
           ```jack
           #{parsed_line}
           ```
