@@ -193,7 +193,11 @@ module JackCompiler
     end
 
     def init_child_node_names
-      allowed_nodes = [Statement::METHOD_DESCRIPTION, Statement::SUBROUTINE_DESCRIPTION, Statement::CONSTRUCTOR_DESCRIPTION]
+      allowed_nodes = [
+        Statement::METHOD_DESCRIPTION,
+        Statement::SUBROUTINE_DESCRIPTION,
+        Statement::CONSTRUCTOR_DESCRIPTION
+      ]
 
       @child_node_names = xml_node.children
         .select { |item| allowed_nodes.include? item.name }
