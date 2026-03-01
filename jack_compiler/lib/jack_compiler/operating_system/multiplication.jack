@@ -113,11 +113,11 @@ class Multiplication {
     while (j < 16) {
       let value_of_power_of_two = Multiplication.power_of_two(j);
       if (is_true(y, value_of_power_of_two)) {
-        sum = sum + shiftedX;
+        let sum = sum + shiftedX;
       }
 
-      shiftedX = shiftedX + shiftedX;
-      j = j + 1;
+      let shiftedX = shiftedX + shiftedX;
+      let j = j + 1;
     }
 
     return sum;
