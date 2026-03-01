@@ -68,6 +68,7 @@ require_relative 'jack_compiler/infix_evaluator_expression'
 require_relative 'jack_compiler/expression_node'
 
 require_relative 'jack_compiler/if_node'
+require_relative 'jack_compiler/while_node'
 
 require_relative 'jack_compiler/memory'
 require_relative 'jack_compiler/primitive_memory'
