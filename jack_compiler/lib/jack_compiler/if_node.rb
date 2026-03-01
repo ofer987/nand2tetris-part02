@@ -20,7 +20,7 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
-        #{condition.emit_vm_code(options[:scope])}
+        #{condition.emit_vm_code(options[:memory_scope])}
         if-goto #{if_true_label}
         goto #{if_false_label}
         label #{if_true_label}
