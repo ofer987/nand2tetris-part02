@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pry-byebug'
+require_relative '../lib/jack_compiler'
+
+paths = ARGV
+  .map(&:strip)
+  .reject(&:blank?)
+
+paths.each do |path|
+  next if File.stat(path).file?
+  next if path.end_with? '.jack'
+
+  puts "#{path} is not a '.jack' file!"
+  exit 1
+end
+
+# rubocop:disable Style/CombinableLoops
+paths.each do |path|
+  state_machine = JackCompiler::StateMachine.new(path)
+  state_machine.parse
+
+  root = state_machine.document.root
+
+  root_jack_node = JackCompiler::Utils::XML.convert_to_jack_node(root)
+
+  puts root_jack_node.emit_vm_code
+    .split("\n")
+    .reject(&:blank?)
+    .map(&:strip)
+    .join("\n")
+end
+# rubocop:enable Style/CombinableLoops
