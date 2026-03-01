@@ -7,19 +7,11 @@ module JackCompiler
     def initialize(xml_node, options)
       super(xml_node, options)
 
-      if_statement, else_statement = find_child_nodes_with_css_selector("> #{Statement::STATEMENTS_STATEMENT}")[0..1]
       # TODO: enable
       self.condition = " > #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
-
-      @if_statements = get_conditional_statements(if_statement, IF_ELSE_STATEMENT_NODES_CSS_SELECTOR)
-
-      # rubocop:disable Layout/LineLength
-      @else_statements = get_conditional_statements(else_statement, IF_ELSE_STATEMENT_NODES_CSS_SELECTOR) if else_statements_exist?
-      # rubocop:enable Layout/LineLength
     end
 
     def emit_vm_code
-      binding.pry if calculator.nil?
       <<~VM_CODE
         #{condition.emit_vm_code(options[:memory_scope])}
         if-goto #{if_true_label}
@@ -46,14 +38,6 @@ module JackCompiler
 
       conditional_statement.css(css_selector)
         .map { |node| Utils::XML.convert_to_jack_node(node, options) }
-    end
-
-    def else_statements_exist?
-      @else_statements_exist ||= find_child_nodes(Statement::KEYWORD)
-        .map(&:text)
-        .map(&:strip)
-        .select { |text| text == Statement::ELSE_STATEMENT }
-        .any?
     end
 
     def if_true_label
