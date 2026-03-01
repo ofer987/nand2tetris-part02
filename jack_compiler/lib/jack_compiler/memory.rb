@@ -53,6 +53,7 @@ module JackCompiler
       return Location::LOCAL if kind == Kind::LOCAL
       return Location::ARGUMENT if kind == Kind::ARGUMENT
       return Location::OBJECT if kind == Kind::FIELD
+      return Location::STATIC if kind == Kind::STATIC
 
       raise "Memory Location could not be found for Type '#{type}' and Kind '#{kind}'"
     end

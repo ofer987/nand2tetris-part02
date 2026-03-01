@@ -5,11 +5,18 @@ module JackCompiler
     attr_accessor :memory_hash, :next_scope
 
     def class?(name)
+      raise ArgumentError, 'name is blank' if name.blank?
+
       return true if memory_hash
         .select { |_name, object| object.instance_of? ClassMemory }
         .any?
 
-      return memory_hash.next_scope.find_class(name) unless memory_hash&.next_scope.nil?
+      if !next_scope.nil?
+        return next_scope.class?(name)
+      elsif name.first.start_with?(/^[A-Z]/)
+        # Assume it is defined by an OS library
+        return true
+      end
 
       false
     end
