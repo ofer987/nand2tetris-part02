@@ -37,6 +37,13 @@ module JackCompiler
         .first
 
       @internal_expression_node = internal_expression_class.new(xml_node, variable:, offset:)
+    rescue NoMethodError => e
+      backtrace = e.backtrace.join("\n")
+
+      puts "Error: No method for #{xml_node.text}"
+      puts "Backtrace:\n#{backtrace}"
+
+      exit 1
     end
 
     attr_reader :internal_expression_node, :variable, :offset

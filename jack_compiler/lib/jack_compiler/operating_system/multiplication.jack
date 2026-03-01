@@ -2,24 +2,24 @@ class Multiplication {
   static int powers_of_two;
 
   function void init() {
-    let powers_of_two = Array.new(16);
+    let Multiplication.powers_of_two = Array.new(16);
 
-    let powers_of_two[0] = 1;
-    let powers_of_two[1] = 2;
-    let powers_of_two[2] = 4;
-    let powers_of_two[3] = 8;
-    let powers_of_two[4] = 16;
-    let powers_of_two[5] = 32;
-    let powers_of_two[6] = 64;
-    let powers_of_two[7] = 128;
-    let powers_of_two[8] = 256;
-    let powers_of_two[9] = 512;
-    let powers_of_two[10] = 1024;
-    let powers_of_two[11] = 2048;
-    let powers_of_two[12] = 4096;
-    let powers_of_two[13] = 8192;
-    let powers_of_two[14] = 16384;
-    let powers_of_two[15] = 32768;
+    let Multiplication.powers_of_two[0] = 1;
+    let Multiplication.powers_of_two[1] = 2;
+    let Multiplication.powers_of_two[2] = 4;
+    let Multiplication.powers_of_two[3] = 8;
+    let Multiplication.powers_of_two[4] = 16;
+    let Multiplication.powers_of_two[5] = 32;
+    let Multiplication.powers_of_two[6] = 64;
+    let Multiplication.powers_of_two[7] = 128;
+    let Multiplication.powers_of_two[8] = 256;
+    let Multiplication.powers_of_two[9] = 512;
+    let Multiplication.powers_of_two[10] = 1024;
+    let Multiplication.powers_of_two[11] = 2048;
+    let Multiplication.powers_of_two[12] = 4096;
+    let Multiplication.powers_of_two[13] = 8192;
+    let Multiplication.powers_of_two[14] = 16384;
+    let Multiplication.powers_of_two[15] = 32768;
 
     return;
   }
@@ -31,7 +31,7 @@ class Multiplication {
       return 0;
     }
 
-    let result = powers_of_two[index];
+    let result = Multiplication.powers_of_two[index];
     return result;
   }
 

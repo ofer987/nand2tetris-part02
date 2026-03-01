@@ -12,7 +12,7 @@ module JackCompiler
       ARRAY_OPERAND_REGEX = /^\s*((\w+)\[(\d+)\])\s*/
       BOOLEAN_CONSTANT_REGEX = /(false|true)/
       NUMERICAL_REGEX = /^\s*(\d+)\s*/
-      OPERAND_REGEX = /^\s*(\w+)\s*/
+      OPERAND_REGEX = /^\s*([\w.]+)\s*/
       OPEN_ROUND_BRACKET_REGEX = /^\s*(\()\s*/
       CLOSE_ROUND_BRACKET_REGEX = /^\s*(\))\s*/
 
