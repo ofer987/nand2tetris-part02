@@ -87,11 +87,14 @@ module JackCompiler
 
       if next_klass.blank? && !next_lines.strip.blank?
         parsed_line = next_lines.split(';').first
+        remaining_lines = next_lines.split(';').join("\n")
         puts <<~PARSE_FAILURE
-          Failed to parse this line:
+          Failed to parse these lines:
 
           ```jack
           #{parsed_line}
+
+          #{remaining_lines}
           ```
         PARSE_FAILURE
 
