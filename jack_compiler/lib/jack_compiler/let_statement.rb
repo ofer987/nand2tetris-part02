@@ -50,7 +50,8 @@ module JackCompiler
         StringAssignmentStatement,
         NullAssignmentStatement,
         IntegerAssignmentStatement,
-        VariableAssignmentStatement
+        VariableAssignmentStatement,
+        WhileStatement
       ]
     end
   end

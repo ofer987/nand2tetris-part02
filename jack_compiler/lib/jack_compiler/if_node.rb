@@ -11,9 +11,10 @@ module JackCompiler
       # TODO: enable
       self.condition = " > #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
 
+      @if_statements = get_conditional_statements(if_statement, IF_ELSE_STATEMENT_NODES_CSS_SELECTOR)
+
       # rubocop:disable Layout/LineLength
-      @if_statements = get_conditional_statements(if_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}")
-      @else_statements = get_conditional_statements(else_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}") if else_statements_exist?
+      @else_statements = get_conditional_statements(else_statement, IF_ELSE_STATEMENT_NODES_CSS_SELECTOR) if else_statements_exist?
       # rubocop:enable Layout/LineLength
     end
 

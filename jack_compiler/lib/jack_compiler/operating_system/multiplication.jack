@@ -1,4 +1,4 @@
-class Math {
+class Multiplication {
   static int powers_of_two;
 
   function void init() {
@@ -25,24 +25,30 @@ class Math {
   }
 
   function int power_of_two(int index) {
+    var int result;
+
     if (index > 15 | index < 0) {
       return 0;
     }
 
-    return powers_of_two[index];
+    let result = powers_of_two[index];
+    return result;
   }
 
   function int add(int x, int y) {
-    return x + y;
+    var int result;
+
+    let result = x + y;
+    return result;
   }
 
   function boolean is_negative(int x) {
     var int value_of_power_of_two;
     var int result;
 
-    let value_of_power_of_two = power_of_two(15);
+    let value_of_power_of_two = Multiplication.power_of_two(15);
 
-    let result = bitwise_and(x, value_of_power_of_two)
+    let result = Multiplication.bitwise_and(x, value_of_power_of_two);
 
     if (result > 0) {
       return true;
@@ -52,28 +58,36 @@ class Math {
   }
 
   function int absolute_value(int x, int y) {
-    if (is_negative(x)) {
-      return ~x;
+    var int result;
+
+    let result = x;
+    if (Multiplication.is_negative(x)) {
+      let result = ~x;
     }
 
-    return x;
+    return result;
   }
 
   function boolean result_is_positive(int x, int y) {
     // XOR: Exclusive OR operation
-    return (is_negative(x) & is_negative(y)) | (is_negative(~x) & is_negative(~y))
+    var boolean result;
+
+    let result = (Multiplication.is_negative(x) & Multiplication.is_negative(y)) | (Multiplication.is_negative(~x) & Multiplication.is_negative(~y));
+
+    return result;
   }
 
   function boolean is_true(int x, int index) {
+    var int value_of_power_of_two;
+    var int result;
+
     if (index > 15 | index < 0) {
       return false;
     }
 
-    var int value_of_power_of_two;
-    var int result;
-    let value_of_power_of_two = power_of_two(index);
+    let value_of_power_of_two = Multiplication.power_of_two(index);
 
-    let result = bitwise_and(x, value_of_power_of_two)
+    let result = Multiplication.bitwise_and(x, value_of_power_of_two);
 
     if (result > 0) {
       return false;
@@ -84,17 +98,20 @@ class Math {
 
   function int bitwise_and(int x, int y) {
     // TODO emit VM_CODE
+    return 2;
   }
 
   function int multiply(int x, int y) {
     // TODO: validate that x and y are positive numbers
     var int shiftedX, j, sum;
+    var int value_of_power_of_two;
+
     let shiftedX = x;
     let sum = 0;
     let j = 0;
 
     while (j < 16) {
-      var value_of_power_of_two = power_of_two(j)
+      let value_of_power_of_two = Multiplication.power_of_two(j);
       if (is_true(y, value_of_power_of_two)) {
         sum = sum + shiftedX;
       }

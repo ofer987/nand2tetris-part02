@@ -26,6 +26,7 @@ module JackCompiler
     EQUAL_SIGN = '='
     IF_STATEMENT = 'ifStatement'
     ELSE_STATEMENT = 'else'
+    WHILE_STATEMENT = 'while'
     LET_STATEMENT = 'letStatement'
     LET_KEYWORD = 'let'
     DO_STATEMENT = 'doStatement'
@@ -41,11 +42,14 @@ module JackCompiler
     EVALUATION_STATEMENT = 'evaluation'
     EVALUATION_TYPE_STATEMENT = 'evaluation_type'
 
+    NUMERICAL_EQUALITY_OPERATION = 'numericalEqualityOperation'
     BOOLEAN_CONSTANT = 'booleanConstant'
     NULL_CONSTANT = 'nullConstant'
     INTEGER_CONSTANT = 'integerConstant'
     STRING_CONSTANT = 'stringConstant'
     REFERENCE_VARIABLE = 'referenceVariable'
+
+    LESS_THAN_SYMBOL = '<'
 
     VARIABLE_CONSTANT = 'identifier'
     INFIX_EXPRESSION = 'infix_expression'

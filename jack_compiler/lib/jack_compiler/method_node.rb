@@ -47,9 +47,7 @@ module JackCompiler
       @subroutine_body_node = find_child_nodes(Statement::SUBROUTINE_BODY)
         .first
 
-      # rubocop:disable Layout/LineLength
-      self.statement_nodes = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}, #{Statement::RETURN_STATEMENT}"
-      # rubocop:enable Layout/LineLength
+      self.statement_nodes = STATEMENT_NODES_CSS_SELECTOR
     end
     # rubocop:enable Metrics/PerceivedComplexity
 
