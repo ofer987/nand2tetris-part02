@@ -14,6 +14,8 @@ module JackCompiler
     OPERATIONS = %r{[*\-+/|]}
 
     OPERAND = /[\w.]+/
+    EQUAL_REGEX = /(#{OPERAND})\s*==\s*(#{OPERAND})/
+    NOT_EQUAL_REGEX = /(#{OPERAND})\s*!=\s*(#{OPERAND})/
     LESS_THAN_REGEX = /(#{OPERAND})\s*<\s*(#{OPERAND})/
     LESS_THAN_OR_EQUAL_REGEX = /(#{OPERAND})\s*<=\s*(#{OPERAND})/
     GREATER_THAN_REGEX = /(#{OPERAND})\s*>\s*(#{OPERAND})/

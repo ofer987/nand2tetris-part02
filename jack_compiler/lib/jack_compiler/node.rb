@@ -14,6 +14,7 @@ module JackCompiler
     def initialize(xml_node, options = {})
       @xml_node = xml_node
       @options = options
+      @memory_scope = options[:memory_scope]
     end
 
     def emit_vm_code
@@ -30,6 +31,6 @@ module JackCompiler
       Utils::XML.find_child_nodes(xml_node, name)
     end
 
-    attr_reader :options
+    attr_reader :options, :memory_scope
   end
 end

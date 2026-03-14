@@ -13,7 +13,7 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
-        #{condition.emit_vm_code(options[:memory_scope])}
+        #{condition.emit_vm_code}
         if-goto #{if_true_label}
         goto #{if_false_label}
         label #{if_true_label}
@@ -30,7 +30,7 @@ module JackCompiler
     def condition=(css_selector)
       value = find_child_nodes_with_css_selector(css_selector).first.text
 
-      @condition = BooleanExpression.new(value)
+      @condition = BooleanExpression.new(value, memory_scope)
     end
 
     def get_conditional_statements(conditional_statement, css_selector)
