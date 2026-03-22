@@ -1,50 +1,90 @@
-class Math {
+class Multiplication {
   static int powers_of_two;
 
   function void init() {
-    let powers_of_two = Array.new(16);
+    let Multiplication.powers_of_two = Array.new(16);
 
-    let powers_of_two[0] = 1;
-    let powers_of_two[1] = 2;
-    let powers_of_two[2] = 4;
-    let powers_of_two[3] = 8;
-    let powers_of_two[4] = 16;
-    let powers_of_two[5] = 32;
-    let powers_of_two[6] = 64;
-    let powers_of_two[7] = 128;
-    let powers_of_two[8] = 256;
-    let powers_of_two[9] = 512;
-    let powers_of_two[10] = 1024;
-    let powers_of_two[11] = 2048;
-    let powers_of_two[12] = 4096;
-    let powers_of_two[13] = 8192;
-    let powers_of_two[14] = 16384;
-    let powers_of_two[15] = 32768;
+    let Multiplication.powers_of_two[0] = 1;
+    let Multiplication.powers_of_two[1] = 2;
+    let Multiplication.powers_of_two[2] = 4;
+    let Multiplication.powers_of_two[3] = 8;
+    let Multiplication.powers_of_two[4] = 16;
+    let Multiplication.powers_of_two[5] = 32;
+    let Multiplication.powers_of_two[6] = 64;
+    let Multiplication.powers_of_two[7] = 128;
+    let Multiplication.powers_of_two[8] = 256;
+    let Multiplication.powers_of_two[9] = 512;
+    let Multiplication.powers_of_two[10] = 1024;
+    let Multiplication.powers_of_two[11] = 2048;
+    let Multiplication.powers_of_two[12] = 4096;
+    let Multiplication.powers_of_two[13] = 8192;
+    let Multiplication.powers_of_two[14] = 16384;
+    let Multiplication.powers_of_two[15] = 32768;
 
     return;
   }
 
+  function int multiply(int x, int y) {
+    // TODO: validate that x and y are positive numbers
+    var int shiftedX, j, sum;
+    var int value_of_power_of_two;
+    var boolean isTrue;
+
+    let shiftedX = x;
+    let sum = 0;
+    let j = 0;
+
+    while (j < 16) {
+      let value_of_power_of_two = Multiplication.power_of_two(j);
+
+      let isTrue = is_true(y, value_of_power_of_two);
+      if (isTrue) {
+        let sum = sum + shiftedX;
+      }
+
+      let shiftedX = shiftedX + shiftedX;
+      let j = j + 1;
+    }
+
+    return sum;
+  }
+
   function int power_of_two(int index) {
-    if (index > 15 | index < 0) {
+    var int result;
+    var boolean isInvalid;
+    var boolean leftOperand;
+    var boolean rightOperand;
+
+    let leftOperand = index > 15;
+    let rightOperand = index < 0;
+
+    let isInvalid = leftOperand | rightOperand;
+    if (isInvalid) {
       return 0;
     }
 
-    return powers_of_two[index];
+    let result = Multiplication.powers_of_two[index];
+    return result;
   }
 
   function int add(int x, int y) {
-    return x + y;
+    var int result;
+
+    let result = x + y;
+    return result;
   }
 
   function boolean is_negative(int x) {
     var int value_of_power_of_two;
     var int result;
+    var boolean isValid;
 
-    let value_of_power_of_two = power_of_two(15);
+    let value_of_power_of_two = Multiplication.power_of_two(15);
 
-    let result = bitwise_and(x, value_of_power_of_two)
+    let result = Multiplication.bitwise_and(x, value_of_power_of_two);
 
-    if (result > 0) {
+    let isValid = result > 0;
+    if (isValid) {
       return true;
     }
 
@@ -52,30 +92,52 @@ class Math {
   }
 
   function int absolute_value(int x, int y) {
-    if (is_negative(x)) {
-      return ~x;
+    var int result;
+    var boolean isValid;
+
+    let result = x;
+
+    let isValid = Multiplication.is_negative(x);
+    if (isValid) {
+      let result = ~x;
     }
 
-    return x;
+    return result;
   }
 
   function boolean result_is_positive(int x, int y) {
     // XOR: Exclusive OR operation
-    return (is_negative(x) & is_negative(y)) | (is_negative(~x) & is_negative(~y))
+    var boolean result;
+
+    // let result = (Multiplication.is_negative(x) & Multiplication.is_negative(y)) | (Multiplication.is_negative(~x) & Multiplication.is_negative(~y));
+
+    // return result;
+
+    return true;
   }
 
   function boolean is_true(int x, int index) {
-    if (index > 15 | index < 0) {
+    var int value_of_power_of_two;
+    var int result;
+    var boolean isInvalid;
+    var boolean leftOperand;
+    var boolean rightOperand;
+    var boolean isValid;
+
+    let leftOperand = index > 15;
+    let rightOperand = index < 0;
+
+    let isInvalid = leftOperand | rightOperand;
+    if (isInvalid) {
       return false;
     }
 
-    var int value_of_power_of_two;
-    var int result;
-    let value_of_power_of_two = power_of_two(index);
+    let value_of_power_of_two = Multiplication.power_of_two(index);
 
-    let result = bitwise_and(x, value_of_power_of_two)
+    let result = Multiplication.bitwise_and(x, value_of_power_of_two);
 
-    if (result > 0) {
+    let isValid = result > 0;
+    if (isValid) {
       return false;
     }
 
@@ -84,25 +146,6 @@ class Math {
 
   function int bitwise_and(int x, int y) {
     // TODO emit VM_CODE
-  }
-
-  function int multiply(int x, int y) {
-    // TODO: validate that x and y are positive numbers
-    var int shiftedX, j, sum;
-    let shiftedX = x;
-    let sum = 0;
-    let j = 0;
-
-    while (j < 16) {
-      var value_of_power_of_two = power_of_two(j)
-      if (is_true(y, value_of_power_of_two)) {
-        sum = sum + shiftedX;
-      }
-
-      shiftedX = shiftedX + shiftedX;
-      j = j + 1;
-    }
-
-    return sum;
+    return 2;
   }
 }

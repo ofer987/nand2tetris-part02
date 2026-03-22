@@ -11,15 +11,32 @@ module JackCompiler
       # TODO: enable
       self.condition = " > #{Statement::EXPRESSION_STATEMENT} > #{Statement::EVALUATION_STATEMENT}"
 
+      @if_statements = get_conditional_statements(if_statement, IF_ELSE_STATEMENT_NODES_CSS_SELECTOR)
+
       # rubocop:disable Layout/LineLength
-      @if_statements = get_conditional_statements(if_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}")
-      @else_statements = get_conditional_statements(else_statement, "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}") if else_statements_exist?
+      @else_statements = get_conditional_statements(else_statement, IF_ELSE_STATEMENT_NODES_CSS_SELECTOR) if else_statements_exist?
       # rubocop:enable Layout/LineLength
     end
 
     def emit_vm_code
+      return emit_vm_code_with_else_statements if else_statements_exist?
+
       <<~VM_CODE
-        #{condition.emit_vm_code(options[:scope])}
+        #{condition.emit_vm_code}
+        if-goto #{if_true_label}
+        goto #{if_end_label}
+        label #{if_true_label}
+          #{if_statements.map(&:emit_vm_code).join("\n")}
+        goto #{if_end_label}
+      VM_CODE
+    end
+
+    private
+
+    def emit_vm_code_with_else_statements
+      <<~VM_CODE
+
+        #{condition.emit_vm_code}
         if-goto #{if_true_label}
         goto #{if_false_label}
         label #{if_true_label}
@@ -31,12 +48,10 @@ module JackCompiler
       VM_CODE
     end
 
-    private
-
     def condition=(css_selector)
       value = find_child_nodes_with_css_selector(css_selector).first.text
 
-      @condition = BooleanExpression.new(value)
+      @condition = BooleanExpression.new(value, memory_scope)
     end
 
     def get_conditional_statements(conditional_statement, css_selector)
@@ -70,6 +85,6 @@ module JackCompiler
       @uuid ||= SecureRandom.uuid
     end
 
-    attr_reader :condition, :if_statements, :else_statements, :memory
+    attr_reader :condition, :if_statements, :else_statements
   end
 end

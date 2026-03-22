@@ -5,14 +5,16 @@ module JackCompiler
     # rubocop:disable Metrics/ClassLength
     class Infix
       OPERATORS_LIST_REGEX = %r{[|*/+~\-&]}
+      COMPARISON_OPERATORS_LIST_REGEX = />=|>|<=|<|==|!=/
 
       MONOMIAL_REGEX = /^\s*([+~-])\s*(\w+)\s*/
       MONOMIAL_REGEX_OPEN_ROUND_BRACKET = /^\s*([+~-])\s*(\()\s*/
       OPERATOR_REGEX = /^\s*(#{OPERATORS_LIST_REGEX})\s*/
-      ARRAY_OPERAND_REGEX = /^\s*((\w+)\[(\d+)\])\s*/
+      COMPARISON_OPERATOR_REGEX = /^\s*(#{COMPARISON_OPERATORS_LIST_REGEX})\s*/
+      ARRAY_OPERAND_REGEX = /^\s*(([\w.]+)\[(.+)\])\s*/
       BOOLEAN_CONSTANT_REGEX = /(false|true)/
       NUMERICAL_REGEX = /^\s*(\d+)\s*/
-      OPERAND_REGEX = /^\s*(\w+)\s*/
+      OPERAND_REGEX = /^\s*([\w.]+)\s*/
       OPEN_ROUND_BRACKET_REGEX = /^\s*(\()\s*/
       CLOSE_ROUND_BRACKET_REGEX = /^\s*(\))\s*/
 
@@ -52,14 +54,19 @@ module JackCompiler
           next_regex_keys: %i[array_operand operand open_round_bracket monomial],
           stack_type: :stack
         },
+        comparison_operator: {
+          regex: COMPARISON_OPERATOR_REGEX,
+          next_regex_keys: %i[array_operand operand open_round_bracket monomial],
+          stack_type: :stack
+        },
         array_operand: {
           regex: ARRAY_OPERAND_REGEX,
-          next_regex_keys: %i[operator close_round_bracket],
+          next_regex_keys: %i[operator comparison_operator close_round_bracket],
           stack_type: :postfix_stack
         },
         operand: {
           regex: OPERAND_REGEX,
-          next_regex_keys: %i[operator close_round_bracket],
+          next_regex_keys: %i[operator comparison_operator close_round_bracket],
           stack_type: :postfix_stack
         },
         open_round_bracket: {
@@ -69,7 +76,7 @@ module JackCompiler
         },
         close_round_bracket: {
           regex: CLOSE_ROUND_BRACKET_REGEX,
-          next_regex_keys: %i[operator close_round_bracket],
+          next_regex_keys: %i[operator comparison_operator close_round_bracket],
           stack_type: :close_bracket
         },
         monomial: {

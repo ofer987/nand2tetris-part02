@@ -9,6 +9,13 @@ module JackCompiler
             .select { |jack_node_class| xml_node.name == jack_node_class::NODE_NAME }
             .map { |klazz| klazz.new(xml_node, options) }
             .first
+        rescue ArgumentError => e
+          backtrace = e.backtrace.join("\n")
+
+          puts "Error: #{e.message}"
+          puts "Backtrace:\n#{backtrace}"
+
+          exit 1
         end
 
         def find_child_nodes_with_css_selector(xml_node, selector)

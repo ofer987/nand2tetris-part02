@@ -15,14 +15,25 @@ module JackCompiler
     end
 
     def emit_vm_code
-      if value == OBJECT_POINTER
+      case value
+      when OBJECT_POINTER
         <<~VM_CODE
           push pointer 0
           return
         VM_CODE
-      elsif value.match?(/^\d+$/)
+      when /^\d+$/
         <<~VM_CODE
           push constant #{value}
+          return
+        VM_CODE
+      when 'false'
+        <<~VM_CODE
+          push constant 0
+          return
+        VM_CODE
+      when 'true'
+        <<~VM_CODE
+          push constant 1
           return
         VM_CODE
       else

@@ -12,6 +12,15 @@ module JackCompiler
     NULL_CONSTANT_ASSIGNMENT = /(null)/
     VARIABLE_ASSIGNMENT = /((.+))/
     OPERATIONS = %r{[*\-+/|]}
+
+    OPERAND = /[\w.]+/
+    EQUAL_REGEX = /(#{OPERAND})\s*==\s*(#{OPERAND})/
+    NOT_EQUAL_REGEX = /(#{OPERAND})\s*!=\s*(#{OPERAND})/
+    LESS_THAN_REGEX = /(#{OPERAND})\s*<\s*(#{OPERAND})/
+    LESS_THAN_OR_EQUAL_REGEX = /(#{OPERAND})\s*<=\s*(#{OPERAND})/
+    GREATER_THAN_REGEX = /(#{OPERAND})\s*>\s*(#{OPERAND})/
+    GREATER_THAN_OR_EQUAL_REGEX = /(#{OPERAND})\s*>=\s*(#{OPERAND})/
+
     # rubocop:disable Layout/LineLength
     UNARY_OPERATION_EXPRESSION_REGEX = /(\()(#{OPERATIONS})\s*([#{INTEGER_CONSTANT_ASSIGNMENT}#{VARIABLE_ASSIGNMENT}])(\))/
     # rubocop:enable Layout/LineLength
@@ -49,5 +58,6 @@ module JackCompiler
     IF_STATEMENT_REGEX = /(if)\s*(\()([^{]+)(\))\s*({)/
     ELSE_STATEMENT_REGEX = /(else)\s*({)/
     STATEMENTS_REGEX = /if|let|do|return/
+    WHILE_STATEMENT_REGEX = /(while)\s*(\()([^{]+)(\))\s*({)/
   end
 end
