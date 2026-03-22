@@ -101,16 +101,12 @@ module JackCompiler
 
           if array_index.match?(/^\d+$/)
             result << "push constant #{array_index}"
-          elsif array_index == 'false'
-            result << 'push constant 0'
-          elsif array_index == 'true'
-            result << 'push constant 1'
           elsif memory.key? array_index
             index_constant = memory[array_index]
 
             result << index_constant.read_memory
           else
-            raise "'#{array_index} is neither an integer not a variable"
+            raise "'#{array_index} is neither an integer nor a variable"
           end
 
           variable = memory[array_name]
