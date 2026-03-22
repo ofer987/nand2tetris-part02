@@ -99,9 +99,21 @@ module JackCompiler
           array_index = matches[3]
           values_stack << 1
 
-          variable = memory[array_name]
+          if array_index.match?(/^\d+$/)
+            result << "push constant #{array_index}"
+          elsif array_index == 'false'
+            result << 'push constant 0'
+          elsif array_index == 'true'
+            result << 'push constant 1'
+          elsif memory.key? array_index
+            index_constant = memory[array_index]
 
-          result << "push constant #{array_index}"
+            result << index_constant.read_memory
+          else
+            raise "'#{array_index} is neither an integer not a variable"
+          end
+
+          variable = memory[array_name]
           result << "push #{variable.memory_location} #{variable.index}"
           result << 'add'
 
@@ -116,6 +128,22 @@ module JackCompiler
 
           values_stack << 1
           result << "push #{variable.memory_location} #{variable.index}"
+        elsif item.match? Utils::Infix::COMPARISON_OPERATORS_LIST_REGEX
+          raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
+
+          operator = item
+
+          raise 'Stack contains less than two (2) values' if values_stack.size < 2
+
+          values_stack.pop
+          values_stack.pop
+
+          values_stack << 1
+          vm_code_comparison_operators(operator).each do |vm_code|
+            result << vm_code
+          end
+
+          operator = nil
         elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
           raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
 
@@ -189,6 +217,25 @@ module JackCompiler
         ['or']
       else
         raise "operator '#{operator}' is invalid"
+      end
+    end
+
+    def vm_code_comparison_operators(operator)
+      case operator
+      when '>='
+        ['ge']
+      when '>'
+        ['gt']
+      when '<='
+        ['le']
+      when '<'
+        ['lt']
+      when '=='
+        ['eq']
+      when '!='
+        ['ne']
+      else
+        raise "comparison operator '#{operator}' is invalid"
       end
     end
 

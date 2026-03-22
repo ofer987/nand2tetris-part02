@@ -19,7 +19,23 @@ module JackCompiler
     end
 
     def emit_vm_code
+      return emit_vm_code_with_else_statements if else_statements_exist?
+
       <<~VM_CODE
+        #{condition.emit_vm_code}
+        if-goto #{if_true_label}
+        goto #{if_end_label}
+        label #{if_true_label}
+          #{if_statements.map(&:emit_vm_code).join("\n")}
+        goto #{if_end_label}
+      VM_CODE
+    end
+
+    private
+
+    def emit_vm_code_with_else_statements
+      <<~VM_CODE
+
         #{condition.emit_vm_code}
         if-goto #{if_true_label}
         goto #{if_false_label}
@@ -31,8 +47,6 @@ module JackCompiler
         label #{if_end_label}
       VM_CODE
     end
-
-    private
 
     def condition=(css_selector)
       value = find_child_nodes_with_css_selector(css_selector).first.text

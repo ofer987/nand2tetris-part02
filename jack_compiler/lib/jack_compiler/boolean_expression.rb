@@ -2,6 +2,10 @@
 
 module JackCompiler
   class BooleanExpression
+    # rubocop:disable Metrics/PerceivedComplexity
+    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize
     def initialize(value, memory_scope)
       @value = value
       @memory_scope = memory_scope
@@ -40,6 +44,10 @@ module JackCompiler
         raise "Error: #{value} is not a correct boolean expression"
       end
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def emit_vm_code
       <<~VM_CODE
