@@ -179,7 +179,9 @@ module JackCompiler
 
           postfix_stack << stack.pop while stack.any?
 
-          postfix_stack.join(' ')
+          postfix_stack
+            .map { |item| convert_from_boolean_to_integer(item) }
+            .join(' ')
         end
         # rubocop:enable Metrics/AbcSize
         # rubocop:enable Metrics/CyclomaticComplexity
@@ -187,6 +189,17 @@ module JackCompiler
         # rubocop:enable Metrics/PerceivedComplexity
 
         private
+
+        def convert_from_boolean_to_integer(value)
+          case value
+          when 'false'
+            0
+          when 'true'
+            1
+          else
+            value
+          end
+        end
 
         def compare_operator_priority(first_operator, second_operator)
           OPERATOR_PRIORITY[first_operator] > OPERATOR_PRIORITY[second_operator]
