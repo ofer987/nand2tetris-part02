@@ -41,7 +41,7 @@ module JackCompiler
 
           variable = memory[variable_name]
 
-          values_stack << variable.value
+          values_stack << variable.read_memory
         elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
           raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
 
