@@ -2,9 +2,11 @@
 
 module JackCompiler
   class Memory
+    TEMPORARY_MEMORY = 'temp 0'
+
     def self.next_static_memory_index
       unless defined? @next_static_memory_index
-        @next_static_memory_index = 16
+        @next_static_memory_index = 0
 
         return @next_static_memory_index
       end
@@ -17,7 +19,8 @@ module JackCompiler
       @next_static_memory_index += 1
     end
 
-    MAX_STATIC_MEMORY = 255
+    # Or is it 255?
+    MAX_STATIC_MEMORY = 255 - 16
 
     # Three types of memory
     module Type
@@ -58,29 +61,10 @@ module JackCompiler
       raise "Memory Location could not be found for Type '#{type}' and Kind '#{kind}'"
     end
 
+    def prepare_memory(*); end
+
     def read_memory
-      "push #{memory_location} #{index}"
-    end
-
-    def assign_value_from_stack(*)
-      <<~MEMORY_SCOPE
-        pop #{memory_location} #{index}
-      MEMORY_SCOPE
-    end
-
-    def assign_value(memory_value)
-      # rubocop:disable Style/ConditionalAssignment
-      if memory_value.match?(/^\d+$/)
-        value = "push constant #{memory_value}"
-      else
-        value = memory_value.read_memory
-      end
-      # rubocop:enable Style/ConditionalAssignment
-
-      <<~MEMORY_SCOPE
-        #{value}
-        pop #{memory_location} #{index}
-      MEMORY_SCOPE
+      "push #{kind} #{index}"
     end
 
     def name
@@ -108,9 +92,11 @@ module JackCompiler
       @name = name
       @kind = kind
       @index = index
+
+      @index = Memory.next_static_memory_index if self.kind == Kind::STATIC
     end
 
-    def assignment_vm_code(_options = {})
+    def assignment_vm_code(*)
       raise NotImplementedError
     end
   end

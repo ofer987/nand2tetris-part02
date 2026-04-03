@@ -19,11 +19,7 @@ module JackCompiler
       @value = 0
     end
 
-    def read_memory
-      "push #{memory_location} #{index}"
-    end
-
-    def assignment_vm_code(_options = {})
+    def assignment_vm_code(*)
       <<~VM_CODE
         pop #{kind} #{index}
       VM_CODE

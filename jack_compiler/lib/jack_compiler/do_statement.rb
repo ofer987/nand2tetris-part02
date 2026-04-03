@@ -6,7 +6,11 @@ module JackCompiler
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
-      result_node = document.create_element(DO_STATEMENT)
+      if lines.match? RegularExpressions::CLASS_NEW_EXPRESSION
+        raise "Cannot instantiate new instance of '#{result[3]}' in '#{result[0]}'"
+      end
+
+      result_node = document.create_element(REGEX)
 
       parent_node << result_node
 

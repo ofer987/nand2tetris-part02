@@ -5,6 +5,7 @@ module JackCompiler
     REGEX = RegularExpressions::WHILE_STATEMENT_REGEX
     NODE_NAME = WHILE_STATEMENT
 
+    # rubocop:disable Metrics/AbcSize
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
 
@@ -31,10 +32,14 @@ module JackCompiler
 
       next_lines = lines.sub(REGEX, '')
 
-      next_lines = next_statements(result_node, next_lines, next_classes)
+      subroutine_body_node = document.create_element(SUBROUTINE_BODY)
+      result_node << subroutine_body_node
 
-      next_statements(result_node, next_lines, end_classes)
+      next_lines = next_statements(subroutine_body_node, next_lines, next_classes)
+
+      next_statements(subroutine_body_node, next_lines, end_classes)
     end
+    # rubocop:enable Metrics/AbcSize
 
     protected
 

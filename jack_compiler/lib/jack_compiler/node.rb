@@ -5,7 +5,8 @@ module JackCompiler
     NODE_NAME = ''
 
     # rubocop:disable Layout/LineLength
-    STATEMENT_NODES_CSS_SELECTOR = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT} > #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}, #{Statement::WHILE_STATEMENT}, #{Statement::RETURN_STATEMENT}".freeze
+    PARENT_NODE_CSS_SELECTOR = "> #{Statement::SUBROUTINE_BODY} > #{Statement::STATEMENTS_STATEMENT}".freeze
+    STATEMENT_NODES_CSS_SELECTOR = "> #{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::IF_STATEMENT}, #{Statement::WHILE_STATEMENT}, #{Statement::RETURN_STATEMENT}".freeze
     IF_ELSE_STATEMENT_NODES_CSS_SELECTOR = "#{Statement::LET_STATEMENT}, #{Statement::DO_STATEMENT}, #{Statement::WHILE_STATEMENT}, #{Statement::IF_STATEMENT}".freeze
     # rubocop:enable Layout/LineLength
 

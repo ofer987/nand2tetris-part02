@@ -31,11 +31,32 @@ module JackCompiler
 
     def emit_vm_code
       <<~VM_CODE
+        #{prepare_variable_store_result}
         #{expression_node.emit_vm_code(memory_scope)}
+        #{temporarily_store_result}
+        #{emit_assignment_vm_code}
       VM_CODE
     end
 
     private
+
+    def prepare_variable_store_result
+      variable.prepare_memory(memory_scope:, offset:)
+    end
+
+    def emit_assignment_vm_code
+      <<~VM_CODE
+        # Push temporary value into indexed array
+        push #{Memory::TEMPORARY_MEMORY}
+        #{variable.assignment_vm_code(offset:)}
+      VM_CODE
+    end
+
+    def temporarily_store_result
+      <<~VM_CODE
+        pop #{Memory::TEMPORARY_MEMORY}
+      VM_CODE
+    end
 
     def expression_node=(css_selector)
       xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))

@@ -10,7 +10,7 @@ module JackCompiler
     def array?
       return @array if defined? @array
 
-      @array = identifiers.first.text.strip == Statement::ARRAY_CLASS
+      @array = keywords.size >= 2 && keywords[1].text.strip == Statement::ARRAY_CLASS
     end
 
     def primitive?

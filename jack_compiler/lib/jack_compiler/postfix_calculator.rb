@@ -93,6 +93,22 @@ module JackCompiler
         elsif item.match? Utils::Infix::NUMERICAL_REGEX
           values_stack << 1
           result << "push constant #{item.to_i}"
+        elsif item.match? Utils::Infix::FUNCTION_OR_METHOD_REGEX
+          values_stack << 1
+
+          match = item.match(Utils::Infix::FUNCTION_OR_METHOD_REGEX)
+          variable = result[4]
+          begin
+            variable = memory[variable]
+
+            emit_method_vm_code(memory, variable, match).each do |line|
+              result << line
+            end
+          rescue ArgumentError
+            emit_function_vm_code(match).each do |line|
+              result << line
+            end
+          end
         elsif item.match? Utils::Infix::ARRAY_OPERAND_REGEX
           matches = item.match(Utils::Infix::ARRAY_OPERAND_REGEX)
           array_name = matches[2]
@@ -233,6 +249,22 @@ module JackCompiler
       else
         raise "comparison operator '#{operator}' is invalid"
       end
+    end
+
+    def emit_method_vm_code(memory, variable, values)
+      class_name = memory[variable].type
+      method_name = values[4]
+      arguments = (values[6] || '').split(',')
+
+      ["call #{class_name}.#{method_name} #{arguments.size}"]
+    end
+
+    def emit_function_vm_code(values)
+      class_name = values[2]
+      function_name = values[4]
+      arguments = (values[6] || '').split(',')
+
+      ["call #{class_name}.#{function_name} #{arguments.size}"]
     end
 
     def stack

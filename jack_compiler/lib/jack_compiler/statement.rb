@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
+  # rubocop:disable Metrics/ClassLength
   class Statement
     # Default NODE_NAME is empty
     NODE_NAME = ''
@@ -59,6 +60,8 @@ module JackCompiler
     ARRAY_CLASS = 'Array'
     ARRAY_VALUE = 'array'
     EXECUTION_TYPE = 'execution'
+    NEW_ARRAY_TYPE = 'newArray'
+    NEW_CLASS_TYPE = 'newClass'
 
     CONSTRUCTOR_METHOD_CALL = 'new'
 
@@ -131,4 +134,5 @@ module JackCompiler
       next_lines
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

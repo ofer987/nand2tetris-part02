@@ -39,14 +39,13 @@ module JackCompiler
       variable.value = Memory::NULL_VALUE
     end
 
+    # Copy this to somewhere in the PostfixCalculator#emit_vm_code
     def emit_vm_code(memory_scope)
       return '' if expression_list_node.blank?
 
       begin
         obj = memory_scope[object]
       rescue ArgumentError
-        return emit_vm_code_for_constructor if memory_scope.class?(object)
-
         return emit_function_vm_code
       end
 
@@ -78,22 +77,22 @@ module JackCompiler
     private
 
     def emit_function_vm_code
-      result = []
-      expression_list_node.parameters.each do |parameter|
-        parameter_memory = memory_scope[parameter]
+      <<~VM_CODE
+        call #{object}.#{method_name} #{expression_list_node.size}
 
-        result << <<~VM_CODE
-          push #{parameter_memory.memory_location} #{parameter_memory.index}
-        VM_CODE
-      end
-
-      result << <<~VM_CODE
-        call #{object_name}.#{method_name} #{expression_list_node.size}
-
+        # Should I remove this?
         pop temp 0
       VM_CODE
+    end
 
-      result.join("\n")
+    def emit_vm_code_for_array_constructor
+      array_size = expression_list_node.parameters.first.to_i
+
+      <<~VM_CODE
+        push constant #{array_size}
+        call Array.new 1
+        pop #{variable.memory_location} #{variable.index}
+      VM_CODE
     end
 
     def emit_vm_code_for_constructor

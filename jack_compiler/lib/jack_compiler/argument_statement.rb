@@ -16,7 +16,6 @@ module JackCompiler
 
     def arugment_classes
       [
-        IntegerAssignmentStatement,
         StringAssignmentStatement,
         ArrayAssignmentStatement,
         BooleanAssignmentStatement,

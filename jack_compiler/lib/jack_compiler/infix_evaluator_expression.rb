@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class InfixEvaluatorAssignmentExpression
+  class InfixEvaluatorExpression
     class << self
       def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
@@ -35,7 +35,6 @@ module JackCompiler
       calculator = PostfixCalculator.new(expression: value)
 
       result = calculator.emit_vm_code(memory: objects)
-      result << variable.assign_value_from_stack(offset:)
 
       result.join("\n")
     end

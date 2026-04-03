@@ -1,5 +1,5 @@
 class Multiplication {
-  static int powers_of_two;
+  static Array powers_of_two;
 
   function void init() {
     let powers_of_two = Array.new(16);

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class ArrrayExpressionStatement < Statement
+  class ArrayExpressionStatement < Statement
     REGEX = RegularExpressions::ARRAY_EXPRESSION
 
     def create_elements(parent_node, lines)
@@ -27,7 +27,7 @@ module JackCompiler
     private
 
     def next_expression_classes
-      [IntegerAssignmentStatement, VariableAssignmentStatement]
+      [VariableAssignmentStatement]
     end
   end
 end
