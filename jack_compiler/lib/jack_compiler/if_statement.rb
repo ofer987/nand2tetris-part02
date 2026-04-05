@@ -45,7 +45,6 @@ module JackCompiler
         ArrayAssignmentStatement,
         StringAssignmentStatement,
         NullAssignmentStatement,
-        IntegerAssignmentStatement,
         InfixExpressionStatement
       ]
     end

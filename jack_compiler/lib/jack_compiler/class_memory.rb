@@ -11,38 +11,15 @@ module JackCompiler
       @value = Memory::NULL_VALUE
     end
 
-    def callee_constructor_vm_code
-      # TODO: move constructor to its own Ruby code
+    def assignment_vm_code(*)
       <<~VM_CODE
-        // TODO: Pop arguments
-        // TODO: Call alloc
-        push #{arguments.size}
-        Memory.alloc 1
-        pop pointer 0
-        // Set up the "this" segment
-        call #{type}.new
-
-        // TODO: When accessing argument memory:
-        // TODO: Push "argument" memory into the stack; and then
-        // TODO: Pop into the "this" #{location of field memory} or location of method local memory or location of static memory
-
-        push pointer 0
-        return
+        pop this 0
       VM_CODE
     end
 
-    def caller_constructor_vm_code
-      # TODO: move to its own Ruby code
+    def prepare_memory(*)
       <<~VM_CODE
-        // TODO: Push arguments
-        call #{type}.new
-        pop #{kind} #{index}
-      VM_CODE
-    end
-
-    def assignment_vm_code(_options = {})
-      <<~VM_CODE
-        // Pop variable on stack into the "this" segment
+        #{read_memory}
         pop pointer 0
       VM_CODE
     end

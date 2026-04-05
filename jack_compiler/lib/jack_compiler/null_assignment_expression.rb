@@ -30,7 +30,6 @@ module JackCompiler
     def emit_vm_code(_objects)
       <<~VM_CODE
         push constant #{value}
-        #{variable.assign_value_from_stack}
       VM_CODE
     end
 

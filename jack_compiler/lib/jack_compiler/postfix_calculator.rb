@@ -41,7 +41,7 @@ module JackCompiler
 
           variable = memory[variable_name]
 
-          values_stack << variable.value
+          values_stack << variable.read_memory
         elsif item.match? Utils::Infix::OPERATORS_LIST_REGEX
           raise 'Stack is invalid because it contains two consecutive operators' unless operator.blank?
 
@@ -93,6 +93,22 @@ module JackCompiler
         elsif item.match? Utils::Infix::NUMERICAL_REGEX
           values_stack << 1
           result << "push constant #{item.to_i}"
+        elsif item.match? Utils::Infix::FUNCTION_OR_METHOD_REGEX
+          values_stack << 1
+
+          match = item.match(Utils::Infix::FUNCTION_OR_METHOD_REGEX)
+          variable = result[4]
+          begin
+            variable = memory[variable]
+
+            emit_method_vm_code(memory, variable, match).each do |line|
+              result << line
+            end
+          rescue ArgumentError
+            emit_function_vm_code(match).each do |line|
+              result << line
+            end
+          end
         elsif item.match? Utils::Infix::ARRAY_OPERAND_REGEX
           matches = item.match(Utils::Infix::ARRAY_OPERAND_REGEX)
           array_name = matches[2]
@@ -101,16 +117,12 @@ module JackCompiler
 
           if array_index.match?(/^\d+$/)
             result << "push constant #{array_index}"
-          elsif array_index == 'false'
-            result << 'push constant 0'
-          elsif array_index == 'true'
-            result << 'push constant 1'
           elsif memory.key? array_index
             index_constant = memory[array_index]
 
             result << index_constant.read_memory
           else
-            raise "'#{array_index} is neither an integer not a variable"
+            raise "'#{array_index} is neither an integer nor a variable"
           end
 
           variable = memory[array_name]
@@ -237,6 +249,22 @@ module JackCompiler
       else
         raise "comparison operator '#{operator}' is invalid"
       end
+    end
+
+    def emit_method_vm_code(memory, variable, values)
+      class_name = memory[variable].type
+      method_name = values[4]
+      arguments = (values[6] || '').split(',')
+
+      ["call #{class_name}.#{method_name} #{arguments.size}"]
+    end
+
+    def emit_function_vm_code(values)
+      class_name = values[2]
+      function_name = values[4]
+      arguments = (values[6] || '').split(',')
+
+      ["call #{class_name}.#{function_name} #{arguments.size}"]
     end
 
     def stack

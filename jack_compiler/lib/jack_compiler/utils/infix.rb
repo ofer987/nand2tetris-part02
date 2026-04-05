@@ -7,6 +7,7 @@ module JackCompiler
       OPERATORS_LIST_REGEX = %r{[|*/+~\-&]}
       COMPARISON_OPERATORS_LIST_REGEX = />=|>|<=|<|==|!=/
 
+      FUNCTION_OR_METHOD_REGEX = /^(#{RegularExpressions::ASSIGNMENT_EXPRESSION_STATEMENT})$/
       MONOMIAL_REGEX = /^\s*([+~-])\s*(\w+)\s*/
       MONOMIAL_REGEX_OPEN_ROUND_BRACKET = /^\s*([+~-])\s*(\()\s*/
       OPERATOR_REGEX = /^\s*(#{OPERATORS_LIST_REGEX})\s*/
@@ -46,18 +47,50 @@ module JackCompiler
       REGEXES = {
         start: {
           regex: nil,
-          next_regex_keys: %i[open_round_bracket array_operand operand monomial monomial_open_round_bracket],
+          next_regex_keys: %i[
+            open_round_bracket
+            array_operand
+            numerical_operand
+            function_or_method_operand
+            operand
+            monomial
+            monomial_open_round_bracket
+          ],
           stack_type: nil
         },
         operator: {
           regex: OPERATOR_REGEX,
-          next_regex_keys: %i[array_operand operand open_round_bracket monomial],
+          next_regex_keys: %i[
+            array_operand
+            numerical_operand
+            function_or_method_operand
+            operand
+            open_round_bracket
+            monomial
+          ],
           stack_type: :stack
         },
         comparison_operator: {
           regex: COMPARISON_OPERATOR_REGEX,
-          next_regex_keys: %i[array_operand operand open_round_bracket monomial],
+          next_regex_keys: %i[
+            array_operand
+            numerical_operand
+            function_or_method_operand
+            operand
+            open_round_bracket
+            monomial
+          ],
           stack_type: :stack
+        },
+        numerical_operand: {
+          regex: NUMERICAL_REGEX,
+          next_regex_keys: %i[operator comparison_operator close_round_bracket],
+          stack_type: :postfix_stack
+        },
+        function_or_method_operand: {
+          regex: FUNCTION_OR_METHOD_REGEX,
+          next_regex_keys: %i[operator comparison_operator close_round_bracket],
+          stack_type: :postfix_stack
         },
         array_operand: {
           regex: ARRAY_OPERAND_REGEX,
@@ -71,7 +104,15 @@ module JackCompiler
         },
         open_round_bracket: {
           regex: OPEN_ROUND_BRACKET_REGEX,
-          next_regex_keys: %i[open_round_bracket close_round_bracket array_operand operand monomial],
+          next_regex_keys: %i[
+            open_round_bracket
+            close_round_bracket
+            array_operand
+            numerical_operand
+            function_or_method_operand
+            operand
+            monomial
+          ],
           stack_type: :open_bracket
         },
         close_round_bracket: {
@@ -86,7 +127,7 @@ module JackCompiler
         },
         monomial_open_round_bracket: {
           regex: MONOMIAL_REGEX_OPEN_ROUND_BRACKET,
-          next_regex_keys: %i[array_operand operand],
+          next_regex_keys: %i[array_operand numerical_operand function_or_method_operand operand],
           stack_type: :monomial_open_round_bracket
         }
       }.freeze
@@ -179,7 +220,10 @@ module JackCompiler
 
           postfix_stack << stack.pop while stack.any?
 
-          postfix_stack.join(' ')
+          postfix_stack
+            .map { |item| convert_from_boolean_to_integer(item) }
+            .map { |item| item.gsub(/\s+/, '') }
+            .join(' ')
         end
         # rubocop:enable Metrics/AbcSize
         # rubocop:enable Metrics/CyclomaticComplexity
@@ -187,6 +231,17 @@ module JackCompiler
         # rubocop:enable Metrics/PerceivedComplexity
 
         private
+
+        def convert_from_boolean_to_integer(value)
+          case value
+          when 'false'
+            0
+          when 'true'
+            1
+          else
+            value
+          end
+        end
 
         def compare_operator_priority(first_operator, second_operator)
           OPERATOR_PRIORITY[first_operator] > OPERATOR_PRIORITY[second_operator]

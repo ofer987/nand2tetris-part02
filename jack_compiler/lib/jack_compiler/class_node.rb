@@ -72,36 +72,34 @@ module JackCompiler
       @static_memory = {}
       # rubocop:disable Metrics/BlockLength
       static_xml_nodes.each do |xml_node|
-        index = Memory.next_static_memory_index
-
         xml_node.names.each do |name|
-          if xml_node.primitive?
-            static_name = "#{class_name}.#{name}"
+          static_name = "#{class_name}.#{name}"
+
+          if xml_node.array?
+            memory_item = ArrayMemory.new(
+              type: Memory::Type::ARRAY,
+              name: name,
+              kind: xml_node.kind
+            )
+          elsif xml_node.primitive?
+            static_name = name
+
             memory_item = PrimitiveMemory.new(
               type: xml_node.type,
               name: static_name,
-              kind: xml_node.kind,
-              index: index
-            )
-          elsif xml_node.array?
-            memory_item = ArrayMemory.new(
-              type: Memory::Type::ARRAY,
-              name: static_name,
-              kind: xml_node.kind,
-              index: index
+              kind: xml_node.kind
             )
           elsif xml_node.reference?
             memory_item = ClassMemory.new(
               type: Memory::Type::CLASS,
               name: static_name,
-              kind: xml_node.kind,
-              index: index
+              kind: xml_node.kind
             )
           else
             raise "Invalid memory type '#{xml_node.type}'"
           end
 
-          @static_memory[static_name] = memory_item
+          @static_memory[name] = memory_item
         end
       end
       # rubocop:enable Metrics/BlockLength
@@ -205,7 +203,7 @@ module JackCompiler
     end
 
     def all_child_nodes
-      function_nodes.concat(method_nodes).concat(constructor_nodes)
+      constructor_nodes.concat(function_nodes).concat(method_nodes)
     end
 
     attr_reader :static_memory, :field_memory, :child_node_names

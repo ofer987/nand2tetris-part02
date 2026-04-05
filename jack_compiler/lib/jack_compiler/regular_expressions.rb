@@ -5,6 +5,8 @@ module JackCompiler
     PARAMETER_LIST = /^\s*,?\s*(\w+)\s+(\w+)/
 
     LET_STATEMENT = /(let)\s+(\S+)\s*(=)\s*([^;]+)(;)/
+    ARRAY_NEW_EXPRESSION = /(#{JackCompiler::Statement::ARRAY_CLASS})\.new\((\d+)\)/
+    CLASS_NEW_EXPRESSION = /([A-Za-z]+)\.new\(([^)]*)\)/
     ARRAY_EXPRESSION = /(([^\[]+)(\[)(\d+)(\]))/
     BOOLEAN_CONSTANT_ASSIGNMENT = /(false|true)/
     STRING_CONSTANT_ASSIGNMENT = /"(.*)"/
@@ -25,15 +27,14 @@ module JackCompiler
     UNARY_OPERATION_EXPRESSION_REGEX = /(\()(#{OPERATIONS})\s*([#{INTEGER_CONSTANT_ASSIGNMENT}#{VARIABLE_ASSIGNMENT}])(\))/
     # rubocop:enable Layout/LineLength
 
-    # FIXME: string does not allow spaces
     # UNARY operation left & right
-    BINARY_OPERATION_EXPRESSION_REGEX_01 = /((\(.+\))\s*(#{OPERATIONS})\s*(\(.+\)))/
+    # rubocop:disable Layout/LineLength
+    BINARY_OPERATION_EXPRESSION_REGEX_01 = /(#{INTEGER_CONSTANT_ASSIGNMENT}\s*(#{OPERATIONS})\s*#{INTEGER_CONSTANT_ASSIGNMENT})/
+    # rubocop:enable Layout/LineLength
+    BINARY_OPERATION_EXPRESSION_REGEX_02 = /(#{INTEGER_CONSTANT_ASSIGNMENT}\s*(#{OPERATIONS})\s*#{VARIABLE_ASSIGNMENT})/
+    BINARY_OPERATION_EXPRESSION_REGEX_03 = /(#{VARIABLE_ASSIGNMENT}\s*(#{OPERATIONS})\s*#{INTEGER_CONSTANT_ASSIGNMENT})/
+    BINARY_OPERATION_EXPRESSION_REGEX_04 = /(#{VARIABLE_ASSIGNMENT}\s*(#{OPERATIONS})\s*#{VARIABLE_ASSIGNMENT})/
     # UNARY operation left only
-    BINARY_OPERATION_EXPRESSION_REGEX_02 = /((\(.+\))\s*(#{OPERATIONS})\s*([^\s]+))/
-    # UNARY operation right only
-    BINARY_OPERATION_EXPRESSION_REGEX_03 = /(([^\s]+)\s*(#{OPERATIONS})\s*((\().+(\))))/
-    # No UNARY operations
-    BINARY_OPERATION_EXPRESSION_REGEX_04 = /(([^\s]+)\s*(#{OPERATIONS})\s*([^\s]+))/
     INFIX_EXPRESSION = /(.+)/
 
     CLASS = /class\s+(\S+)\s+{/

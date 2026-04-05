@@ -74,7 +74,8 @@ module JackCompiler
     end
 
     def statement_nodes=(css_selector)
-      xml_nodes = Array(find_child_nodes_with_css_selector(css_selector))
+      parent_xml_node = find_child_nodes_with_css_selector(PARENT_NODE_CSS_SELECTOR).first
+      xml_nodes = parent_xml_node.css(css_selector)
 
       @statement_nodes = xml_nodes
         .map { |node| Utils::XML.convert_to_jack_node(node, memory_scope:) }

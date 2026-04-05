@@ -39,7 +39,6 @@ module JackCompiler
       [
         ArrayAssignmentStatement,
         StringAssignmentStatement,
-        IntegerAssignmentStatement,
         NullAssignmentStatement,
         VariableAssignmentStatement
       ]
