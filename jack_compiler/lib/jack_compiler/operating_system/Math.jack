@@ -1,4 +1,4 @@
-class Multiplication {
+class Math {
   static Array powers_of_two;
 
   function void init() {
@@ -35,9 +35,9 @@ class Multiplication {
     let j = 0;
 
     while (j < 16) {
-      let value_of_power_of_two = Multiplication.power_of_two(j);
+      let value_of_power_of_two = Math.power_of_two(j);
 
-      let isTrue = Multiplication.is_true(y, value_of_power_of_two);
+      let isTrue = Math.is_true(y, value_of_power_of_two);
       if (isTrue) {
         let sum = sum + shiftedX;
       }
@@ -79,9 +79,9 @@ class Multiplication {
     var int result;
     var boolean isValid;
 
-    let value_of_power_of_two = Multiplication.power_of_two(15);
+    let value_of_power_of_two = Math.power_of_two(15);
 
-    let result = Multiplication.bitwise_and(x, value_of_power_of_two);
+    let result = Math.bitwise_and(x, value_of_power_of_two);
 
     let isValid = result > 0;
     if (isValid) {
@@ -97,7 +97,7 @@ class Multiplication {
 
     let result = x;
 
-    let isValid = Multiplication.is_negative(x);
+    let isValid = Math.is_negative(x);
     if (isValid) {
       let result = ~x;
     }
@@ -109,7 +109,7 @@ class Multiplication {
     // XOR: Exclusive OR operation
     var boolean result;
 
-    // let result = (Multiplication.is_negative(x) & Multiplication.is_negative(y)) | (Multiplication.is_negative(~x) & Multiplication.is_negative(~y));
+    // let result = (Math.is_negative(x) & Math.is_negative(y)) | (Math.is_negative(~x) & Math.is_negative(~y));
 
     // return result;
 
@@ -132,9 +132,9 @@ class Multiplication {
       return false;
     }
 
-    let value_of_power_of_two = Multiplication.power_of_two(index);
+    let value_of_power_of_two = Math.power_of_two(index);
 
-    let result = Multiplication.bitwise_and(x, value_of_power_of_two);
+    let result = Math.bitwise_and(x, value_of_power_of_two);
 
     let isValid = result > 0;
     if (isValid) {
