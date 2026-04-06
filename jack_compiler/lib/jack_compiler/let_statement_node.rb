@@ -46,7 +46,6 @@ module JackCompiler
 
     def emit_assignment_vm_code
       <<~VM_CODE
-        # Push temporary value into indexed array
         push #{Memory::TEMPORARY_MEMORY}
         #{variable.assignment_vm_code(offset:)}
       VM_CODE

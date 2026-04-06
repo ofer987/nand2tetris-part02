@@ -15,9 +15,9 @@ module JackCompiler
       end
     end
 
-    def initialize(xml_node, variable:, _offset:)
+    def initialize(xml_node, params)
       @xml_node = xml_node
-      @variable = variable
+      @variable = params[:variable]
 
       self.expression_list_node = "> #{Statement::TERM_STATEMENT} > #{Statement::EXPRESSION_LIST}"
       #

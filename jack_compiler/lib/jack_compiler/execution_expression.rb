@@ -79,8 +79,6 @@ module JackCompiler
     def emit_function_vm_code
       <<~VM_CODE
         call #{object}.#{method_name} #{expression_list_node.size}
-
-        # Should I remove this?
         pop temp 0
       VM_CODE
     end
