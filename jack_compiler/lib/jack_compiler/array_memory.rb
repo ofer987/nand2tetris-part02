@@ -19,14 +19,16 @@ module JackCompiler
 
     def prepare_memory(memory_scope:, offset:)
       # Behave like a primitive
+      # i.e., just store the memory address
       return if offset.nil?
 
       result = []
       if offset.match?(/\d+/)
         result << "push constant #{offset}"
       else
-        offset_variable = memory_scope[offset]
+        raise "Cannot find field variable '#{offset}'" unless memory_scope.key? offset
 
+        offset_variable = memory_scope[offset]
         result << "push #{offset_variable.kind} #{offset_variable.index}"
       end
 
