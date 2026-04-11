@@ -12,7 +12,7 @@ module JackCompiler
       MONOMIAL_REGEX_OPEN_ROUND_BRACKET = /^\s*([+~-])\s*(\()\s*/
       OPERATOR_REGEX = /^\s*(#{OPERATORS_LIST_REGEX})\s*/
       COMPARISON_OPERATOR_REGEX = /^\s*(#{COMPARISON_OPERATORS_LIST_REGEX})\s*/
-      ARRAY_OPERAND_REGEX = /^\s*(([\w.]+)\[(.+)\])\s*/
+      ARRAY_OPERAND_REGEX = /^\s*(([\w.]+)\[([^\]]+)\])\s*/
       BOOLEAN_CONSTANT_REGEX = /(false|true)/
       NUMERICAL_REGEX = /^\s*(\d+)\s*/
       OPERAND_REGEX = /^\s*([\w.]+)\s*/
