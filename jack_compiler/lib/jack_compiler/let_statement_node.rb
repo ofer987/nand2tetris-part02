@@ -34,6 +34,8 @@ module JackCompiler
         #{prepare_variable_store_result}
         #{expression_node.emit_vm_code(memory_scope)}
         #{temporarily_store_result}
+        #{finish_prepare_variable_store_result}
+        #{return_temporary_result}
         #{emit_assignment_vm_code}
       VM_CODE
     end
@@ -44,16 +46,29 @@ module JackCompiler
       variable.prepare_memory(memory_scope:, offset:)
     end
 
+    def finish_prepare_variable_store_result
+      variable.finish_prepare_memory(offset:)
+    end
+
     def emit_assignment_vm_code
       <<~VM_CODE
-        push #{Memory::TEMPORARY_MEMORY}
         #{variable.assignment_vm_code(offset:)}
       VM_CODE
     end
 
     def temporarily_store_result
+      return if offset.blank?
+
       <<~VM_CODE
         pop #{Memory::TEMPORARY_MEMORY}
+      VM_CODE
+    end
+
+    def return_temporary_result
+      return if offset.blank?
+
+      <<~VM_CODE
+        push #{Memory::TEMPORARY_MEMORY}
       VM_CODE
     end
 

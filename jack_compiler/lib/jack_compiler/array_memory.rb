@@ -12,7 +12,7 @@ module JackCompiler
     end
 
     def assignment_vm_code(offset:)
-      return "pop #{kind} #{index}" if offset.nil?
+      return "pop #{kind} #{index}" if offset.blank?
 
       'pop that 0'
     end
@@ -34,9 +34,14 @@ module JackCompiler
 
       result << read_memory
       result << 'add'
-      result << 'pop pointer 1'
 
       result.join("\n")
+    end
+
+    def finish_prepare_memory(offset:)
+      return if offset.blank?
+
+      'pop pointer 1'
     end
 
     def emit_vm_code

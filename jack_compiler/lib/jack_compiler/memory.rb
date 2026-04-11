@@ -63,6 +63,8 @@ module JackCompiler
 
     def prepare_memory(*); end
 
+    def finish_prepare_memory(*); end
+
     def read_memory
       "push #{kind} #{index}"
     end

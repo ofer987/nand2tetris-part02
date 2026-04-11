@@ -11,10 +11,10 @@ module JackCompiler
       @value = Memory::NULL_VALUE
     end
 
-    def assignment_vm_code(*)
-      <<~VM_CODE
-        pop this 0
-      VM_CODE
+    def assignment_vm_code(offset:)
+      return "pop #{kind} #{index}" if offset.blank?
+
+      'pop this 0'
     end
 
     def prepare_memory(memory_scope:, offset:)
@@ -25,7 +25,7 @@ module JackCompiler
 
       variable = memory_scope[variable]
       unless variable.kind == Memory::Kind::FIELD
-        raise "Variable '#{offset}' is not a #{Memory::Kind::FIELD} variable in class '#{type}'" 
+        raise "Variable '#{offset}' is not a #{Memory::Kind::FIELD} variable in class '#{type}'"
       end
 
       vm_code = []
@@ -34,9 +34,13 @@ module JackCompiler
       vm_code << "push #{variable.kind} #{variable.index}"
       vm_code << 'add'
 
-      vm_code << 'pop pointer 0'
-
       vm_code.join("\n")
+    end
+
+    def finish_prepare_memory(offset:)
+      return if offset.blank?
+
+      'pop pointer 0'
     end
   end
 end
