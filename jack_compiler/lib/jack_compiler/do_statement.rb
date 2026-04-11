@@ -2,6 +2,7 @@
 
 module JackCompiler
   class DoStatement < Statement
+    NODE_NAME = DO_STATEMENT
     REGEX = RegularExpressions::DO_STATEMENT
 
     def create_elements(parent_node, lines)
@@ -10,7 +11,7 @@ module JackCompiler
         raise "Cannot instantiate new instance of '#{result[3]}' in '#{result[0]}'"
       end
 
-      result_node = document.create_element(REGEX)
+      result_node = document.create_element(DO_STATEMENT)
 
       parent_node << result_node
 
