@@ -34,7 +34,7 @@ module JackCompiler
     module Kind
       LOCAL = 'local'
       ARGUMENT = 'argument'
-      FIELD = 'field'
+      FIELD = 'this'
       STATIC = 'static'
       NOT_APPLICABLE = 'NA'
     end
