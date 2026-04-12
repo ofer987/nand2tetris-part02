@@ -1,0 +1,25 @@
+class Hannukah {
+  field int count;
+  field int size;
+
+  constructor Hannukah new(int countParameter) {
+    let count = countParameter;
+
+    return this;
+  }
+
+  method int count(Array a) {
+    var int index;
+    var int result;
+
+    let index = 0;
+    let result = 0;
+    while (index < count) {
+      let result = result + a[index];
+
+      let index = index + 1;
+    }
+
+    return result;
+  }
+}
