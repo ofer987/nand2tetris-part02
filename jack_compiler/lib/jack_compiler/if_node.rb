@@ -27,7 +27,7 @@ module JackCompiler
         goto #{if_end_label}
         label #{if_true_label}
           #{if_statements.map(&:emit_vm_code).join("\n")}
-        goto #{if_end_label}
+        label #{if_end_label}
       VM_CODE
     end
 
@@ -83,6 +83,8 @@ module JackCompiler
 
     def uuid
       @uuid ||= SecureRandom.uuid
+        .upcase
+        .gsub('-', '')
     end
 
     attr_reader :condition, :if_statements, :else_statements

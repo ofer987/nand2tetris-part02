@@ -66,7 +66,6 @@ module JackCompiler
 
       result << <<~VM_CODE
         call #{obj.type}.#{method_name} #{expression_list_node.size + 1}
-        pop #{variable.memory_location} #{variable.index}
       VM_CODE
 
       result.join("\n")
@@ -79,26 +78,7 @@ module JackCompiler
     def emit_function_vm_code
       <<~VM_CODE
         call #{object}.#{method_name} #{expression_list_node.size}
-
-        # Should I remove this?
         pop temp 0
-      VM_CODE
-    end
-
-    def emit_vm_code_for_array_constructor
-      array_size = expression_list_node.parameters.first.to_i
-
-      <<~VM_CODE
-        push constant #{array_size}
-        call Array.new 1
-        pop #{variable.memory_location} #{variable.index}
-      VM_CODE
-    end
-
-    def emit_vm_code_for_constructor
-      <<~VM_CODE
-        call #{object}.new #{expression_list_node.size}
-        pop #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 

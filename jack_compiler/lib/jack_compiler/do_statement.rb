@@ -2,15 +2,15 @@
 
 module JackCompiler
   class DoStatement < Statement
+    NODE_NAME = DO_STATEMENT
     REGEX = RegularExpressions::DO_STATEMENT
+    NEW_METHOD = 'new'
 
     def create_elements(parent_node, lines)
       result = lines.match(REGEX)
-      if lines.match? RegularExpressions::CLASS_NEW_EXPRESSION
-        raise "Cannot instantiate new instance of '#{result[3]}' in '#{result[0]}'"
-      end
+      raise "Cannot instantiate new instance of '#{result[3]}' in '#{result[0]}'" if result[5] == NEW_METHOD
 
-      result_node = document.create_element(REGEX)
+      result_node = document.create_element(DO_STATEMENT)
 
       parent_node << result_node
 

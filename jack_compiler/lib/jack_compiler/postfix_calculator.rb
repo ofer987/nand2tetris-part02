@@ -105,7 +105,7 @@ module JackCompiler
               result << line
             end
           rescue ArgumentError
-            emit_function_vm_code(match).each do |line|
+            emit_function_vm_code(memory, match).each do |line|
               result << line
             end
           end
@@ -252,19 +252,41 @@ module JackCompiler
     end
 
     def emit_method_vm_code(memory, variable, values)
+      vm_code = []
       class_name = memory[variable].type
       method_name = values[4]
-      arguments = (values[6] || '').split(',')
 
-      ["call #{class_name}.#{method_name} #{arguments.size}"]
+      # Include the `self` variable
+      argument_names = (values[6] || '').split(',') + [variable]
+
+      if argument_names.size.positive?
+        emit_arguments_vm_code(memory, argument_names).each do |line|
+          vm_code << line
+        end
+      end
+
+      vm_code << "call #{class_name}.#{method_name} #{argument_names.size}"
     end
 
-    def emit_function_vm_code(values)
+    def emit_function_vm_code(memory, values)
+      vm_code = []
       class_name = values[2]
       function_name = values[4]
-      arguments = (values[6] || '').split(',')
+      argument_names = (values[6] || '').split(',')
 
-      ["call #{class_name}.#{function_name} #{arguments.size}"]
+      if argument_names.size.positive?
+        emit_arguments_vm_code(memory, argument_names).each do |line|
+          vm_code << line
+        end
+      end
+
+      vm_code << "call #{class_name}.#{function_name} #{argument_names.size}"
+    end
+
+    def emit_arguments_vm_code(memory, names)
+      names.reverse
+        .map { |name| memory[name] }
+        .map { |argument| "push #{argument.kind} #{argument.index}" }
     end
 
     def stack

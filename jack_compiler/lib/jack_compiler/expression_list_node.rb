@@ -56,12 +56,9 @@ module JackCompiler
         raise "Parameter list has #{values.size} values, but only #{value_types.size} types"
       end
 
-      values.each_with_index do |value, index|
-        value_type = value_types[index]
-
-        is_constant = CONSTANT_TYPES.include? value_type
+      values.each do |value|
+        is_constant = value.match?(/^\d+$/)
         parameter = {
-          type: value_type,
           is_constant: is_constant,
           value: value
         }

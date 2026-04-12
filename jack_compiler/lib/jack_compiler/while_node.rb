@@ -64,6 +64,8 @@ module JackCompiler
 
     def uuid
       @uuid ||= SecureRandom.uuid
+        .upcase
+        .gsub('-', '')
     end
 
     attr_reader :condition, :if_statements, :else_statements, :memory, :statement_nodes

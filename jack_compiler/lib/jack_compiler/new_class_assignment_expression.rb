@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module JackCompiler
-  class NewArrayAssignmentExpression
+  class NewClassAssignmentExpression
     class << self
       def execution_node?(xml_node)
         evaluation_node = Utils::XML.find_child_nodes_with_css_selector(
@@ -11,7 +11,7 @@ module JackCompiler
 
         return false if evaluation_node.blank?
 
-        evaluation_node.text == Statement::NEW_ARRAY_TYPE
+        evaluation_node.text == Statement::NEW_CLASS_TYPE
       end
     end
 
@@ -24,16 +24,16 @@ module JackCompiler
       variable.value = Memory::NULL_VALUE
     end
 
-    def emit_vm_code(*)
-      array_size = expression_list_node.parameters.first.to_i
+    def emit_vm_code(memory_scope)
+      array_size = expression_list_node.parameters.size
 
       <<~VM_CODE
-        push constant #{array_size}
-        call Array.new 1
+        #{expression_list_node.emit_vm_code(memory_scope)}
+        call #{variable.type}.new #{array_size}
       VM_CODE
     end
 
-    def calculate(objects); end
+    def calculate(memory_scope); end
 
     private
 

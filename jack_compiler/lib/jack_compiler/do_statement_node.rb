@@ -54,8 +54,14 @@ module JackCompiler
 
       # Now let us call the method
       # And discard the return statement
+
+      # Array is its own class
+      # References store the class name in `variable.type`
+      klazz_type = variable.type
+      klazz_type = 'Array' if variable.instance_of? ArrayMemory
+
       result << <<~VM_CODE
-        call #{variable.type}.#{method_name} #{expression_list_node.size + 1}
+        call #{klazz_type}.#{method_name} #{expression_list_node.size + 1}
 
         pop temp 0
       VM_CODE

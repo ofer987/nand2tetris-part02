@@ -34,7 +34,7 @@ module JackCompiler
     end
 
     def next_expression_classes
-      [ArrrayExpressionStatement]
+      [ArrayExpressionStatement]
     end
   end
 end
