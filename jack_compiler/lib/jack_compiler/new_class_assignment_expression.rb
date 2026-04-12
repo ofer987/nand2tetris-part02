@@ -20,11 +20,6 @@ module JackCompiler
       @variable = params[:variable]
 
       self.expression_list_node = "> #{Statement::TERM_STATEMENT} > #{Statement::EXPRESSION_LIST}"
-      #
-      # @symbol = Utils::XML.find_child_nodes_with_css_selector(xml_node, "> #{Statement::SYMBOL}")
-      #   .map(&:text)
-      #   .map(&:strip)
-      #   .first
 
       variable.value = Memory::NULL_VALUE
     end

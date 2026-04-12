@@ -82,21 +82,6 @@ module JackCompiler
       VM_CODE
     end
 
-    def emit_vm_code_for_array_constructor
-      array_size = expression_list_node.parameters.first.to_i
-
-      <<~VM_CODE
-        push constant #{array_size}
-        call Array.new 1
-      VM_CODE
-    end
-
-    def emit_vm_code_for_constructor
-      <<~VM_CODE
-        call #{object}.new #{expression_list_node.size}
-      VM_CODE
-    end
-
     def method_name
       xml_nodes = Array(Utils::XML.find_child_nodes_with_css_selector(
         xml_node,
