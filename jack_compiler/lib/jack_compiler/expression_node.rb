@@ -8,7 +8,7 @@ module JackCompiler
       StringAssignmentExpression,
       NullAssignmentExpression,
       NewArrayAssignmentExpression,
-      # NewClassAssignmentExpression,
+      NewClassAssignmentExpression,
       ExecutionExpression
     ].freeze
 

@@ -66,7 +66,6 @@ module JackCompiler
 
       result << <<~VM_CODE
         call #{obj.type}.#{method_name} #{expression_list_node.size + 1}
-        pop #{variable.memory_location} #{variable.index}
       VM_CODE
 
       result.join("\n")
@@ -89,14 +88,12 @@ module JackCompiler
       <<~VM_CODE
         push constant #{array_size}
         call Array.new 1
-        pop #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 
     def emit_vm_code_for_constructor
       <<~VM_CODE
         call #{object}.new #{expression_list_node.size}
-        pop #{variable.memory_location} #{variable.index}
       VM_CODE
     end
 
