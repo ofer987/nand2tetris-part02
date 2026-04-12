@@ -55,8 +55,6 @@ module JackCompiler
     end
 
     def get_conditional_statements(conditional_statement, css_selector)
-      return [] unless else_statements_exist?
-
       conditional_statement.css(css_selector)
         .map { |node| Utils::XML.convert_to_jack_node(node, options) }
     end
